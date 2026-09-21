@@ -1,0 +1,217 @@
+import { useT } from '@/hooks/useT';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Bell, ClipboardList, UsersRound, WalletCards } from 'lucide-react';
+
+type Child = {
+    id: number;
+    name: string;
+    student_number: string;
+    school_name: string | null;
+    class_name: string | null;
+    section_name: string | null;
+};
+
+type ExamRow = {
+    id: number;
+    child_name: string | null;
+    exam_date: string;
+    starts_at: string;
+    ends_at: string;
+    room: string | null;
+    section_name: string | null;
+    class_name: string | null;
+    subject_name_en: string | null;
+    subject_name_ar: string | null;
+};
+
+type Outstanding = {
+    total_minor: number;
+    currency: string | null;
+    by_child: Array<{
+        student_id: number;
+        amount_minor: number;
+        currency: string | null;
+    }>;
+};
+
+type GuardianDashboardProps = {
+    guardian: { name: string } | null;
+    today: { iso: string; weekday: number };
+    children: Child[];
+    upcoming_exams: ExamRow[];
+    outstanding: Outstanding;
+    counts: { children: number; exams: number };
+};
+
+export default function GuardianDashboard() {
+    const {
+        guardian,
+        today,
+        children,
+        upcoming_exams: upcomingExams,
+        outstanding,
+        counts,
+    } = usePage<GuardianDashboardProps>().props;
+    const { t, dayName, isArabic } = useT();
+
+    const subjectLabel = (item: {
+        subject_name_en: string | null;
+        subject_name_ar: string | null;
+    }) =>
+        isArabic
+            ? (item.subject_name_ar ?? item.subject_name_en)
+            : (item.subject_name_en ?? item.subject_name_ar);
+
+    const money = (minor: number, currency: string | null) =>
+        `${(minor / 100).toFixed(2)} ${currency ?? 'SAR'}`;
+
+    const outstandingFor = (studentId: number) =>
+        outstanding.by_child.find((row) => row.student_id === studentId)
+            ?.amount_minor ?? 0;
+
+    return (
+        <>
+            <Head title={t('portal.guardianTitle')} />
+
+            <div className="space-y-6 p-4 md:p-8">
+                <header className="rounded-[1.75rem] bg-[#143e36] p-6 text-white md:p-8">
+                    <p className="text-sm font-bold text-[#b7d7c5]">
+                        {guardian?.name} · {t('portal.today')} {today.iso} ·{' '}
+                        {dayName(today.weekday)}
+                    </p>
+                    <h1 className="mt-2 text-3xl font-black md:text-4xl">
+                        {t('portal.guardianTitle')}
+                    </h1>
+                    <p className="mt-3 max-w-xl leading-7 text-[#d2e6d8]">
+                        {t('portal.guardianSubtitle')}
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-3">
+                        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
+                            {t('portal.children')}: {counts.children}
+                        </span>
+                        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
+                            {t('portal.upcomingExams')}: {counts.exams}
+                        </span>
+                    </div>
+                </header>
+
+                {children.length === 0 ? (
+                    <p className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6 text-sm font-bold text-[#789087]">
+                        {t('portal.noChildren')}
+                    </p>
+                ) : (
+                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                            <UsersRound size={19} aria-hidden="true" />
+                            {t('portal.children')}
+                        </h2>
+                        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {children.map((child) => (
+                                <li
+                                    key={child.id}
+                                    className="rounded-2xl border border-[#edf2ed] p-4"
+                                >
+                                    <strong className="block text-sm font-black text-[#17342f]">
+                                        {child.name}
+                                    </strong>
+                                    <small className="mt-1 block text-[#789087]">
+                                        {child.class_name} ·{' '}
+                                        {child.section_name} ·{' '}
+                                        {child.school_name}
+                                    </small>
+                                    <small className="mt-2 block text-[#0d5c4d]">
+                                        {outstandingFor(child.id) > 0
+                                            ? `${t('portal.outstanding')}: ${money(outstandingFor(child.id), outstanding.currency)}`
+                                            : t('portal.noOutstanding')}
+                                    </small>
+                                    <Link
+                                        href={`/portal/students/${child.id}`}
+                                        className="mt-3 inline-block text-xs font-black text-[#0d5c4d] underline"
+                                    >
+                                        {t('portal.myRecord')}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                            <ClipboardList size={19} aria-hidden="true" />
+                            {t('portal.upcomingExams')}
+                        </h2>
+
+                        {upcomingExams.length === 0 ? (
+                            <p className="mt-4 text-sm text-[#789087]">
+                                {t('portal.noUpcomingExams')}
+                            </p>
+                        ) : (
+                            <ol className="mt-4 space-y-3">
+                                {upcomingExams.map((exam) => (
+                                    <li
+                                        key={exam.id}
+                                        className="rounded-2xl border border-[#edf2ed] p-3"
+                                    >
+                                        <div className="flex items-center justify-between gap-3">
+                                            <strong className="text-sm font-black text-[#17342f]">
+                                                {subjectLabel(exam)}
+                                            </strong>
+                                            <span className="text-xs font-bold text-[#0d5c4d]">
+                                                {exam.starts_at}–{exam.ends_at}
+                                            </span>
+                                        </div>
+                                        <small className="mt-1 block text-[#789087]">
+                                            {exam.exam_date} ·{' '}
+                                            {t('portal.child')}:{' '}
+                                            {exam.child_name}
+                                            {exam.room
+                                                ? ` · ${t('portal.room')} ${exam.room}`
+                                                : ''}
+                                        </small>
+                                    </li>
+                                ))}
+                            </ol>
+                        )}
+                    </section>
+
+                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                            <WalletCards size={19} aria-hidden="true" />
+                            {t('portal.outstanding')}
+                        </h2>
+                        <p className="mt-4 text-3xl font-black text-[#17342f]">
+                            {money(
+                                outstanding.total_minor,
+                                outstanding.currency,
+                            )}
+                        </p>
+                        {outstanding.total_minor === 0 ? (
+                            <p className="mt-2 text-sm text-[#789087]">
+                                {t('portal.noOutstanding')}
+                            </p>
+                        ) : null}
+
+                        <div className="mt-5 flex flex-wrap gap-3">
+                            <Link
+                                href="/portal/guardian"
+                                className="inline-flex items-center gap-2 rounded-full bg-[#eef4f0] px-5 py-3 font-black text-[#28544a]"
+                            >
+                                <WalletCards size={18} aria-hidden="true" />
+                                {t('portal.myWorkspace')}
+                            </Link>
+                            <Link
+                                href="/portal/notifications"
+                                className="inline-flex items-center gap-2 rounded-full bg-[#eef4f0] px-5 py-3 font-black text-[#28544a]"
+                            >
+                                <Bell size={18} aria-hidden="true" />
+                                {t('portal.notifications')}
+                            </Link>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </>
+    );
+}

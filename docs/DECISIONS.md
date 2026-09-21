@@ -1,0 +1,94 @@
+# Decision register
+
+This register separates confirmed build assumptions from intentionally deferred work. A decision is only changed through a documented update, so implementation does not silently drift from the product direction.
+
+## Confirmed decisions
+
+| Decision | Status | Direction | Source |
+| --- | --- | --- |
+| Launch market | Confirmed | Launch Saudi-first. Preserve modularity for GCC and international support. | [Choose the launch market and compliance baseline](../.wayfinder/issues/001-launch-market-and-compliance-baseline.md) |
+| Deployment model | Confirmed | Use one tenant-aware codebase that can run as shared SaaS or a dedicated client deployment. | [Decide the deployment and tenancy model](../.wayfinder/issues/002-deployment-and-tenancy-model.md) |
+| V1 product cut | Confirmed | Deliver core operations; defer payroll and optional add-on modules. | [Set the v1 module and persona boundary](../.wayfinder/issues/003-v1-module-and-persona-boundary.md) |
+| First payment provider | Confirmed | Implement Stripe first behind the `PaymentProvider` interface. | [Choose the v1 payments and finance integration strategy](../.wayfinder/issues/004-payments-and-finance-integration-strategy.md) |
+| Mobile channel | Confirmed | Deliver responsive web in V1; defer native apps. | [Decide the mobile channel scope](../.wayfinder/issues/005-mobile-channel-scope.md) |
+| Data and isolation baseline | Confirmed | Use MySQL, mandatory organization identifiers, application query scoping, policies, and database constraints. | Product planning decision, 2026-09-13 |
+| ZATCA timing | Confirmed | Build tax-ready finance seams in V1; schedule ZATCA integration in Phase 4. | [Choose the launch market and compliance baseline](../.wayfinder/issues/001-launch-market-and-compliance-baseline.md) |
+
+## Deferred decisions
+
+| Topic | Why it is deferred | Required before |
+| --- | --- | --- |
+| Payroll | V1 does not include payroll; employment, statutory, and calculation requirements must be scoped separately. | Payroll design or implementation |
+| Optional modules | Library, transport, cafeteria/inventory, and LMS priorities depend on customer demand and commercial validation. | Phase 4 module implementation |
+| Hosting and residency | The required cloud, regions, availability objective, backup target, and retention commitments are not yet chosen. | Production architecture and launch |
+| Additional gateways | A second provider earns an adapter only when a target market or client requirement is approved. | Gateway onboarding |
+| Native mobile applications | Personas, workflow cut, platform choice, and offline requirements are unknown. | Mobile product planning |
+| Saudi calendar behavior | Hijri display and editing rules need workflow-specific acceptance criteria. | Relevant Saudi workflow implementation |
+
+## Change process
+
+1. Record the question and alternatives in the Wayfinder map or a linked decision record.
+2. State the decision, rationale, affected roadmap phase, and any migration or compatibility consequence.
+3. Update product, architecture, roadmap, and validation documentation in the same change.
+4. Do not start dependent implementation until its decision is confirmed.
+
+## Implementation decisions — 2026-09-21 (school calendar module)
+
+The school calendar module (subjects, teaching assignments, bell schedules, timetable, exam schedules) was implemented on branch `feature/school-calendar`. The following operational decisions were taken where the specification left room; each is enforced in code and covered by tests.
+
+| # | Decision | Rationale | Where enforced |
+| --- | --- | --- | --- |
+| 1 | Cross-tenant and cross-school lookups return **404**, never 403. | A 403 would confirm that a record exists in another tenant, leaking existence. Consistent with the existing tenant-scoping decision for finance reports. | `ExamScheduleController::ensureBelongsToSchool`, `ExamPaperController::ensureBelongsToSchool`, plus the `Tenantable` global scope. Test: `test_user_from_another_organization_cannot_reach_exam_period`. |
+| 2 | Schedule conflicts are returned as **machine codes**: `422` with a `conflicts` array for JSON clients, and a redirect back with flashed `conflicts` for Inertia forms. Display strings are never produced server-side. | The UI must translate for Arabic and English; the server stays locale-agnostic. | `ExamConflictDetector`, `ExamScheduleController::conflictResponse`, `ExamPaperController::conflictResponse`, `HandleInertiaRequests` shares `flash.conflicts`. Tests: conflict tests + `test_inertia_form_gets_translatable_conflict_codes_in_the_session`. |
+| 3 | `exam_papers.exam_date`, `exam_schedules.starts_on/ends_on` use the `date:Y-m-d` cast. | With the plain `date` cast the value was stored as `YYYY-MM-DD 00:00:00`, so equality filters silently matched nothing on SQLite and would depend on implicit conversion on MySQL. `Y-m-d` keeps a DATE column free of a time component on both engines. | `app/Models/ExamPaper.php`, `app/Models/ExamSchedule.php`; date filters use `whereDate`. |
+| 4 | An invigilator must be a `teacher` in the **same organization** as the school. School membership is not required to be an invigilator. | Existing data has teachers without school memberships; requiring membership would block current schools. Role plus organization is the strongest check that holds for all existing data. | `ExamConflictDetector::invigilatorConflicts`, `ExamPaperController::invigilatorIds`. Code: `INVIGILATOR_NOT_A_TEACHER_OF_SCHOOL`. |
+| 5 | Only `draft` exam periods are editable; `published` periods are read-only and must be archived or replaced. | Publishing is the point where the schedule becomes contractual for students and guardians; silent edits afterwards destroy trust and make audit reconciliation impossible. | `ExamSchedule::isEditable()`, `ExamPaperController` guards. Test: `test_published_period_is_read_only`. |
+| 6 | The teaching coordinator (`academic_coordinator`) can create and edit schedule data but cannot publish or delete unless `SCHEDULE_COORDINATORS_CAN_PUBLISH=true`. | Separation of preparation from approval, while still allowing small schools to opt out with one environment flag. | `ScheduleAuthServiceProvider`, `config/schedule.php`. Tests: `ScheduleAuthorizationTest`. |
+| 7 | Exam papers are scoped per **section**, and "apply to all sections of a class" is an explicit bulk action sharing a `batch_uuid`. | Per-section rows keep conflict detection correct for exceptions, while the bulk action keeps normal data entry to one click. | `ExamPaperController::storeBulk`. Test: `test_bulk_creation_adds_a_paper_for_every_section_of_the_class`. |
+| 8 | Conflicts are enforced twice: in the detector (friendly, code-based errors) and by database unique constraints on `(version, section, weekday, period)`, `(version, teacher, weekday, period)` and `(exam_schedule, section, subject)`. | Application checks can be bypassed by concurrency; the database is the last line of defence. | Migrations `2026_09_20_000200`, `2026_09_21_000002`, plus an explicit duplicate-paper guard that converts a would-be 500 into a validation error. |
+
+## Implementation decisions — 2026-09-21 (role dashboards and routing)
+
+| # | Decision | Rationale | Where enforced |
+| --- | --- | --- | --- |
+| 9 | `/dashboard` is the single dashboard URL and renders a different Inertia component per role: `dashboard` (staff), `dashboard/teacher`, `dashboard/guardian`, `dashboard/student`. | Every role previously landed on the administration dashboard, which showed school-wide metrics and admin links to teachers, guardians and students. Dispatching by role removes that exposure without inventing a second URL per role. | `DashboardController`, `PortalDashboardService`. Test: `PortalDashboardTest::test_students_and_guardians_never_see_the_administration_dashboard`. |
+| 10 | `students.user_id` was added as a nullable unique foreign key so a `student` account can be linked to a student record. | The `student` role existed but there was no column connecting it to a `Student`, so a student could never see their own data. The column mirrors `guardians.user_id`. The binding is performed from the Academics administration page (see decision 14). | Migration `2026_09_21_000003_add_user_id_to_students_table.php`, `Student::$fillable`, `Student::user()`. |
+| 11 | The `view-student` gate lets a `student` see their own record only, and nobody else's. | Students had no branch at all in that gate, so they fell through to `access-school`, which excludes the student role; the result was a blanket 403. | `AppServiceProvider::configureAuthorization`. Test: `PortalDashboardTest::test_student_can_view_their_own_record_but_not_another_student`. |
+| 12 | `students.report-card` was removed: `students.show` is the single canonical route because both resolved to `StudentController@show`. The distinct `students.report-card.issue` and `students.report-card.download` actions remain. | Two names for one page is a copy-paste trap and makes route audits meaningless. | `routes/web.php`; guarded by `RouteAuthorizationTest::test_no_two_named_routes_share_the_same_target`. |
+| 13 | Route-table invariants are enforced by tests rather than review: no duplicate target, guests never reach a protected route, and a guardian/teacher/organization-less user never receives 200 outside an explicit allowlist. | These are the failure modes that actually occurred (an unprotected route, a duplicated route). An executable invariant catches the next one without a manual audit. | `tests/Feature/RouteAuthorizationTest.php`. |
+
+## Implementation decisions — 2026-09-21 (binding a student login to a student record)
+
+A `student` account could not reach the student dashboard at all: `students.user_id` existed but nothing in the product wrote it. Rather than add a students CRUD module, the binding was placed on the surface that already owns student records.
+
+| # | Decision | Rationale | Where enforced |
+| --- | --- | --- | --- |
+| 14 | Student logins are bound from the existing **Academics** administration page (`admin.academics.index`), through one added route: `POST admin/schools/{school}/academics/student-accounts`, name `admin.academics.student-accounts.store`, under the existing `manage-enrollment` gate. No new module, controller namespace or navigation entry. | That page already owns the school's student records, classes, sections and enrolments and is already restricted to organization/school admins. Onboarding a login is a step of the existing enrollment workflow, not a second owner of student data. | `AcademicAdminController::linkStudentAccount`, `routes/web.php`, `resources/js/pages/admin/academics/index.tsx`. |
+| 15 | The binding accepts only a `student_id` that belongs to the acting school and a `user_id` that is a `student` in the acting school's organization; both are constrained in validation. Repeating the same pair is a silent no-op, and an account already bound to another student is a validation error rather than a 500. | Idempotent binding makes retries and double submits harmless. Tenant-scoped validation means a school can never attach another tenant's account or another school's record, and the unique index on `students.user_id` remains the backstop. | `App\Http\Requests\Academics\LinkStudentAccountRequest`; tests in `AcademicAdminTest`. |
+| 16 | A cross-tenant attempt is refused as **403** by the form request's authorization, while that tenant's page lookup returns **404** from the tenant scope. The asymmetry is deliberate: an authorization refusal versus a scoped resource that does not exist. Neither discloses existence. | Preserves the existing 404 convention for tenant-scoped lookups (decision 1) while letting the mutation answer "not allowed" without confirming whether the school exists. | `LinkStudentAccountRequest::authorize`, `AcademicAdminController::school`. Test: `test_another_schools_user_cannot_link_accounts_or_read_the_student`. |
+| 17 | The academics page offers only student logins that are not yet bound to any record in the organization, and shows each student's linked/unlinked state. | Offering an already-bound account would only produce a validation error, and the admin needs to see at a glance which students still cannot sign in. | `AcademicAdminController::unlinkedStudentAccounts`, `students.user_id` in the page payload. |
+
+## Implementation decisions — 2026-09-21 (schedule page payload contracts)
+
+The timetable editor and the exam calendar were both shipped with a wire contract their React components could not read. The fix is at the source (the controller's serialization and its date/selection resolution), not in the pages.
+
+| # | Decision | Rationale | Where enforced |
+| --- | --- | --- | --- |
+| 18 | The timetable editor's payload is built by explicit serializers (`versionPayload`, `entryPayload`), never by serializing an Eloquent model. The page reads `version.bellSchedule.bell_periods`, while Eloquent serializes the relation as `bell_schedule` — so the grid received `undefined` and rendered no period columns at all. | Serializing models couples the page to database shape and leaks `organization_id`, `school_id`, `created_by`. Named payloads make the contract explicit and testable at the HTTP boundary. | `TimetableController::versionPayload` / `entryPayload`; test `SchedulePageContractTest::test_the_timetable_editor_payload_matches_what_the_page_consumes`. |
+| 19 | `entries` carries **every** entry of the version (`TimetableEngine::getEntries()`), not one section's. The grid renders all sections as rows and `updateEntries` replaces the version wholesale. | The previous `getEntriesForSection(0)` returned nothing, and any per-section slice would have silently deleted every other section's rows on save. | `TimetableEngine::getEntries`, `TimetableController::edit`. |
+| 20 | `?date=` on the exam calendar is parsed and normalized to a real `Y-m-d` day; anything else falls back to the first paper's date and then to the period's start date. | The calendar and the day agenda are both keyed off this value, so an unvalidated string rendered a day that cannot exist. Normalizing keeps a GET page usable instead of returning an error page. | `ExamScheduleController::resolveSelectedDate` / `normalizeDate`; test `test_a_malformed_selected_date_normalizes_to_a_real_day_instead_of_reaching_the_page`. |
+| 21 | The fallback day is read from the first paper by handling a `DateTimeInterface`, not only a string. | With the `date:Y-m-d` cast, `value()` returns a date object, so the `is_string` guard silently failed and the default day was the period's start date — which often has no exams on it. | `ExamScheduleController::resolveSelectedDate`. |
+
+## Implementation decisions — 2026-09-21 (schedule module architecture)
+
+A shape pass over the schedule and portal code, with no behavior change. Each concern now has one owner; the resulting map is recorded in `docs/ARCHITECTURE.md` under "Scheduling module structure".
+
+| # | Decision | Rationale | Where enforced |
+| --- | --- | --- | --- |
+| 22 | `TimetableEngine` moved from `app/Services/` to `app/Services/Schedule/`, so the schedule domain is one module instead of two directories. | The exam and timetable logic are one bounded area; splitting them by directory made the module boundary invisible. | `app/Services/Schedule/TimetableEngine.php`. |
+| 23 | Page payloads left the controllers: `ExamCalendarPayload` owns the exam calendar props (shared by `index` and `show`) and `TimetableEditorPayload` owns the editor props. `ExamScheduleController` dropped from 511 to 189 lines and `TimetableController` from 286 to 163. | The controllers mixed authorization, mutation, query composition and wire shapes; the `index`/`show` prop blocks were duplicated verbatim, and serializing models leaked columns and produced the wrong keys. | `app/Services/Schedule/ExamCalendarPayload.php`, `TimetableEditorPayload.php`. |
+| 24 | `SchoolOptions` owns the school-scoped option lists (years, bell schedules, classes, sections, subjects, teachers, class subjects, working days) as named payloads. The timetable `create` action stopped sending `sections`/`subjects`/`teachers`, which its page never read. | Four screens picked from the same lists with the same scoping; each had its own query and its own idea of which fields to send. | `app/Services/Schedule/SchoolOptions.php`. |
+| 25 | Conflict reporting has one owner: `ScheduleConflictResponse::make()` replaces the byte-identical `conflictResponse()` in both controllers, and `ExamConflictDetector::partition()` replaces `ExamPaperController::errors()` so no caller needs to know that severity is the discriminator. | Two copies of the same response policy drift; severity knowledge in the HTTP layer contradicts the detector owning conflict semantics. | `app/Http/Responses/ScheduleConflictResponse.php`, `ExamConflictDetector::partition`. |
+| 26 | School loading, authorization and cross-school refusal collapsed into `ResolvesScheduleSchool`, used by all three schedule controllers (previously four near-identical private methods). | The same two steps were re-implemented per controller; the 404-not-403 rule was re-stated each time. | `app/Concerns/ResolvesScheduleSchool.php`. |
+| 27 | Published visibility moved to model scopes: `ExamSchedule::published()`, `ExamPaper::inPublishedPeriod()`, `TimetableVersion::published()`. | The predicate was repeated in eight places across controllers and services; a change to who may see a draft had eight chances to be missed. Matches the existing `Notice`/`Page`/`SiteContent` scope convention. | The three models, and every former call site. |
+| 28 | `DashboardController::todayClasses()` deleted. It could never return a row: teachers are dispatched to `dashboard/teacher` before it is reached, and its first guard rejected every other role. | Dead query code that implied the staff dashboard shows a teacher's classes. The `todayClasses` prop is still sent as `[]` because the page renders an empty-state card; removing that card is a UI decision, not a shape change. | `app/Http/Controllers/DashboardController.php`. |

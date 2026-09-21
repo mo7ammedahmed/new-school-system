@@ -26,43 +26,11 @@ use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherPortalController;
 use App\Http\Controllers\TimetableController;
+use App\Http\Controllers\UserController;
 use App\Models\Media;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-<<<<<<< HEAD
-use App\Models\Media;
-use App\Http\Controllers\HealthController;
-use App\Http\Controllers\PublicSchoolController;
-use App\Http\Controllers\PageAdminController;
-use App\Http\Controllers\AdmissionsController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\AcademicAdminController;
-use App\Http\Controllers\AcademicYearController;
-use App\Http\Controllers\AcademicClassController;
-use App\Http\Controllers\SectionController;
-use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\TeacherAssignmentController;
-use App\Http\Controllers\GuardianController;
-use App\Http\Controllers\GuardianPortalController;
-use App\Http\Controllers\NoticeAdminController;
-use App\Http\Controllers\TeacherPortalController;
-use App\Http\Controllers\AttendanceReportController;
-use App\Http\Controllers\AssessmentController;
-use App\Http\Controllers\ReportCardDownloadController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\FinanceController;
-use App\Http\Controllers\StripeWebhookController;
-use App\Http\Controllers\ReceiptDownloadController;
-use App\Http\Controllers\FinanceReportController;
-use App\Http\Controllers\FinanceReconciliationController;
-use App\Http\Controllers\DeliveryMonitoringController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SiteContentController;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
-=======
->>>>>>> origin/main
 
 Route::inertia('/', 'public/home')->name('home');
 Route::inertia('/about', 'public/about')->name('public.about');
@@ -178,23 +146,25 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
         Route::get('/{guardian}', [GuardianController::class, 'show'])->name('show');
     });
 
+    // Users - keeping existing route names for backward compatibility
+    Route::prefix('admin/schools/{school}/users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        Route::get('/{user}', [UserController::class, 'show'])->name('show');
+    });
+
     // Backward compatibility routes for existing academic admin endpoints
     Route::prefix('admin/schools/{school}/academics')->name('admin.academics.')->group(function () {
         Route::get('/', [AcademicAdminController::class, 'index'])->name('index');
-<<<<<<< HEAD
         Route::post('years', [AcademicYearController::class, 'store'])->name('years.store');
         Route::post('classes', [AcademicClassController::class, 'store'])->name('classes.store');
         Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
         Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
         Route::post('teacher-assignments', [TeacherAssignmentController::class, 'store'])->name('teacher-assignments.store');
-=======
-        Route::post('years', [AcademicAdminController::class, 'storeYear'])->name('years.store');
-        Route::post('classes', [AcademicAdminController::class, 'storeClass'])->name('classes.store');
-        Route::post('sections', [AcademicAdminController::class, 'storeSection'])->name('sections.store');
-        Route::post('enrollments', [AcademicAdminController::class, 'enroll'])->name('enrollments.store');
-        Route::post('student-accounts', [AcademicAdminController::class, 'linkStudentAccount'])->name('student-accounts.store');
-        Route::post('teacher-assignments', [AcademicAdminController::class, 'assignTeacher'])->name('teacher-assignments.store');
->>>>>>> origin/main
     });
 
     Route::prefix('admin/schools/{school}/pages')->name('admin.pages.')->group(function () {

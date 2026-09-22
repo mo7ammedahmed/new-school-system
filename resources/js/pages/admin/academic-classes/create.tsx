@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,66 +12,51 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-classes`;
+
 export default function AcademicClassCreate({ school }: Props) {
+    const { t } = useT();
     const { data, setData, post, processing, errors } = useForm({
         name: '',
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`/admin/schools/${school.id}/academic-classes`, {
+        post(LIST_URL(school.id), {
             onSuccess: () => {
-                // Show success toast
-                setToastMessage('Academic class created successfully.');
-                setToastType('success');
-                setShowToast(true);
-            },
-            onError: () => {
-                // Show error toast
-                setToastMessage('Something went wrong. Please try again.');
-                setToastType('error');
-                setShowToast(true);
+                // Success toast handled by Inertia flash message
             },
         });
     };
 
     return (
         <>
-            <Head title={`New Academic Class — ${school.name}`} />
+            <Head title={t('academicClasses.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        New Academic Class
+                        {t('academicClasses.create')}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/academic-classes`}
-                            variant="outline"
-                        >
-                            Back to Academic Classes
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
                     <CardHeader>
-                        <CardTitle>Academic Class Information</CardTitle>
+                        <CardTitle>{t('academicClasses.form.title')}</CardTitle>
                         <CardDescription>
-                            Enter the details for the new academic class.
+                            {t('academicClasses.form.description')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -79,11 +64,11 @@ export default function AcademicClassCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Name"
-                                description="Enter the name of the academic class (e.g., Grade 1, Year 2)"
+                                label={t('academicClasses.name')}
+                                description={t('academicClasses.nameDescription')}
                             >
                                 <Input
-                                    placeholder="Grade 1"
+                                    placeholder={t('academicClasses.namePlaceholder')}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -94,17 +79,13 @@ export default function AcademicClassCreate({ school }: Props) {
                         </FormSection>
                     </CardContent>
                     <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
                         </Button>
                         <Button onClick={handleSubmit} isLoading={processing}>
-                            Create Academic Class
+                            {t('common.create')}
                         </Button>
                     </CardFooter>
                 </Card>

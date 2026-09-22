@@ -1,14 +1,14 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
 import { User } from 'lucide-react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -30,54 +30,56 @@ type Props = {
     };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/teacher-assignments`;
+const EDIT_URL = (schoolId: number, assignmentId: number) =>
+    `/admin/schools/${schoolId}/teacher-assignments/${assignmentId}`;
+
 export default function TeacherAssignmentShow({ school, assignment }: Props) {
+    const { t } = useT();
+
     return (
         <>
-            <Head title="Teacher Assignment Details" />
+            <Head title={t('teacherAssignments.show', { name: assignment.teacher.name })} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        Teacher Assignment Details
+                        {t('teacherAssignments.show', { name: assignment.teacher.name })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Link
-                            href={`/admin/schools/${school.id}/teacher-assignments/${assignment.id}/edit`}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
-                        >
-                            Edit Assignment
-                        </Link>
+                        <Button asChild>
+                            <Link href={EDIT_URL(school.id, assignment.id)}>
+                                {t('actions.edit')}
+                            </Link>
+                        </Button>
                         <Button
+                            variant="destructive"
                             onClick={() => {
                                 if (
                                     window.confirm(
-                                        'Are you sure you want to delete this teacher assignment?',
+                                        t('teacherAssignments.deleteConfirm'),
                                     )
                                 ) {
                                     // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert(
-                                        'Teacher assignment deleted successfully!',
-                                    );
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/teacher-assignments`;
+                                    alert(t('teacherAssignments.deleted'));
                                 }
                             }}
-                            variant="destructive"
                         >
-                            Delete Assignment
+                            {t('actions.delete')}
                         </Button>
-                        <Button
-                            href={`/admin/schools/${school.id}/teacher-assignments`}
-                            variant="outline"
-                        >
-                            Back to Assignments
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Assignment Details</CardTitle>
+                        <CardTitle>{t('teacherAssignments.details')}</CardTitle>
+                        <CardDescription>
+                            {t('teacherAssignments.detailsDescription')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
@@ -91,7 +93,7 @@ export default function TeacherAssignmentShow({ school, assignment }: Props) {
                                     </h2>
                                     <div className="text-muted-foreground flex items-center gap-2 text-sm">
                                         <p className="text-muted-foreground text-sm">
-                                            Teacher
+                                            {t('teacherAssignments.teacher')}
                                         </p>
                                     </div>
                                 </div>
@@ -100,7 +102,7 @@ export default function TeacherAssignmentShow({ school, assignment }: Props) {
                             <div className="space-y-4">
                                 <div>
                                     <h3 className="text-muted-foreground text-sm font-medium">
-                                        Teacher Email
+                                        {t('teacherAssignments.teacherEmail')}
                                     </h3>
                                     <p className="mt-1 block truncate">
                                         {assignment.teacher.email}
@@ -108,7 +110,7 @@ export default function TeacherAssignmentShow({ school, assignment }: Props) {
                                 </div>
                                 <div>
                                     <h3 className="text-muted-foreground text-sm font-medium">
-                                        Section
+                                        {t('teacherAssignments.section')}
                                     </h3>
                                     <p className="mt-1 block truncate">
                                         {assignment.section.name}
@@ -116,7 +118,7 @@ export default function TeacherAssignmentShow({ school, assignment }: Props) {
                                 </div>
                                 <div>
                                     <h3 className="text-muted-foreground text-sm font-medium">
-                                        Class
+                                        {t('teacherAssignments.academicClass')}
                                     </h3>
                                     <p className="mt-1 block truncate">
                                         {assignment.section.academic_class.name}

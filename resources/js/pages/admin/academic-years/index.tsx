@@ -1,13 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { DataTable } from '@/components/data-display/data-table';
 import {
     DropdownMenu,
@@ -19,7 +11,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { confirmDelete } from '@/lib/confirm-delete';
 import { paginated } from '@/lib/paginated';
 import { SearchField } from '@/components/forms/search-field';
-import { Toast } from '@/components/ui/toast';
+import { useT } from '@/hooks/useT';
 import { useState } from 'react';
 
 type Props = {
@@ -48,108 +40,177 @@ type Props = {
     filters: Record<string, any>;
 };
 
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-years`;
+
 export default function AcademicYearIndex({
     school,
     academicYears,
     filters = {},
 }: Props) {
+    const { t } = useT();
     const list =
         paginated<Props['academicYears']['data'][number]>(academicYears);
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [search, setSearch] = useState(filters.search ?? '');
+    const [status, setStatus] = useState(filters.status ?? '');
 
-    // Handle flash messages from Laravel session
-    // In a real implementation, you would check for flash messages in the page props
+    const applyFilters = (next: { search?: string; status?: string }) => {
+        router.get(
+            LIST_URL(school.id),
+            {
+                search: next.search || undefined,
+                status: next.status || undefined,
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
 
     return (
         <>
-            <Head title={`Academic Years — ${school.name}`} />
+            <Head title={t('academicYears.title')} />
             <div className="space-y-6 p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Academic Years</h1>
-                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Link
-                            href={`/admin/schools/${school.id}/academic-years/create`}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
-                        >
-                            New Academic Year
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-semibold">
+                        {t('academicYears.title')}
+                    </h1>
+                    <Button asChild>
+                        <Link href={`${LIST_URL(school.id)}/create`}>
+                            {t('academicYears.create')}
                         </Link>
-                    </div>
+                    </Button>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
-                <div className="space-y-4">
-                    <SearchField
-                        placeholder="Search academic years..."
-                        value={filters.search ?? ''}
-                        onChange={(value) => {
-                            // In a real implementation, you would update the URL query params
-                            // and trigger a refetch
+                <div className="flex flex-col gap-4 md:flex-row">
+                    <form
+                        className="w-full md:max-w-sm"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            applyFilters({ ...filters, search });
                         }}
-                    />
+                    >
+                        <SearchField
+                            placeholder={t('academicYears.searchPlaceholder')}
+                            value={search}
+                            onChange={setSearch}
+                        />
+                    </form>
 
-                    <DataTable
-                        columns={[
-                            { accessorKey: 'name', header: 'Name' },
-                            { accessorKey: 'starts_on', header: 'Starts On' },
-                            { accessorKey: 'ends_on', header: 'Ends On' },
-                            { accessorKey: 'is_current', header: 'Current' },
-                            { accessorKey: 'actions', header: 'Actions' },
-                        ]}
-                        data={list.data.map((year) => ({
-                            ...year,
-                            actions: (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon">
-                                            {/* More vertical icon would go here */}
-                                            ⋮
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        side="right"
-                                    >
-                                        <DropdownMenuItem>
-                                            <Link
-                                                href={`/admin/schools/${school.id}/academic-years/${year.id}`}
-                                            >
-                                                View
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Link
-                                                href={`/admin/schools/${school.id}/academic-years/${year.id}/edit`}
-                                            >
-                                                Edit
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                confirmDelete(
-                                                    `/admin/schools/${school.id}/academic-years/${year.id}`,
-                                                    { preserveScroll: true },
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ),
-                        }))}
-                    />
-
-                    <Pagination
-                        page={list.meta.current_page}
-                        lastPage={list.meta.last_page}
-                        href={(page: number) =>
-                            `/admin/schools/${school.id}/academic-years?page=${page}`
+                    <select
+                        aria-label={t('academicYears.filterStatus')}
+                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                        value={status}
+                        onChange={(event) =>
+                            applyFilters({
+                                ...filters,
+                                status: event.target.value,
+                            })
                         }
-                    />
+                    >
+                        <option value="">
+                            {t('academicYears.allStatuses')}
+                        </option>
+                        <option value="current">
+                            {t('academicYears.status.current')}
+                        </option>
+                        <option value="past">
+                            {t('academicYears.status.past')}
+                        </option>
+                        <option value="future">
+                            {t('academicYears.status.future')}
+                        </option>
+                    </select>
                 </div>
+
+                <DataTable
+                    columns={[
+                        {
+                            accessorKey: 'name',
+                            header: t('academicYears.name'),
+                        },
+                        {
+                            accessorKey: 'starts_on',
+                            header: t('academicYears.startsOn'),
+                            cell: (value: string) =>
+                                new Date(value).toLocaleDateString(),
+                        },
+                        {
+                            accessorKey: 'ends_on',
+                            header: t('academicYears.endsOn'),
+                            cell: (value: string) =>
+                                new Date(value).toLocaleDateString(),
+                        },
+                        {
+                            accessorKey: 'is_current',
+                            header: t('academicYears.isCurrent'),
+                            cell: (value: boolean) =>
+                                value ? t('common.yes') : t('common.no'),
+                        },
+                        {
+                            accessorKey: 'actions',
+                            header: t('common.actions'),
+                        },
+                    ]}
+                    data={list.data.map((year) => ({
+                        ...year,
+                        actions: (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <span aria-hidden="true">⋮</span>
+                                        <span className="sr-only">
+                                            {t('common.actions')}
+                                        </span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL(school.id)}/${year.id}`}
+                                        >
+                                            {t('common.view')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL(school.id)}/${year.id}/edit`}
+                                        >
+                                            {t('actions.edit')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            confirmDelete(
+                                                `${LIST_URL(school.id)}/${year.id}`,
+                                                { preserveScroll: true },
+                                            )
+                                        }
+                                    >
+                                        {t('actions.delete')}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ),
+                    }))}
+                    emptyMessage={
+                        filters.search || filters.status
+                            ? t('academicYears.emptyFiltered')
+                            : t('academicYears.empty')
+                    }
+                />
+
+                <Pagination
+                    page={list.meta.current_page}
+                    lastPage={list.meta.last_page}
+                    href={(page: number) =>
+                        `${LIST_URL(school.id)}?page=${page}${filters.search ? `&search=${encodeURIComponent(filters.search)}` : ''}${filters.status ? `&status=${filters.status}` : ''}`
+                    }
+                    labels={{
+                        previous: t('common.previous'),
+                        next: t('common.next'),
+                        page: t('common.page'),
+                        of: t('common.of'),
+                    }}
+                />
             </div>
         </>
     );

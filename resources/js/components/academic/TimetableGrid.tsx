@@ -271,11 +271,11 @@ export default function TimetableGrid({
                                                         }
                                                         draggable={canManage}
                                                         className={cn(
-                                                            'absolute left-[${leftPercent}%] top-0 w-[${widthPercent}%] h-full rounded-lg border transition-all duration-200',
+                                                            'left-[${leftPercent}%] w-[${widthPercent}%] absolute top-0 h-full rounded-lg border transition-all duration-200',
                                                             period.subject_color
                                                                 ? `border-[${period.subject_color}] bg-[${period.subject_color}]/20 hover:bg-[${period.subject_color}]/10`
                                                                 : 'border-[#dbe8df] bg-white hover:bg-[#0d5c4d]/10',
-                                                            'hover:border-[#0d5c4d]'
+                                                            'hover:border-[#0d5c4d]',
                                                         )}
                                                     >
                                                         <div className="p-2">

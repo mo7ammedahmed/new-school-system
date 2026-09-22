@@ -53,6 +53,15 @@ type Props = {
 };
 
 export default function StudentShow({ student }: Props) {
+    // Calculate attendance rate from student.attendance record
+    const attendance = student.attendance || {};
+    const present = attendance.present || 0;
+    const absent = attendance.absent || 0;
+    const late = attendance.late || 0;
+    const excused = attendance.excused || 0;
+    const total = present + absent + late + excused;
+    const attendanceRate = total > 0 ? Math.round((present / total) * 100) : 0;
+
     return (
         <>
             <Head title={`Student: ${student.name}`} />

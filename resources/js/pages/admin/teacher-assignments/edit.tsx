@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,8 +12,7 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -31,68 +30,51 @@ type Props = {
     }>;
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/teacher-assignments`;
+const EDIT_URL = (schoolId: number, assignmentId: number) =>
+    `/admin/schools/${schoolId}/teacher-assignments/${assignmentId}`;
+
 export default function TeacherAssignmentEdit({
     school,
     assignment,
     teachers,
     sections,
 }: Props) {
+    const { t } = useT();
     const { data, setData, put, processing, errors } = useForm({
         teacher_id: assignment.teacher_id,
         section_id: assignment.section_id,
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(
-            `/admin/schools/${school.id}/teacher-assignments/${assignment.id}`,
-            {
-                onSuccess: () => {
-                    // Show success toast
-                    setToastMessage('Teacher assignment updated successfully.');
-                    setToastType('success');
-                    setShowToast(true);
-                },
-                onError: (errors) => {
-                    // Show error toast
-                    setToastMessage('Please correct the errors and try again.');
-                    setToastType('error');
-                    setShowToast(true);
-                    // In a real implementation, the form errors would be displayed automatically
-                },
+        put(EDIT_URL(school.id, assignment.id), {
+            onSuccess: () => {
+                // Success toast handled by Inertia flash message
             },
-        );
+        });
     };
 
     return (
         <>
-            <Head title="Edit Teacher Assignment" />
+            <Head title={t('teacherAssignments.edit')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">
-                        Edit Teacher Assignment
-                    </h1>
+                    <h1 className="text-2xl font-semibold">{t('teacherAssignments.edit')}</h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/teacher-assignments`}
-                            variant="outline"
-                        >
-                            Back to Assignments
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
                     <CardHeader>
-                        <CardTitle>Teacher Assignment</CardTitle>
+                        <CardTitle>{t('teacherAssignments.form.title')}</CardTitle>
                         <CardDescription>
-                            Edit the teacher assignment.
+                            {t('teacherAssignments.form.editDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -100,18 +82,18 @@ export default function TeacherAssignmentEdit({
 
                         <FormSection>
                             <FormField
-                                label="Teacher"
-                                description="Select the teacher to assign"
+                                label={t('teacherAssignments.teacher')}
+                                description={t('teacherAssignments.teacherDescription')}
                             >
                                 <Select
                                     value={data.teacher_id}
                                     onValueChange={(value) =>
-                                        setData('teacher_id', value)
+                                        setData('teacher_id', Number(value))
                                     }
-                                    placeholder="Select teacher"
+                                    placeholder={t('teacherAssignments.teacherPlaceholder')}
                                     required
                                 >
-                                    <option value="">Select teacher</option>
+                                    <option value="">{t('teacherAssignments.teacherPlaceholder')}</option>
                                     {teachers.map((teacher) => (
                                         <option
                                             key={teacher.id}
@@ -126,25 +108,24 @@ export default function TeacherAssignmentEdit({
 
                         <FormSection>
                             <FormField
-                                label="Section"
-                                description="Select the section to assign the teacher to"
+                                label={t('teacherAssignments.section')}
+                                description={t('teacherAssignments.sectionDescription')}
                             >
                                 <Select
                                     value={data.section_id}
                                     onValueChange={(value) =>
-                                        setData('section_id', value)
+                                        setData('section_id', Number(value))
                                     }
-                                    placeholder="Select section"
+                                    placeholder={t('teacherAssignments.sectionPlaceholder')}
                                     required
                                 >
-                                    <option value="">Select section</option>
+                                    <option value="">{t('teacherAssignments.sectionPlaceholder')}</option>
                                     {sections.map((section) => (
                                         <option
                                             key={section.id}
                                             value={section.id}
                                         >
-                                            {section.name} (
-                                            {section.academic_class.name})
+                                            {section.name} ({section.academic_class.name})
                                         </option>
                                     ))}
                                 </Select>
@@ -152,17 +133,13 @@ export default function TeacherAssignmentEdit({
                         </FormSection>
                     </CardContent>
                     <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
                         </Button>
                         <Button onClick={handleSubmit} isLoading={processing}>
-                            Update Assignment
+                            {t('common.update')}
                         </Button>
                     </CardFooter>
                 </Card>

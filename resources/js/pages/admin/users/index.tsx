@@ -1,13 +1,5 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { DataTable } from '@/components/data-display/data-table';
 import {
     DropdownMenu,
@@ -18,23 +10,24 @@ import {
 import { Pagination } from '@/components/ui/pagination';
 import { confirmDelete } from '@/lib/confirm-delete';
 import { paginated } from '@/lib/paginated';
-import { useT } from '@/hooks/useT';
 import { SearchField } from '@/components/forms/search-field';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
+import { useT } from '@/hooks/useT';
 import { useState } from 'react';
+
+type UserData = {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+    phone: string | null;
+    status: string | null;
+};
 
 type Props = {
     filters: Record<string, any>;
     users: {
-        data: Array<{
-            id: number;
-            name: string;
-            email: string;
-            role: string;
-            phone: string | null;
-            status: string | null;
-        }>;
+        data: UserData[];
         meta: {
             total: number;
             per_page: number;
@@ -51,126 +44,153 @@ type Props = {
     school: { id: number; name: string };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/users`;
+
+const ROLES = [
+    { value: 'organization_admin', label: 'Organization Admin' },
+    { value: 'school_admin', label: 'School Admin' },
+    { value: 'teacher', label: 'Teacher' },
+    { value: 'staff', label: 'Staff' },
+    { value: 'guardian', label: 'Guardian' },
+];
+
 export default function UserIndex({ filters = {}, users, school }: Props) {
     const { t } = useT();
-    const list = paginated<Props['users']['data'][number]>(users);
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const list = paginated<UserData>(users);
+    const [search, setSearch] = useState(filters.search ?? '');
+    const [role, setRole] = useState(filters.role ?? '');
 
-    // Handle flash messages from Laravel session
-    // In a real implementation, you would check for flash messages in the page props
+    const applyFilters = (next: { search?: string; role?: string }) => {
+        router.get(
+            LIST_URL(school.id),
+            {
+                search: next.search || undefined,
+                role: next.role || undefined,
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
 
     return (
         <>
-            <Head title="Users" />
+            <Head title={t('users.title')} />
             <div className="space-y-6 p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Users</h1>
-                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Link
-                            href={`/admin/schools/${school.id}/users/create`}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
-                        >
-                            New User
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-semibold">
+                        {t('users.title')}
+                    </h1>
+                    <Button asChild>
+                        <Link href={`${LIST_URL(school.id)}/create`}>
+                            {t('users.create')}
                         </Link>
-                    </div>
+                    </Button>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <form
+                        className="w-full md:max-w-sm"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            applyFilters({ ...filters, search });
+                        }}
+                    >
                         <SearchField
-                            placeholder="Search users..."
-                            value={filters.search ?? ''}
-                            onChange={(value) => {
-                                // In a real implementation, you would update the URL query params
-                                // and trigger a refetch
-                            }}
+                            placeholder={t('users.searchPlaceholder')}
+                            value={search}
+                            onChange={setSearch}
                         />
-                        <Select
-                            value={filters.role ?? ''}
-                            onValueChange={(value) => {
-                                // In a real implementation, you would update the URL query params
-                                // and trigger a refetch
-                            }}
-                            placeholder="Filter by role"
-                        >
-                            <option value="">All Roles</option>
-                            <option value="organization_admin">
-                                Organization Admin
-                            </option>
-                            <option value="school_admin">School Admin</option>
-                            <option value="teacher">Teacher</option>
-                            <option value="staff">Staff</option>
-                            <option value="guardian">Guardian</option>
-                        </Select>
-                    </div>
-
-                    <DataTable
-                        columns={[
-                            { accessorKey: 'name', header: 'Name' },
-                            { accessorKey: 'email', header: 'Email' },
-                            {
-                                accessorKey: 'role',
-                                header: 'Role',
-                                cell: (value: string) => t(`roles.${value}`),
-                            },
-                            { accessorKey: 'actions', header: 'Actions' },
-                        ]}
-                        data={list.data.map((user) => ({
-                            ...user,
-                            actions: (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon">
-                                            {/* More vertical icon would go here */}
-                                            ⋮
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        side="right"
-                                    >
-                                        <DropdownMenuItem>
-                                            <Link
-                                                href={`/admin/schools/${school.id}/users/${user.id}`}
-                                            >
-                                                View
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Link
-                                                href={`/admin/schools/${school.id}/users/${user.id}/edit`}
-                                            >
-                                                Edit
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                confirmDelete(
-                                                    `/admin/schools/${school.id}/users/${user.id}`,
-                                                    { preserveScroll: true },
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ),
-                        }))}
-                    />
-
-                    <Pagination
-                        page={list.meta.current_page}
-                        lastPage={list.meta.last_page}
-                        href={(page: number) =>
-                            `/admin/schools/${school.id}/users?page=${page}`
+                    </form>
+                    <Select
+                        value={role}
+                        onValueChange={(value) =>
+                            applyFilters({ ...filters, role: value })
                         }
-                    />
+                        placeholder={t('users.filterByRole')}
+                    >
+                        <option value="">{t('users.allRoles')}</option>
+                        {ROLES.map((r) => (
+                            <option key={r.value} value={r.value}>
+                                {t(`roles.${r.value}`)}
+                            </option>
+                        ))}
+                    </Select>
                 </div>
+
+                <DataTable
+                    columns={[
+                        { accessorKey: 'name', header: t('users.name') },
+                        { accessorKey: 'email', header: t('users.email') },
+                        {
+                            accessorKey: 'role',
+                            header: t('users.role'),
+                            cell: (value: string) => t(`roles.${value}`),
+                        },
+                        {
+                            accessorKey: 'actions',
+                            header: t('common.actions'),
+                        },
+                    ]}
+                    data={list.data.map((user) => ({
+                        ...user,
+                        actions: (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <span aria-hidden="true">⋮</span>
+                                        <span className="sr-only">
+                                            {t('common.actions')}
+                                        </span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL(school.id)}/${user.id}`}
+                                        >
+                                            {t('common.view')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL(school.id)}/${user.id}/edit`}
+                                        >
+                                            {t('actions.edit')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            confirmDelete(
+                                                `${LIST_URL(school.id)}/${user.id}`,
+                                                { preserveScroll: true },
+                                            )
+                                        }
+                                    >
+                                        {t('actions.delete')}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ),
+                    }))}
+                    emptyMessage={
+                        filters.search || filters.role
+                            ? t('users.emptyFiltered')
+                            : t('users.empty')
+                    }
+                />
+
+                <Pagination
+                    page={list.meta.current_page}
+                    lastPage={list.meta.last_page}
+                    href={(page: number) =>
+                        `${LIST_URL(school.id)}?page=${page}${filters.search ? `&search=${encodeURIComponent(filters.search)}` : ''}${filters.role ? `&role=${filters.role}` : ''}`
+                    }
+                    labels={{
+                        previous: t('common.previous'),
+                        next: t('common.next'),
+                        page: t('common.page'),
+                        of: t('common.of'),
+                    }}
+                />
             </div>
         </>
     );

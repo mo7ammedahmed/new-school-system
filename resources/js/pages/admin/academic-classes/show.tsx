@@ -1,19 +1,15 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DateCell } from '@/components/data-display/date-cell';
-import { UserCell } from '@/components/data-display/user-cell';
-import { MoneyCell } from '@/components/data-display/money-cell';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -22,81 +18,80 @@ type Props = {
         name: string;
         created_at: string;
         updated_at: string;
-        // Additional fields that might be useful
         section_count?: number;
         student_count?: number;
         teacher_count?: number;
     };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-classes`;
+const EDIT_URL = (schoolId: number, classId: number) =>
+    `/admin/schools/${schoolId}/academic-classes/${classId}`;
+
 export default function AcademicClassShow({ school, academicClass }: Props) {
+    const { t, locale } = useT();
+    const formatDate = (date: string) =>
+        new Date(date).toLocaleDateString(locale);
+
+    const avgSectionSize =
+        academicClass.section_count && academicClass.section_count > 0
+            ? Math.round(academicClass.student_count / academicClass.section_count)
+            : 0;
+
     return (
         <>
-            <Head
-                title={`Academic Class: ${academicClass.name} — ${school.name}`}
-            />
+            <Head title={t('academicClasses.show', { name: academicClass.name })} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        Academic Class: {academicClass.name}
+                        {t('academicClasses.show', { name: academicClass.name })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/academic-classes`}
-                            variant="outline"
-                        >
-                            Back to Academic Classes
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
-                        <Button
-                            href={`/admin/schools/${school.id}/academic-classes/${academicClass.id}/edit`}
-                            variant="default"
-                        >
-                            Edit Academic Class
+                        <Button asChild>
+                            <Link href={EDIT_URL(school.id, academicClass.id)}>
+                                {t('actions.edit')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Academic Class Overview</CardTitle>
+                        <CardTitle>{t('academicClasses.overview')}</CardTitle>
                         <CardDescription>
-                            Key information and statistics for this academic
-                            class.
+                            {t('academicClasses.overviewDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <StatCard
-                                title="Student Count"
+                                title={t('academicClasses.studentCount')}
                                 value={academicClass.student_count ?? 0}
                                 trend="up"
-                                description="Total students in this class"
+                                description={t('academicClasses.studentCountDescription')}
                             />
                             <StatCard
-                                title="Section Count"
+                                title={t('academicClasses.sectionCount')}
                                 value={academicClass.section_count ?? 0}
                                 trend="up"
-                                description="Class sections"
+                                description={t('academicClasses.sectionCountDescription')}
                             />
                             <StatCard
-                                title="Teacher Count"
+                                title={t('academicClasses.teacherCount')}
                                 value={academicClass.teacher_count ?? 0}
                                 trend="up"
-                                description="Teachers assigned"
+                                description={t('academicClasses.teacherCountDescription')}
                             />
                             <StatCard
-                                title="Average Section Size"
-                                value={
-                                    academicClass.student_count
-                                        ? Math.round(
-                                              academicClass.student_count /
-                                                  (academicClass.section_count ||
-                                                      1),
-                                          )
-                                        : 0
-                                }
+                                title={t('academicClasses.avgSectionSize')}
+                                value={avgSectionSize}
                                 trend="up"
-                                description="Average students per section"
+                                description={t('academicClasses.avgSectionSizeDescription')}
                             />
                         </div>
 
@@ -104,20 +99,22 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
                             <Tabs defaultValue="info">
                                 <TabsList className="grid w-[200px] grid-cols-1">
                                     <TabsTrigger value="info">
-                                        Information
+                                        {t('common.information')}
                                     </TabsTrigger>
                                     <TabsTrigger value="details">
-                                        Details
+                                        {t('common.details')}
                                     </TabsTrigger>
                                     <TabsTrigger value="timeline">
-                                        Timeline
+                                        {t('common.timeline')}
                                     </TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="info">
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <p className="font-medium">Name:</p>
+                                            <p className="font-medium">
+                                                {t('academicClasses.name')}
+                                            </p>
                                             <p className="text-muted-foreground">
                                                 {academicClass.name}
                                             </p>
@@ -125,23 +122,19 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Created At:
+                                                {t('common.createdAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {new Date(
-                                                    academicClass.created_at,
-                                                ).toLocaleDateString()}
+                                                {formatDate(academicClass.created_at)}
                                             </p>
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Updated At:
+                                                {t('common.updatedAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {new Date(
-                                                    academicClass.updated_at,
-                                                ).toLocaleDateString()}
+                                                {formatDate(academicClass.updated_at)}
                                             </p>
                                         </div>
                                     </div>
@@ -149,18 +142,16 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
 
                                 <TabsContent value="details">
                                     <div className="space-y-4">
-                                        {/* In a real implementation, this would show detailed information */}
                                         <p className="text-muted-foreground">
-                                            Detailed view coming soon...
+                                            {t('academicClasses.detailsComingSoon')}
                                         </p>
                                     </div>
                                 </TabsContent>
 
                                 <TabsContent value="timeline">
                                     <div className="space-y-4">
-                                        {/* In a real implementation, this would show a timeline of events */}
                                         <p className="text-muted-foreground">
-                                            Timeline view coming soon...
+                                            {t('academicClasses.timelineComingSoon')}
                                         </p>
                                     </div>
                                 </TabsContent>

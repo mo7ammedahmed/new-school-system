@@ -1,19 +1,17 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DateCell } from '@/components/data-display/date-cell';
-import { UserCell } from '@/components/data-display/user-cell';
-import { MoneyCell } from '@/components/data-display/money-cell';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -25,7 +23,6 @@ type Props = {
         is_current: boolean;
         created_at: string;
         updated_at: string;
-        // Additional fields that might be useful
         student_count?: number;
         class_count?: number;
         section_count?: number;
@@ -33,66 +30,75 @@ type Props = {
     };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-years`;
+const EDIT_URL = (schoolId: number, yearId: number) =>
+    `/admin/schools/${schoolId}/academic-years/${yearId}`;
+
 export default function AcademicYearShow({ school, academicYear }: Props) {
+    const { t, locale } = useT();
+    const formatDate = (date: string) =>
+        new Date(date).toLocaleDateString(locale);
+
+    const durationYears = Math.max(
+        0,
+        new Date(academicYear.ends_on).getFullYear() -
+            new Date(academicYear.starts_on).getFullYear(),
+    );
+
     return (
         <>
-            <Head
-                title={`Academic Year: ${academicYear.name} — ${school.name}`}
-            />
+            <Head title={t('academicYears.show', { name: academicYear.name })} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        Academic Year: {academicYear.name}
+                        {t('academicYears.show', { name: academicYear.name })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/academic-years`}
-                            variant="outline"
-                        >
-                            Back to Academic Years
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
-                        <Button
-                            href={`/admin/schools/${school.id}/academic-years/${academicYear.id}/edit`}
-                            variant="default"
-                        >
-                            Edit Academic Year
+                        <Button asChild>
+                            <Link href={EDIT_URL(school.id, academicYear.id)}>
+                                {t('actions.edit')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Academic Year Overview</CardTitle>
+                        <CardTitle>{t('academicYears.overview')}</CardTitle>
                         <CardDescription>
-                            Key information and statistics for this academic
-                            year.
+                            {t('academicYears.overviewDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <StatCard
-                                title="Student Count"
+                                title={t('academicYears.studentCount')}
                                 value={academicYear.student_count ?? 0}
                                 trend="up"
-                                description="Total students enrolled"
+                                description={t('academicYears.studentCountDescription')}
                             />
                             <StatCard
-                                title="Class Count"
+                                title={t('academicYears.classCount')}
                                 value={academicYear.class_count ?? 0}
                                 trend="up"
-                                description="Academic classes offered"
+                                description={t('academicYears.classCountDescription')}
                             />
                             <StatCard
-                                title="Section Count"
+                                title={t('academicYears.sectionCount')}
                                 value={academicYear.section_count ?? 0}
                                 trend="up"
-                                description="Class sections"
+                                description={t('academicYears.sectionCountDescription')}
                             />
                             <StatCard
-                                title="Enrollment Count"
+                                title={t('academicYears.enrollmentCount')}
                                 value={academicYear.enrollment_count ?? 0}
                                 trend="up"
-                                description="Total enrollments"
+                                description={t('academicYears.enrollmentCountDescription')}
                             />
                         </div>
 
@@ -100,20 +106,22 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                             <Tabs defaultValue="info">
                                 <TabsList className="grid w-[200px] grid-cols-1">
                                     <TabsTrigger value="info">
-                                        Information
+                                        {t('common.information')}
                                     </TabsTrigger>
                                     <TabsTrigger value="details">
-                                        Details
+                                        {t('common.details')}
                                     </TabsTrigger>
                                     <TabsTrigger value="timeline">
-                                        Timeline
+                                        {t('common.timeline')}
                                     </TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="info">
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <p className="font-medium">Name:</p>
+                                            <p className="font-medium">
+                                                {t('academicYears.name')}
+                                            </p>
                                             <p className="text-muted-foreground">
                                                 {academicYear.name}
                                             </p>
@@ -121,52 +129,41 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Status:
+                                                {t('academicYears.status')}
                                             </p>
-                                            <span
-                                                className={`rounded-full px-2 py-1 text-xs font-medium ${
+                                            <Badge
+                                                variant={
                                                     academicYear.is_current
-                                                        ? 'bg-success/20 text-success'
-                                                        : 'bg-muted/20 text-muted-foreground'
-                                                }`}
+                                                        ? 'success'
+                                                        : 'secondary'
+                                                }
                                             >
                                                 {academicYear.is_current
-                                                    ? 'Current'
-                                                    : 'Inactive'}
-                                            </span>
+                                                    ? t('academicYears.status.current')
+                                                    : t('academicYears.status.inactive')}
+                                            </Badge>
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Start Date:
+                                                {t('academicYears.startsOn')}
                                             </p>
-                                            <DateCell
-                                                value={academicYear.starts_on}
-                                            />
+                                            <DateCell value={academicYear.starts_on} />
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                End Date:
+                                                {t('academicYears.endsOn')}
                                             </p>
-                                            <DateCell
-                                                value={academicYear.ends_on}
-                                            />
+                                            <DateCell value={academicYear.ends_on} />
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Duration:
+                                                {t('academicYears.duration')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {/* Calculate duration - simplified for example */}
-                                                {new Date(
-                                                    academicYear.ends_on,
-                                                ).getFullYear() -
-                                                    new Date(
-                                                        academicYear.starts_on,
-                                                    ).getFullYear()}{' '}
-                                                years
+                                                {t('academicYears.durationValue', { years: durationYears })}
                                             </p>
                                         </div>
                                     </div>
@@ -176,23 +173,19 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                     <div className="space-y-4">
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Created At:
+                                                {t('common.createdAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {new Date(
-                                                    academicYear.created_at,
-                                                ).toLocaleDateString()}
+                                                {formatDate(academicYear.created_at)}
                                             </p>
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Updated At:
+                                                {t('common.updatedAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {new Date(
-                                                    academicYear.updated_at,
-                                                ).toLocaleDateString()}
+                                                {formatDate(academicYear.updated_at)}
                                             </p>
                                         </div>
                                     </div>
@@ -200,9 +193,8 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
 
                                 <TabsContent value="timeline">
                                     <div className="space-y-4">
-                                        {/* In a real implementation, this would show a timeline of events */}
                                         <p className="text-muted-foreground">
-                                            Timeline view coming soon...
+                                            {t('academicYears.timelineComingSoon')}
                                         </p>
                                     </div>
                                 </TabsContent>

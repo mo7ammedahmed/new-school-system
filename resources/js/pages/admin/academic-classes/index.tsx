@@ -1,13 +1,5 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { DataTable } from '@/components/data-display/data-table';
 import {
     DropdownMenu,
@@ -19,19 +11,22 @@ import { Pagination } from '@/components/ui/pagination';
 import { confirmDelete } from '@/lib/confirm-delete';
 import { paginated } from '@/lib/paginated';
 import { SearchField } from '@/components/forms/search-field';
-import { Toast } from '@/components/ui/toast';
+import { useT } from '@/hooks/useT';
 import { useState } from 'react';
+
+type AcademicClassData = {
+    id: number;
+    name: string;
+    section_count?: number;
+    student_count?: number;
+    enrollments_count?: number;
+    sections?: unknown[] | null;
+};
 
 type Props = {
     school: { id: number; name: string };
     academicClasses: {
-        data: Array<{
-            id: number;
-            name: string;
-            // Additional fields that might be useful
-            section_count?: number;
-            student_count?: number;
-        }>;
+        data: AcademicClassData[];
         meta: {
             total: number;
             per_page: number;
@@ -48,125 +43,147 @@ type Props = {
     filters: Record<string, any>;
 };
 
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-classes`;
+
 export default function AcademicClassIndex({
     school,
     academicClasses,
     filters = {},
 }: Props) {
-    const list =
-        paginated<Props['academicClasses']['data'][number]>(academicClasses);
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const { t } = useT();
+    const list = paginated<AcademicClassData>(academicClasses);
+    const [search, setSearch] = useState(filters.search ?? '');
 
-    // Handle flash messages from Laravel session
-    // In a real implementation, you would check for flash messages in the page props
+    const applyFilters = (next: { search?: string }) => {
+        router.get(
+            LIST_URL(school.id),
+            {
+                search: next.search || undefined,
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
 
     return (
         <>
-            <Head title={`Academic Classes — ${school.name}`} />
+            <Head title={t('academicClasses.title')} />
             <div className="space-y-6 p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Academic Classes</h1>
-                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Link
-                            href={`/admin/schools/${school.id}/academic-classes/create`}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
-                        >
-                            New Academic Class
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-semibold">
+                        {t('academicClasses.title')}
+                    </h1>
+                    <Button asChild>
+                        <Link href={`${LIST_URL(school.id)}/create`}>
+                            {t('academicClasses.create')}
                         </Link>
-                    </div>
+                    </Button>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
-                <div className="space-y-4">
-                    <SearchField
-                        placeholder="Search academic classes..."
-                        value={filters.search ?? ''}
-                        onChange={(value) => {
-                            // In a real implementation, you would update the URL query params
-                            // and trigger a refetch
+                <div className="flex flex-col gap-4 md:flex-row">
+                    <form
+                        className="w-full md:max-w-sm"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            applyFilters({ ...filters, search });
                         }}
-                    />
-
-                    <DataTable
-                        columns={[
-                            { accessorKey: 'name', header: 'Name' },
-                            {
-                                accessorKey: 'sectionCount',
-                                header: 'Sections',
-                            },
-                            {
-                                accessorKey: 'studentCount',
-                                header: 'Students',
-                            },
-                            { accessorKey: 'actions', header: 'Actions' },
-                        ]}
-                        data={list.data.map((academicClass) => ({
-                            ...academicClass,
-                            sectionCount:
-                                (
-                                    academicClass as {
-                                        sections?: unknown[] | null;
-                                    }
-                                ).sections?.length ?? 0,
-                            studentCount:
-                                (
-                                    academicClass as {
-                                        enrollments_count?: number;
-                                    }
-                                ).enrollments_count ?? 0,
-                            actions: (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon">
-                                            {/* More vertical icon would go here */}
-                                            ⋮
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        side="right"
-                                    >
-                                        <DropdownMenuItem>
-                                            <Link
-                                                href={`/admin/schools/${school.id}/academic-classes/${academicClass.id}`}
-                                            >
-                                                View
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Link
-                                                href={`/admin/schools/${school.id}/academic-classes/${academicClass.id}/edit`}
-                                            >
-                                                Edit
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                confirmDelete(
-                                                    `/admin/schools/${school.id}/academic-classes/${academicClass.id}`,
-                                                    { preserveScroll: true },
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ),
-                        }))}
-                    />
-
-                    <Pagination
-                        page={list.meta.current_page}
-                        lastPage={list.meta.last_page}
-                        href={(page: number) =>
-                            `/admin/schools/${school.id}/academic-classes?page=${page}`
-                        }
-                    />
+                    >
+                        <SearchField
+                            placeholder={t('academicClasses.searchPlaceholder')}
+                            value={search}
+                            onChange={setSearch}
+                        />
+                    </form>
                 </div>
+
+                <DataTable
+                    columns={[
+                        {
+                            accessorKey: 'name',
+                            header: t('academicClasses.name'),
+                        },
+                        {
+                            accessorKey: 'sectionCount',
+                            header: t('academicClasses.sections'),
+                        },
+                        {
+                            accessorKey: 'studentCount',
+                            header: t('academicClasses.students'),
+                        },
+                        {
+                            accessorKey: 'actions',
+                            header: t('common.actions'),
+                        },
+                    ]}
+                    data={list.data.map((academicClass) => ({
+                        ...academicClass,
+                        sectionCount:
+                            academicClass.sections?.length ??
+                            academicClass.section_count ??
+                            0,
+                        studentCount:
+                            academicClass.student_count ??
+                            academicClass.enrollments_count ??
+                            0,
+                        actions: (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <span aria-hidden="true">⋮</span>
+                                        <span className="sr-only">
+                                            {t('common.actions')}
+                                        </span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL(school.id)}/${academicClass.id}`}
+                                        >
+                                            {t('common.view')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL(school.id)}/${academicClass.id}/edit`}
+                                        >
+                                            {t('actions.edit')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            confirmDelete(
+                                                `${LIST_URL(school.id)}/${academicClass.id}`,
+                                                { preserveScroll: true },
+                                            )
+                                        }
+                                    >
+                                        {t('actions.delete')}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ),
+                    }))}
+                    emptyMessage={
+                        filters.search
+                            ? t('academicClasses.emptyFiltered')
+                            : t('academicClasses.empty')
+                    }
+                />
+
+                <Pagination
+                    page={list.meta.current_page}
+                    lastPage={list.meta.last_page}
+                    href={(page: number) =>
+                        `${LIST_URL(school.id)}?page=${page}${filters.search ? `&search=${encodeURIComponent(filters.search)}` : ''}`
+                    }
+                    labels={{
+                        previous: t('common.previous'),
+                        next: t('common.next'),
+                        page: t('common.page'),
+                        of: t('common.of'),
+                    }}
+                />
             </div>
         </>
     );

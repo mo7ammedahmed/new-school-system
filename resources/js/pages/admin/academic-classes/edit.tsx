@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,9 +12,7 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -24,61 +22,47 @@ type Props = {
     };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-classes`;
+const EDIT_URL = (schoolId: number, classId: number) =>
+    `/admin/schools/${schoolId}/academic-classes/${classId}`;
+
 export default function AcademicClassEdit({ school, academicClass }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { t } = useT();
+    const { data, setData, put, processing, errors } = useForm({
         name: academicClass.name,
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(
-            `/admin/schools/${school.id}/academic-classes/${academicClass.id}`,
-            {
-                onSuccess: () => {
-                    // Show success toast
-                    setToastMessage('Academic class updated successfully.');
-                    setToastType('success');
-                    setShowToast(true);
-                },
-                onError: () => {
-                    // Show error toast
-                    setToastMessage('Something went wrong. Please try again.');
-                    setToastType('error');
-                    setShowToast(true);
-                },
+        put(EDIT_URL(school.id, academicClass.id), {
+            onSuccess: () => {
+                // Success toast handled by Inertia flash message
             },
-        );
+        });
     };
 
     return (
         <>
-            <Head title={`Edit Academic Class — ${school.name}`} />
+            <Head title={t('academicClasses.edit', { name: academicClass.name })} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        Edit Academic Class
+                        {t('academicClasses.edit', { name: academicClass.name })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/academic-classes`}
-                            variant="outline"
-                        >
-                            Back to Academic Classes
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
                     <CardHeader>
-                        <CardTitle>Academic Class Information</CardTitle>
+                        <CardTitle>{t('academicClasses.form.title')}</CardTitle>
                         <CardDescription>
-                            Edit the details for this academic class.
+                            {t('academicClasses.form.editDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -86,11 +70,11 @@ export default function AcademicClassEdit({ school, academicClass }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Name"
-                                description="Enter the name of the academic class (e.g., Grade 1, Year 2)"
+                                label={t('academicClasses.name')}
+                                description={t('academicClasses.nameDescription')}
                             >
                                 <Input
-                                    placeholder="Grade 1"
+                                    placeholder={t('academicClasses.namePlaceholder')}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -101,17 +85,13 @@ export default function AcademicClassEdit({ school, academicClass }: Props) {
                         </FormSection>
                     </CardContent>
                     <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
                         </Button>
                         <Button onClick={handleSubmit} isLoading={processing}>
-                            Update Academic Class
+                            {t('common.update')}
                         </Button>
                     </CardFooter>
                 </Card>

@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,67 +12,53 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
     academicClasses: Array<{ id: number; name: string }>;
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/sections`;
+const CREATE_URL = (schoolId: number) => `/admin/schools/${schoolId}/sections`;
+
 export default function SectionCreate({ school, academicClasses }: Props) {
+    const { t } = useT();
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         class_id: '',
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`/admin/schools/${school.id}/sections`, {
+        post(CREATE_URL(school.id), {
             onSuccess: () => {
-                // Show success toast
-                setToastMessage('Section created successfully.');
-                setToastType('success');
-                setShowToast(true);
-            },
-            onError: () => {
-                // Show error toast
-                setToastMessage('Something went wrong. Please try again.');
-                setToastType('error');
-                setShowToast(true);
+                // Success toast handled by Inertia flash message
             },
         });
     };
 
     return (
         <>
-            <Head title={`New Section — ${school.name}`} />
+            <Head title={t('sections.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">New Section</h1>
+                    <h1 className="text-2xl font-semibold">{t('sections.create')}</h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/sections`}
-                            variant="outline"
-                        >
-                            Back to Sections
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
                     <CardHeader>
-                        <CardTitle>Section Information</CardTitle>
+                        <CardTitle>{t('sections.form.title')}</CardTitle>
                         <CardDescription>
-                            Enter the details for the new section.
+                            {t('sections.form.createDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -80,11 +66,11 @@ export default function SectionCreate({ school, academicClasses }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Name"
-                                description="Enter the name of the section (e.g., A, B, C)"
+                                label={t('sections.name')}
+                                description={t('sections.nameDescription')}
                             >
                                 <Input
-                                    placeholder="Section A"
+                                    placeholder={t('sections.namePlaceholder')}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -96,15 +82,15 @@ export default function SectionCreate({ school, academicClasses }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Academic Class"
-                                description="Select the academic class for this section"
+                                label={t('sections.academicClass')}
+                                description={t('sections.academicClassDescription')}
                             >
                                 <Select
                                     value={data.class_id}
                                     onValueChange={(value) =>
                                         setData('class_id', value)
                                     }
-                                    placeholder="Select academic class"
+                                    placeholder={t('sections.academicClassPlaceholder')}
                                     required
                                 >
                                     {academicClasses.map((academicClass) => (
@@ -120,17 +106,13 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                         </FormSection>
                     </CardContent>
                     <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
                         </Button>
                         <Button onClick={handleSubmit} isLoading={processing}>
-                            Create Section
+                            {t('common.create')}
                         </Button>
                     </CardFooter>
                 </Card>

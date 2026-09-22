@@ -1,9 +1,10 @@
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import type { ReactNode } from 'react';
 
 type StatCardProps = {
     title: string;
-    value: string | number;
+    value: string | number | ReactNode;
     trend?: 'up' | 'down' | 'neutral';
     description?: string;
     className?: string;

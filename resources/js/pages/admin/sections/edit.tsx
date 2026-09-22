@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,10 +12,8 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -27,61 +25,52 @@ type Props = {
     academicClasses: Array<{ id: number; name: string }>;
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/sections`;
+const EDIT_URL = (schoolId: number, sectionId: number) =>
+    `/admin/schools/${schoolId}/sections/${sectionId}`;
+
 export default function SectionEdit({
     school,
     section,
     academicClasses,
 }: Props) {
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { t } = useT();
+    const { data, setData, put, processing, errors } = useForm({
         name: section.name,
         class_id: section.class_id,
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/schools/${school.id}/sections/${section.id}`, {
+        put(EDIT_URL(school.id, section.id), {
             onSuccess: () => {
-                // Show success toast
-                setToastMessage('Section updated successfully.');
-                setToastType('success');
-                setShowToast(true);
-            },
-            onError: () => {
-                // Show error toast
-                setToastMessage('Something went wrong. Please try again.');
-                setToastType('error');
-                setShowToast(true);
+                // Success toast handled by Inertia flash message
             },
         });
     };
 
     return (
         <>
-            <Head title={`Edit Section — ${school.name}`} />
+            <Head title={t('sections.edit', { name: section.name })} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Edit Section</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t('sections.edit', { name: section.name })}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/sections`}
-                            variant="outline"
-                        >
-                            Back to Sections
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
                     <CardHeader>
-                        <CardTitle>Section Information</CardTitle>
+                        <CardTitle>{t('sections.form.title')}</CardTitle>
                         <CardDescription>
-                            Edit the details for this section.
+                            {t('sections.form.editDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -89,11 +78,11 @@ export default function SectionEdit({
 
                         <FormSection>
                             <FormField
-                                label="Name"
-                                description="Enter the name of the section (e.g., A, B, C)"
+                                label={t('sections.name')}
+                                description={t('sections.nameDescription')}
                             >
                                 <Input
-                                    placeholder="Section A"
+                                    placeholder={t('sections.namePlaceholder')}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -105,15 +94,15 @@ export default function SectionEdit({
 
                         <FormSection>
                             <FormField
-                                label="Academic Class"
-                                description="Select the academic class for this section"
+                                label={t('sections.academicClass')}
+                                description={t('sections.academicClassDescription')}
                             >
                                 <Select
                                     value={data.class_id}
                                     onValueChange={(value) =>
-                                        setData('class_id', value)
+                                        setData('class_id', Number(value))
                                     }
-                                    placeholder="Select academic class"
+                                    placeholder={t('sections.academicClassPlaceholder')}
                                     required
                                 >
                                     {academicClasses.map((academicClass) => (
@@ -129,17 +118,13 @@ export default function SectionEdit({
                         </FormSection>
                     </CardContent>
                     <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
                         </Button>
                         <Button onClick={handleSubmit} isLoading={processing}>
-                            Update Section
+                            {t('common.update')}
                         </Button>
                     </CardFooter>
                 </Card>

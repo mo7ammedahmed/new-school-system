@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,16 +12,25 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/guardians`;
+const CREATE_URL = (schoolId: number) => `/admin/schools/${schoolId}/guardians`;
+
+const RELATIONSHIPS = [
+    { value: 'father', label: 'Father' },
+    { value: 'mother', label: 'Mother' },
+    { value: 'guardian', label: 'Guardian' },
+    { value: 'other', label: 'Other' },
+] as const;
+
 export default function GuardianCreate({ school }: Props) {
+    const { t } = useT();
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -31,52 +40,35 @@ export default function GuardianCreate({ school }: Props) {
         relationship: '',
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`/admin/schools/${school.id}/guardians`, {
+        post(CREATE_URL(school.id), {
             onSuccess: () => {
-                // Show success toast
-                setToastMessage('Guardian created successfully.');
-                setToastType('success');
-                setShowToast(true);
-            },
-            onError: (errors) => {
-                // Show error toast
-                setToastMessage('Please correct the errors and try again.');
-                setToastType('error');
-                setShowToast(true);
-                // In a real implementation, the form errors would be displayed automatically
+                // Success toast handled by Inertia flash message
             },
         });
     };
 
     return (
         <>
-            <Head title="New Guardian" />
+            <Head title={t('guardians.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">New Guardian</h1>
+                    <h1 className="text-2xl font-semibold">{t('guardians.create')}</h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/guardians`}
-                            variant="outline"
-                        >
-                            Back to Guardians
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
                     <CardHeader>
-                        <CardTitle>Guardian Information</CardTitle>
+                        <CardTitle>{t('guardians.form.title')}</CardTitle>
                         <CardDescription>
-                            Enter the details for the new guardian.
+                            {t('guardians.form.createDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -84,11 +76,11 @@ export default function GuardianCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Name"
-                                description="Enter the guardian's full name"
+                                label={t('guardians.name')}
+                                description={t('guardians.nameDescription')}
                             >
                                 <Input
-                                    placeholder="Full name"
+                                    placeholder={t('guardians.namePlaceholder')}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -101,11 +93,11 @@ export default function GuardianCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Email Address"
-                                description="Enter the guardian's email address"
+                                label={t('guardians.email')}
+                                description={t('guardians.emailDescription')}
                             >
                                 <Input
-                                    placeholder="email@example.com"
+                                    placeholder={t('guardians.emailPlaceholder')}
                                     value={data.email}
                                     onChange={(e) =>
                                         setData('email', e.target.value)
@@ -119,11 +111,11 @@ export default function GuardianCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Phone Number"
-                                description="Enter the guardian's phone number"
+                                label={t('guardians.phone')}
+                                description={t('guardians.phoneDescription')}
                             >
                                 <Input
-                                    placeholder="Phone number"
+                                    placeholder={t('guardians.phonePlaceholder')}
                                     value={data.phone}
                                     onChange={(e) =>
                                         setData('phone', e.target.value)
@@ -135,11 +127,11 @@ export default function GuardianCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Address"
-                                description="Enter the guardian's address"
+                                label={t('guardians.address')}
+                                description={t('guardians.addressDescription')}
                             >
                                 <Input
-                                    placeholder="Address"
+                                    placeholder={t('guardians.addressPlaceholder')}
                                     value={data.address}
                                     onChange={(e) =>
                                         setData('address', e.target.value)
@@ -150,11 +142,11 @@ export default function GuardianCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Occupation"
-                                description="Enter the guardian's occupation"
+                                label={t('guardians.occupation')}
+                                description={t('guardians.occupationDescription')}
                             >
                                 <Input
-                                    placeholder="Occupation"
+                                    placeholder={t('guardians.occupationPlaceholder')}
                                     value={data.occupation}
                                     onChange={(e) =>
                                         setData('occupation', e.target.value)
@@ -166,39 +158,34 @@ export default function GuardianCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                                label="Relationship"
-                                description="Select the guardian's relationship to the student(s)"
+                                label={t('guardians.relationship')}
+                                description={t('guardians.relationshipDescription')}
                             >
                                 <Select
                                     value={data.relationship}
                                     onValueChange={(value) =>
                                         setData('relationship', value)
                                     }
-                                    placeholder="Select relationship"
+                                    placeholder={t('guardians.relationshipPlaceholder')}
                                 >
-                                    <option value="">
-                                        Select relationship
-                                    </option>
-                                    <option value="father">Father</option>
-                                    <option value="mother">Mother</option>
-                                    <option value="guardian">Guardian</option>
-                                    <option value="other">Other</option>
+                                    <option value="">{t('guardians.relationshipPlaceholder')}</option>
+                                    {RELATIONSHIPS.map((rel) => (
+                                        <option key={rel.value} value={rel.value}>
+                                            {rel.label}
+                                        </option>
+                                    ))}
                                 </Select>
                             </FormField>
                         </FormSection>
                     </CardContent>
                     <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
                         </Button>
                         <Button onClick={handleSubmit} isLoading={processing}>
-                            Create Guardian
+                            {t('common.create')}
                         </Button>
                     </CardFooter>
                 </Card>

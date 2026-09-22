@@ -1,19 +1,15 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DateCell } from '@/components/data-display/date-cell';
-import { UserCell } from '@/components/data-display/user-cell';
-import { MoneyCell } from '@/components/data-display/money-cell';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -22,70 +18,75 @@ type Props = {
         name: string;
         created_at: string;
         updated_at: string;
-        // Additional fields that might be useful
         student_count?: number;
         academic_class_name?: string;
         teacher_name?: string;
     };
 };
 
+const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/sections`;
+const EDIT_URL = (schoolId: number, sectionId: number) =>
+    `/admin/schools/${schoolId}/sections/${sectionId}`;
+
 export default function SectionShow({ school, section }: Props) {
+    const { t, locale } = useT();
+    const formatDate = (date: string) =>
+        new Date(date).toLocaleDateString(locale);
+
     return (
         <>
-            <Head title={`Section: ${section.name} — ${school.name}`} />
+            <Head title={t('sections.show', { name: section.name })} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        Section: {section.name}
+                        {t('sections.show', { name: section.name })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/sections`}
-                            variant="outline"
-                        >
-                            Back to Sections
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.back')}
+                            </Link>
                         </Button>
-                        <Button
-                            href={`/admin/schools/${school.id}/sections/${section.id}/edit`}
-                            variant="default"
-                        >
-                            Edit Section
+                        <Button asChild>
+                            <Link href={EDIT_URL(school.id, section.id)}>
+                                {t('actions.edit')}
+                            </Link>
                         </Button>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Section Overview</CardTitle>
+                        <CardTitle>{t('sections.overview')}</CardTitle>
                         <CardDescription>
-                            Key information and statistics for this section.
+                            {t('sections.overviewDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <StatCard
-                                title="Student Count"
+                                title={t('sections.studentCount')}
                                 value={section.student_count ?? 0}
                                 trend="up"
-                                description="Total students in this section"
+                                description={t('sections.studentCountDescription')}
                             />
                             <StatCard
-                                title="Academic Class"
+                                title={t('sections.academicClass')}
                                 value={section.academic_class_name ?? 'N/A'}
                                 trend="up"
-                                description="Assigned academic class"
+                                description={t('sections.academicClassDescription')}
                             />
                             <StatCard
-                                title="Homeroom Teacher"
+                                title={t('sections.homeroomTeacher')}
                                 value={section.teacher_name ?? 'Unassigned'}
                                 trend="up"
-                                description="Assigned homeroom teacher"
+                                description={t('sections.homeroomTeacherDescription')}
                             />
                             <StatCard
-                                title="Section Capacity"
-                                value={35} // Example capacity
+                                title={t('sections.capacity')}
+                                value={35}
                                 trend="up"
-                                description="Maximum students allowed"
+                                description={t('sections.capacityDescription')}
                             />
                         </div>
 
@@ -93,20 +94,22 @@ export default function SectionShow({ school, section }: Props) {
                             <Tabs defaultValue="info">
                                 <TabsList className="grid w-[200px] grid-cols-1">
                                     <TabsTrigger value="info">
-                                        Information
+                                        {t('common.information')}
                                     </TabsTrigger>
                                     <TabsTrigger value="details">
-                                        Details
+                                        {t('common.details')}
                                     </TabsTrigger>
                                     <TabsTrigger value="timeline">
-                                        Timeline
+                                        {t('common.timeline')}
                                     </TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="info">
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <p className="font-medium">Name:</p>
+                                            <p className="font-medium">
+                                                {t('sections.name')}
+                                            </p>
                                             <p className="text-muted-foreground">
                                                 {section.name}
                                             </p>
@@ -114,43 +117,39 @@ export default function SectionShow({ school, section }: Props) {
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Academic Class:
+                                                {t('sections.academicClass')}
                                             </p>
                                             <p className="text-muted-foreground">
                                                 {section.academic_class_name ??
-                                                    'Not assigned'}
+                                                    t('common.notAssigned')}
                                             </p>
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Homeroom Teacher:
+                                                {t('sections.homeroomTeacher')}
                                             </p>
                                             <p className="text-muted-foreground">
                                                 {section.teacher_name ??
-                                                    'Not assigned'}
+                                                    t('common.notAssigned')}
                                             </p>
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Created At:
+                                                {t('common.createdAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {new Date(
-                                                    section.created_at,
-                                                ).toLocaleDateString()}
+                                                {formatDate(section.created_at)}
                                             </p>
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Updated At:
+                                                {t('common.updatedAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {new Date(
-                                                    section.updated_at,
-                                                ).toLocaleDateString()}
+                                                {formatDate(section.updated_at)}
                                             </p>
                                         </div>
                                     </div>
@@ -158,18 +157,16 @@ export default function SectionShow({ school, section }: Props) {
 
                                 <TabsContent value="details">
                                     <div className="space-y-4">
-                                        {/* In a real implementation, this would show detailed information */}
                                         <p className="text-muted-foreground">
-                                            Detailed view coming soon...
+                                            {t('sections.detailsComingSoon')}
                                         </p>
                                     </div>
                                 </TabsContent>
 
                                 <TabsContent value="timeline">
                                     <div className="space-y-4">
-                                        {/* In a real implementation, this would show a timeline of events */}
                                         <p className="text-muted-foreground">
-                                            Timeline view coming soon...
+                                            {t('sections.timelineComingSoon')}
                                         </p>
                                     </div>
                                 </TabsContent>

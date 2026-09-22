@@ -1,208 +1,239 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Bell, Menu, Search } from 'lucide-react';
+import { Link, usePage, useRouter } from '@inertiajs/react';
+import type { HTMLAttributes } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import LocaleSwitcher from '@/components/locale-switcher';
 import {
-    Bell,
-    Calendar,
-    ChevronDown,
-    Globe,
-    LogOut,
-    MessageCircle,
-    Settings,
-    Sun,
-    Moon,
-    User,
-    Users,
-} from 'lucide-react';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { dashboard } from '@/routes';
+import { SearchField } from '@/components/forms/search-field';
 import { useState } from 'react';
 
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import LocaleSwitcher from '@/components/locale-switcher';
-import { usePageContext } from '@/hooks/use-page-context';
-import { cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
-
 export function AppTopbar({
-    breadcrumbs = [],
-}: {
-    breadcrumbs?: BreadcrumbItem[];
-}) {
-    const {
-        locale = 'ar',
-        school,
-        auth,
-    } = usePage<{
-        locale?: 'ar' | 'en';
-        school?: { id: number; name: string };
-        auth?: {
-            user: { id: number; name: string; email: string; avatar?: string };
+    className,
+    ...props
+}: HTMLAttributes<HTMLElement>) {
+    const { auth } = usePage().props as {
+        auth: {
+            user: { name: string; email: string } | null;
         };
-    }>().props;
-    const { locales } = usePageContext();
-    const isArabic = locale === 'ar';
-    const [notificationCount, setNotificationCount] = useState(3); // Simulated count
+    };
+    const router = useRouter();
+    const [search, setSearch] = useState('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Navigate to search results page - this would need a search route/page implemented
+        // For demonstration, we're logging the search term
+        console.log('Global search for:', search);
+        // In a real implementation, this would navigate to a search page:
+        // router.get('/search', { search }, { preserveState: true, replace: true });
+    };
 
     return (
-        <div className="bg-background border-muted flex h-16 w-full items-center justify-between border-b px-4">
-            {/* Left side: Brand and navigation */}
-            <div className="flex items-center space-x-4">
-                {/* App Logo/Brand */}
-                <Link href="/">
-                    <div className="flex items-center space-x-3">
-                        <Users className="text-primary-foreground h-8 w-8" />
-                        <div className="space-y-1">
-                            <p className="text-foreground text-sm font-medium">
-                                Universal School
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                                Management Platform
-                            </p>
-                        </div>
-                    </div>
-                </Link>
+        <header
+            className={cn(
+                'sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/90 backdrop-blur-xl',
+                className,
+            )}
+            {...props}
+        >
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    aria-label="Open navigation"
+                >
+                    <Menu size={20} />
+                </Button>
 
-                {/* Page Title and Breadcrumbs */}
-                <div className="hidden flex-1 items-center space-x-4 md:flex">
-                    <h1 className="text-foreground text-lg font-semibold">
-                        {isArabic ? 'لوحة التحكم' : 'Control Panel'}
-                    </h1>
-                    <Breadcrumbs breadcrumbs={breadcrumbs} />
+                <Link
+                    href={dashboard()}
+                    className="text-sm font-black text-foreground hover:text-primary"
+                >
+                    Madrasati
+                </Link>
+            </div>
+
+            <div className="flex-1 flex items-center justify-center">
+                {/* Search Field - Visible on lg and up */}
+                <div className="hidden lg:flex lg:items-center lg:w-1/2">
+                    <form onSubmit={handleSearch} className="w-full">
+                        <SearchField
+                            placeholder="Search students, teachers, classes..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full"
+                        />
+                    </form>
+                </div>
+
+                {/* Mobile search button */}
+                <div className="lg:hidden flex items-center">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsSearchOpen(!isSearchOpen)}
+                        aria-label="Toggle search"
+                    >
+                        <Search size={18} />
+                    </Button>
+
+                    {/* Mobile search dropdown */}
+                    {isSearchOpen && (
+                        <div className="absolute top-16 right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                            <form onSubmit={handleSearch} className="p-4">
+                                <SearchField
+                                    placeholder="Search..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="w-full mb-2"
+                                />
+                                <Button
+                                    type="submit"
+                                    variant="default"
+                                    size="sm"
+                                    width="full"
+                                >
+                                    Search
+                                </Button>
+                            </form>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Center: Search and Actions */}
-            <div className="hidden flex-1 items-center justify-center space-x-4 md:flex">
-                {/* Global Search */}
-                <div className="relative w-64">
-                    <input
-                        type="text"
-                        placeholder={
-                            isArabic ? 'بحث عام...' : 'Global search...'
-                        }
-                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-4 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-                        <Globe className="h-4 w-4" />
-                    </div>
-                </div>
+            <div className="flex items-center gap-1.5">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hidden sm:flex"
+                    aria-label="Search"
+                >
+                    <Search size={18} />
+                </Button>
 
-                {/* Language Switcher */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative"
+                    aria-label="Notifications"
+                >
+                    <Bell size={18} />
+                    <Badge
+                        variant="secondary"
+                        className="absolute -top-1 -right-1 h-5 w-5 min-w-[1.25rem] rounded-full p-0 text-xs"
+                    >
+                        0
+                    </Badge>
+                </Button>
+
                 <LocaleSwitcher />
 
-                {/* Theme Switcher */}
-                <div className="border-input bg-background relative inline-flex items-center gap-2 rounded-md border px-2 py-1 text-sm">
-                    <span className="sr-only">Theme</span>
-                    <button
-                        onClick={() => {
-                            // Toggle theme logic would go here
-                            const html = document.documentElement;
-                            html.classList.toggle('dark');
-                        }}
-                        className="hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        {document.documentElement.classList.contains('dark') ? (
-                            <Sun className="h-4 w-4" />
-                        ) : (
-                            <Moon className="h-4 w-4" />
-                        )}
-                    </button>
-                </div>
+                {auth?.user ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button
+                                type="button"
+                                className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                            >
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage
+                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(auth.user.name)}`}
+                                        alt={auth.user.name}
+                                    />
+                                    <AvatarFallback className="bg-primary text-xs font-black text-primary-foreground">
+                                        {auth.user.name
+                                            .split(' ')
+                                            .map((n) => n[0])
+                                            .join('')
+                                            .toUpperCase()
+                                            .slice(0, 2)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <span className="hidden sm:inline">
+                                    {auth.user.name}
+                                </span>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 space-y-1">
+                            <DropdownMenuLabel className="px-4 py-3">
+                                <div className="flex flex-col space-y-1">
+                                    <p className="text-sm font-medium">
+                                        {auth.user.name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {auth.user.email}
+                                    </p>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/profile/edit"
+                                        className="flex w-full items-center gap-2 text-sm"
+                                    >
+                                        Settings
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/appearance/edit"
+                                        className="flex w-full items-center gap-2 text-sm"
+                                    >
+                                        Appearance
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/notifications"
+                                        className="flex w-full items-center gap-2 text-sm"
+                                    >
+                                        Notifications
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/help"
+                                        className="flex w-full items-center gap-2 text-sm"
+                                    >
+                                        Help & Support
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator className="my-1"/>
+                            <DropdownMenuItem
+                                onSelect={() => {
+                                    const form = document.createElement('form');
+                                    form.method = 'post';
+                                    form.action = '/logout';
+                                    document.body.appendChild(form);
+                                    form.requestSubmit();
+                                }}
+                            >
+                                <span className="flex w-full items-center gap-2 text-sm">
+                                    Log out
+                                </span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : null}
             </div>
-
-            {/* Right side: User actions and notifications */}
-            <div className="flex items-center space-x-4">
-                {/* Notifications */}
-                <div className="relative">
-                    <button className="bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring relative inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50">
-                        <Bell className="h-4 w-4" />
-                        {notificationCount > 0 && (
-                            <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 px-1 py-1 text-xs font-medium text-white">
-                                {notificationCount}
-                            </div>
-                        )}
-                    </button>
-                    {/* Notification dropdown would go here */}
-                </div>
-
-                {/* Messages */}
-                <div className="relative">
-                    <button className="bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring relative inline-flex items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50">
-                        <MessageCircle className="h-4 w-4" />
-                    </button>
-                    {/* Messages dropdown would go here */}
-                </div>
-
-                {/* User Menu */}
-                <div className="relative">
-                    <div className="rtl:reverse flex items-center gap-2">
-                        {auth?.user?.avatar ? (
-                            <img
-                                src={auth.user.avatar}
-                                alt={auth.user.name}
-                                className="border-border/50 h-8 w-8 rounded-full"
-                            ></img>
-                        ) : (
-                            <User className="text-primary-foreground h-8 w-8" />
-                        )}
-                        <div className="space-y-1 text-left">
-                            <p className="text-foreground max-w-xs truncate text-sm font-medium">
-                                {auth?.user?.name}
-                            </p>
-                            <p className="text-muted-foreground max-w-xs truncate text-xs">
-                                {school?.name ?? 'School Name'}
-                            </p>
-                        </div>
-                        <ChevronDown className="text-muted-foreground h-4 w-4" />
-                    </div>
-
-                    {/* User menu dropdown */}
-                    <div
-                        className="bg-popover border-popover/50 ring-offset-background absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md border p-1 shadow-[0_8px_9px_-4px_rgb(0,0,0,0.3),0_4px_18px_0_rgb(0,0,0,0.2)] shadow-lg focus:outline-none"
-                        data-state="closed"
-                    >
-                        <div className="px-4 pt-2 pb-3">
-                            <p className="text-popover-foreground text-sm font-medium">
-                                {auth?.user?.name}
-                            </p>
-                            <p className="text-popover-muted text-xs">
-                                {auth?.user?.email}
-                            </p>
-                        </div>
-                        <div className="border-popover/20 border-t"></div>
-                        <div className="px-4 pb-3">
-                            <Link
-                                href="/admin/schools"
-                                className="text-popover-foreground hover:bg-popover/70 block w-full rounded-md px-3 py-2 text-left text-sm font-medium"
-                            >
-                                School Management
-                            </Link>
-                            <Link
-                                href="/admin/organization"
-                                className="text-popover-foreground hover:bg-popover/70 block w-full rounded-md px-3 py-2 text-left text-sm font-medium"
-                            >
-                                Organization Settings
-                            </Link>
-                            <Link
-                                href="/profile"
-                                className="text-popover-foreground hover:bg-popover/70 block w-full rounded-md px-3 py-2 text-left text-sm font-medium"
-                            >
-                                Profile
-                            </Link>
-                            <Link
-                                href="/settings"
-                                className="text-popover-foreground hover:bg-popover/70 block w-full rounded-md px-3 py-2 text-left text-sm font-medium"
-                            >
-                                Settings
-                            </Link>
-                            <Link
-                                href="/logout"
-                                method="post"
-                                className="text-popover-foreground hover:bg-popover/70 text-destructive block w-full rounded-md px-3 py-2 text-left text-sm font-medium"
-                            >
-                                Log Out
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </header>
     );
 }
+
+export default AppTopbar;

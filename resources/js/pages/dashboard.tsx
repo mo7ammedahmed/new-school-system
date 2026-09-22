@@ -20,6 +20,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
+import { DashboardWidget } from '@/components/dashboard/dashboard-widget';
 
 type AttendanceTotals = {
     present: number;
@@ -193,16 +194,16 @@ function Card({
     const Icon = icon;
 
     return (
-        <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
+        <section className="rounded-[1.75rem] border border-border bg-card p-6">
             <div className="flex items-center justify-between gap-3">
-                <h2 className="flex items-center gap-2 text-lg font-black text-[#17342f]">
+                <h2 className="flex items-center gap-2 text-lg font-black text-foreground">
                     <Icon size={18} aria-hidden={true} />
                     {title}
                 </h2>
                 {href ? (
                     <Link
                         href={href}
-                        className="text-xs font-bold text-[#0d5c4d] underline-offset-4 hover:underline"
+                        className="text-xs font-bold text-brand-600 underline-offset-4 hover:underline"
                     >
                         {actionLabel}
                     </Link>
@@ -214,7 +215,7 @@ function Card({
 }
 
 function Empty({ children }: { children: ReactNode }) {
-    return <p className="text-sm text-[#789087]">{children}</p>;
+    return <p className="text-sm text-muted-foreground">{children}</p>;
 }
 
 function StatCard({
@@ -233,17 +234,17 @@ function StatCard({
     const Icon = icon;
     const body = (
         <div className="flex items-start gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#eaf3ee] text-[#0d5c4d]">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-brand-600">
                 <Icon size={18} aria-hidden={true} />
             </span>
             <span className="min-w-0">
-                <span className="block text-sm font-bold text-[#6c837c]">
+                <span className="block text-sm font-bold text-muted-foreground">
                     {title}
                 </span>
-                <span className="mt-1 block truncate text-2xl font-black text-[#17342f]">
+                <span className="mt-1 block truncate text-2xl font-black text-foreground">
                     {value}
                 </span>
-                <span className="mt-1 block text-xs text-[#789087]">
+                <span className="mt-1 block text-xs text-muted-foreground">
                     {hint}
                 </span>
             </span>
@@ -254,7 +255,7 @@ function StatCard({
         return (
             <Link
                 href={href}
-                className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-5 transition-shadow hover:shadow-[0_18px_40px_-32px_#17342f] focus-visible:ring-2 focus-visible:ring-[#28544a] focus-visible:outline-none"
+                className="rounded-3xl border border-border bg-card p-5 transition-shadow hover:shadow-[0_18px_40px_-32px_var(--brand-900)] focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:outline-none"
             >
                 {body}
             </Link>
@@ -262,7 +263,7 @@ function StatCard({
     }
 
     return (
-        <div className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-5">
+        <div className="rounded-3xl border border-border bg-card p-5">
             {body}
         </div>
     );
@@ -271,10 +272,10 @@ function StatCard({
 function AttendanceBar({ totals }: { totals: AttendanceTotals }) {
     const { t } = useT();
     const segments = [
-        { key: 'present', value: totals.present, className: 'bg-[#2f6b3a]' },
-        { key: 'late', value: totals.late, className: 'bg-[#d9a01a]' },
-        { key: 'excused', value: totals.excused, className: 'bg-[#3b7ea1]' },
-        { key: 'absent', value: totals.absent, className: 'bg-[#c0392b]' },
+         { key: 'present', value: totals.present, className: 'bg-brand-800' },
+        { key: 'late', value: totals.late, className: 'bg-amber-500' },
+        { key: 'excused', value: totals.excused, className: 'bg-sky-500' },
+        { key: 'absent', value: totals.absent, className: 'bg-destructive' },
     ];
 
     if (totals.recorded === 0) {
@@ -283,7 +284,7 @@ function AttendanceBar({ totals }: { totals: AttendanceTotals }) {
 
     return (
         <div className="space-y-4">
-            <div className="flex h-2.5 overflow-hidden rounded-full bg-[#eef3ef]">
+            <div className="flex h-2.5 overflow-hidden rounded-full bg-accent">
                 {segments.map((segment) =>
                     segment.value > 0 ? (
                         <span
@@ -301,18 +302,18 @@ function AttendanceBar({ totals }: { totals: AttendanceTotals }) {
                 {segments.map((segment) => (
                     <div
                         key={segment.key}
-                        className="rounded-2xl border border-[#edf2ed] p-3"
+                        className="rounded-2xl border border-border p-3"
                     >
-                        <dt className="text-xs font-bold text-[#789087]">
+                        <dt className="text-xs font-bold text-muted-foreground">
                             {t(`portal.${segment.key}`)}
                         </dt>
-                        <dd className="mt-1 text-lg font-black text-[#17342f]">
+                        <dd className="mt-1 text-lg font-black text-foreground">
                             {segment.value}
                         </dd>
                     </div>
                 ))}
             </dl>
-            <p className="text-xs text-[#789087]">
+            <p className="text-xs text-muted-foreground">
                 {t('dashboard.attendanceHint', { recorded: totals.recorded })} ·{' '}
                 {totals.presentPercentage}%
             </p>
@@ -357,99 +358,119 @@ export default function Dashboard() {
             <Head title={t('dashboard.title')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-[#143e36] p-6 text-white md:p-8">
-                    <p className="text-sm font-bold text-[#b7d7c5]">
+                <header className="rounded-[1.75rem] bg-hero-bg p-6 text-white md:p-8">
+                    <p className="text-sm font-bold text-hero-muted">
                         {t('dashboard.title')}
                     </p>
                     <h1 className="mt-2 text-3xl font-black md:text-4xl">
                         {school.name}
                     </h1>
-                    <p className="mt-3 max-w-2xl leading-7 text-[#d2e6d8]">
+                    <p className="mt-3 max-w-2xl leading-7 text-hero-accent">
                         {t('dashboard.subtitle', { school: school.name })}
                     </p>
                 </header>
 
                 <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <StatCard
-                        title={t('dashboard.students')}
-                        value={metrics.students.total.toLocaleString(locale)}
-                        hint={t('dashboard.studentsHint', {
-                            active: metrics.students.active,
-                            inactive: metrics.students.inactive,
-                        })}
-                        icon={UsersRound}
-                        href="/portal/students"
-                    />
-                    <StatCard
-                        title={t('dashboard.teachers')}
-                        value={metrics.teachers.total.toLocaleString(locale)}
-                        hint={t('dashboard.teachersHint', {
-                            assigned: metrics.teachers.assigned,
-                        })}
-                        icon={GraduationCap}
-                        href={`/admin/schools/${school.id}/users`}
-                    />
-                    <StatCard
-                        title={t('dashboard.attendanceToday')}
-                        value={`${attendance.presentPercentage}%`}
-                        hint={t('dashboard.attendanceHint', {
-                            recorded: attendance.recorded,
-                        })}
-                        icon={ClipboardList}
-                        href={`/admin/schools/${school.id}/reports/attendance`}
-                    />
-                    <StatCard
-                        title={t('dashboard.activeClasses')}
-                        value={metrics.activeClasses.toLocaleString(locale)}
-                        hint={t('dashboard.activeClassesHint')}
-                        icon={Layers}
-                        href={`/admin/schools/${school.id}/academic-classes`}
-                    />
-                    <StatCard
-                        title={t('dashboard.pendingAdmissions')}
-                        value={metrics.pendingAdmissions.toLocaleString(locale)}
-                        hint={t('dashboard.pendingAdmissionsHint')}
-                        icon={Inbox}
-                        href={`/admin/schools/${school.id}/applications`}
-                    />
-                    <StatCard
-                        title={t('dashboard.outstandingBalances')}
-                        value={formatMinor(
-                            metrics.outstandingBalances.amountMinor,
-                            locale,
-                        )}
-                        hint={t('dashboard.outstandingHint')}
-                        icon={WalletCards}
-                        href={`/admin/schools/${school.id}/reports/finance`}
-                    />
-                    <StatCard
-                        title={t('dashboard.paymentsToday')}
-                        value={formatMinor(
-                            metrics.paymentsToday.amountMinor,
-                            locale,
-                        )}
-                        hint={t('dashboard.paymentsHint', {
-                            count: metrics.paymentsToday.count,
-                        })}
-                        icon={CreditCard}
-                        href={`/admin/schools/${school.id}/finance`}
-                    />
-                    <StatCard
-                        title={t('dashboard.upcomingExams')}
-                        value={metrics.upcomingExams.length.toLocaleString(
-                            locale,
-                        )}
-                        hint={t('dashboard.upcomingExamsHint')}
-                        icon={CalendarDays}
-                        href={`/admin/schools/${school.id}/schedule/exams`}
-                    />
+                    <DashboardWidget title={t('dashboard.students')}>
+                        <StatCard
+                            title={t('dashboard.students')}
+                            value={metrics.students.total.toLocaleString(locale)}
+                            hint={t('dashboard.studentsHint', {
+                                active: metrics.students.active,
+                                inactive: metrics.students.inactive,
+                            })}
+                            icon={UsersRound}
+                            href="/portal/students"
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.teachers')}>
+                        <StatCard
+                            title={t('dashboard.teachers')}
+                            value={metrics.teachers.total.toLocaleString(locale)}
+                            hint={t('dashboard.teachersHint', {
+                                assigned: metrics.teachers.assigned,
+                            })}
+                            icon={GraduationCap}
+                            href={`/admin/schools/${school.id}/users`}
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.attendanceToday')}>
+                        <StatCard
+                            title={t('dashboard.attendanceToday')}
+                            value={`${attendance.presentPercentage}%`}
+                            hint={t('dashboard.attendanceHint', {
+                                recorded: attendance.recorded,
+                            })}
+                            icon={ClipboardList}
+                            href={`/admin/schools/${school.id}/reports/attendance`}
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.activeClasses')}>
+                        <StatCard
+                            title={t('dashboard.activeClasses')}
+                            value={metrics.activeClasses.toLocaleString(locale)}
+                            hint={t('dashboard.activeClassesHint')}
+                            icon={Layers}
+                            href={`/admin/schools/${school.id}/academic-classes`}
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.pendingAdmissions')}>
+                        <StatCard
+                            title={t('dashboard.pendingAdmissions')}
+                            value={metrics.pendingAdmissions.toLocaleString(locale)}
+                            hint={t('dashboard.pendingAdmissionsHint')}
+                            icon={Inbox}
+                            href={`/admin/schools/${school.id}/applications`}
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.outstandingBalances')}>
+                        <StatCard
+                            title={t('dashboard.outstandingBalances')}
+                            value={formatMinor(
+                                metrics.outstandingBalances.amountMinor,
+                                locale,
+                            )}
+                            hint={t('dashboard.outstandingHint')}
+                            icon={WalletCards}
+                            href={`/admin/schools/${school.id}/reports/finance`}
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.paymentsToday')}>
+                        <StatCard
+                            title={t('dashboard.paymentsToday')}
+                            value={formatMinor(
+                                metrics.paymentsToday.amountMinor,
+                                locale,
+                            )}
+                            hint={t('dashboard.paymentsHint', {
+                                count: metrics.paymentsToday.count,
+                            })}
+                            icon={CreditCard}
+                            href={`/admin/schools/${school.id}/finance`}
+                        />
+                    </DashboardWidget>
+
+                    <DashboardWidget title={t('dashboard.upcomingExams')}>
+                        <StatCard
+                            title={t('dashboard.upcomingExams')}
+                            value={metrics.upcomingExams.length.toLocaleString(
+                                locale,
+                            )}
+                            hint={t('dashboard.upcomingExamsHint')}
+                            icon={CalendarDays}
+                            href={`/admin/schools/${school.id}/schedule/exams`}
+                        />
+                    </DashboardWidget>
                 </section>
 
                 {widgets.quickActions.length > 0 ? (
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-[#f7f8f4] p-6">
-                        <h2 className="text-lg font-black text-[#17342f]">
-                            {t('dashboard.quickActions')}
-                        </h2>
+                    <DashboardWidget title={t('dashboard.quickActions')}>
                         <div className="mt-4 flex flex-wrap gap-3">
                             {widgets.quickActions.map((action) => {
                                 const meta = QUICK_ACTION_META[action.key];
@@ -459,7 +480,7 @@ export default function Dashboard() {
                                     <Link
                                         key={action.key}
                                         href={action.href}
-                                        className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-[#28544a] shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#28544a] focus-visible:outline-none"
+                                        className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 text-sm font-black text-brand-700 shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:outline-none"
                                     >
                                         <Icon size={17} aria-hidden={true} />
                                         {t(meta?.key ?? action.key)}
@@ -467,24 +488,20 @@ export default function Dashboard() {
                                 );
                             })}
                         </div>
-                    </section>
+                    </DashboardWidget>
                 ) : null}
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.attendanceToday')}
-                        icon={BarChart3}
-                        href={`/admin/schools/${school.id}/reports/attendance`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         <AttendanceBar totals={attendance} />
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.admissionsPipeline')}
-                        icon={Inbox}
-                        href={`/admin/schools/${school.id}/applications`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         {pipelineTotal === 0 ? (
                             <Empty>
@@ -503,54 +520,51 @@ export default function Dashboard() {
                                 ).map(([key, value]) => (
                                     <div
                                         key={key}
-                                        className="rounded-2xl border border-[#edf2ed] p-3"
+                                        className="rounded-2xl border border-border p-3"
                                     >
-                                        <dt className="text-xs font-bold text-[#789087]">
+                                        <dt className="text-xs font-bold text-muted-foreground">
                                             {key}
                                         </dt>
-                                        <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                        <dd className="mt-1 text-lg font-black text-foreground">
                                             {value}
                                         </dd>
                                     </div>
                                 ))}
                             </dl>
-                        )}
-                    </Card>
+                        </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.financeSummary')}
-                        icon={WalletCards}
-                        href={`/admin/schools/${school.id}/reports/finance`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         <dl className="space-y-3">
-                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#edf2ed] p-3">
-                                <dt className="text-sm font-bold text-[#789087]">
+                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-3">
+                                <dt className="text-sm font-bold text-muted-foreground">
                                     {t('dashboard.incomeToday')}
                                 </dt>
-                                <dd className="text-sm font-black text-[#17342f]">
+                                <dd className="text-sm font-black text-foreground">
                                     {formatMinor(
                                         widgets.financeSummary.income.today,
                                         locale,
                                     )}
                                 </dd>
                             </div>
-                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#edf2ed] p-3">
-                                <dt className="text-sm font-bold text-[#789087]">
+                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-3">
+                                <dt className="text-sm font-bold text-muted-foreground">
                                     {t('dashboard.incomeMonth')}
                                 </dt>
-                                <dd className="text-sm font-black text-[#17342f]">
+                                <dd className="text-sm font-black text-foreground">
                                     {formatMinor(
                                         widgets.financeSummary.income.month,
                                         locale,
                                     )}
                                 </dd>
                             </div>
-                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#edf2ed] p-3">
-                                <dt className="text-sm font-bold text-[#789087]">
+                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-3">
+                                <dt className="text-sm font-bold text-muted-foreground">
                                     {t('dashboard.outstandingMinor')}
                                 </dt>
-                                <dd className="text-sm font-black text-[#17342f]">
+                                <dd className="text-sm font-black text-foreground">
                                     {formatMinor(
                                         widgets.financeSummary.outstandingMinor,
                                         locale,
@@ -558,62 +572,57 @@ export default function Dashboard() {
                                 </dd>
                             </div>
                         </dl>
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.paymentStatus')}
-                        icon={Receipt}
-                        href={`/admin/schools/${school.id}/finance`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         <dl className="grid grid-cols-3 gap-3">
-                            <div className="rounded-2xl border border-[#edf2ed] p-3">
-                                <dt className="flex items-center gap-1 text-xs font-bold text-[#789087]">
+                            <div className="rounded-2xl border border-border p-3">
+                                <dt className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
                                     <CheckCircle2
                                         size={14}
                                         aria-hidden="true"
                                     />
                                     {t('dashboard.successful')}
                                 </dt>
-                                <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                <dd className="mt-1 text-lg font-black text-foreground">
                                     {widgets.paymentStatus.successful}
                                 </dd>
                             </div>
-                            <div className="rounded-2xl border border-[#edf2ed] p-3">
-                                <dt className="flex items-center gap-1 text-xs font-bold text-[#789087]">
+                            <div className="rounded-2xl border border-border p-3">
+                                <dt className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
                                     <XCircle size={14} aria-hidden="true" />
                                     {t('dashboard.failed')}
                                 </dt>
-                                <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                <dd className="mt-1 text-lg font-black text-foreground">
                                     {widgets.paymentStatus.failed}
                                 </dd>
                             </div>
-                            <div className="rounded-2xl border border-[#edf2ed] p-3">
-                                <dt className="flex items-center gap-1 text-xs font-bold text-[#789087]">
+                            <div className="rounded-2xl border border-border p-3">
+                                <dt className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
                                     <TrendingUp size={14} aria-hidden="true" />
                                     {t('dashboard.inProgress')}
                                 </dt>
-                                <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                <dd className="mt-1 text-lg font-black text-foreground">
                                     {widgets.paymentStatus.pending}
                                 </dd>
                             </div>
                         </dl>
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
-                        title={t('dashboard.assessmentTitle')}
-                        icon={FileText}
-                    >
+                    <DashboardWidget title={t('dashboard.assessmentTitle')}>
                         {metrics.assessmentStats.total === 0 ? (
                             <Empty>{t('portal.noAssessments')}</Empty>
                         ) : (
                             <div className="space-y-4">
                                 <dl className="grid grid-cols-2 gap-3">
-                                    <div className="rounded-2xl border border-[#edf2ed] p-3">
-                                        <dt className="text-xs font-bold text-[#789087]">
+                                    <div className="rounded-2xl border border-border p-3">
+                                        <dt className="text-xs font-bold text-muted-foreground">
                                             {t('dashboard.assessmentAverage')}
                                         </dt>
-                                        <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                        <dd className="mt-1 text-lg font-black text-foreground">
                                             {
                                                 metrics.assessmentStats
                                                     .averagePercent
@@ -621,16 +630,16 @@ export default function Dashboard() {
                                             %
                                         </dd>
                                     </div>
-                                    <div className="rounded-2xl border border-[#edf2ed] p-3">
-                                        <dt className="text-xs font-bold text-[#789087]">
+                                    <div className="rounded-2xl border border-border p-3">
+                                        <dt className="text-xs font-bold text-muted-foreground">
                                             {t('dashboard.assessmentPassRate')}
                                         </dt>
-                                        <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                        <dd className="mt-1 text-lg font-black text-foreground">
                                             {metrics.assessmentStats.passRate}%
                                         </dd>
                                     </div>
                                 </dl>
-                                <p className="text-xs text-[#789087]">
+                                <p className="text-xs text-muted-foreground">
                                     {t('dashboard.assessmentCount', {
                                         count: metrics.assessmentStats.total,
                                     })}
@@ -640,18 +649,18 @@ export default function Dashboard() {
                                         (assessment) => (
                                             <li
                                                 key={assessment.id}
-                                                className="rounded-2xl border border-[#edf2ed] p-3"
+                                                className="rounded-2xl border border-border p-3"
                                             >
                                                 <div className="flex items-center justify-between gap-3">
-                                                    <strong className="truncate text-sm font-black text-[#17342f]">
+                                                    <strong className="truncate text-sm font-black text-foreground">
                                                         {assessment.title}
                                                     </strong>
-                                                    <span className="shrink-0 text-xs font-bold text-[#0d5c4d]">
+                                                    <span className="shrink-0 text-xs font-bold text-brand-600">
                                                         {assessment.score}/
                                                         {assessment.maxScore}
                                                     </span>
                                                 </div>
-                                                <small className="mt-1 block text-[#789087]">
+                                                <small className="mt-1 block text-muted-foreground">
                                                     {assessment.student}
                                                     {assessment.sectionName
                                                         ? ` · ${assessment.sectionName}`
@@ -663,13 +672,11 @@ export default function Dashboard() {
                                 </ul>
                             </div>
                         )}
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.todaysTimetable')}
-                        icon={CalendarDays}
-                        href={`/admin/schools/${school.id}/schedule/timetable`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         {widgets.todaysTimetable.length === 0 ? (
                             <Empty>{t('dashboard.noTimetable')}</Empty>
@@ -680,20 +687,20 @@ export default function Dashboard() {
                                     .map((entry) => (
                                         <li
                                             key={entry.id}
-                                            className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                            className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                         >
                                             <span
                                                 className="min-w-0 border-s-4 ps-3"
                                                 style={{
                                                     borderColor:
                                                         entry.subject_color ??
-                                                        '#dbe8df',
+                                                        'var(--border)',
                                                 }}
                                             >
-                                                <strong className="block truncate text-sm font-black text-[#17342f]">
+                                                <strong className="block truncate text-sm font-black text-foreground">
                                                     {subjectLabel(entry)}
                                                 </strong>
-                                                <small className="mt-1 block text-[#789087]">
+                                                <small className="mt-1 block text-muted-foreground">
                                                     {entry.class_name} ·{' '}
                                                     {entry.section_name}
                                                     {entry.teacher_name
@@ -701,7 +708,7 @@ export default function Dashboard() {
                                                         : ''}
                                                 </small>
                                             </span>
-                                            <span className="shrink-0 text-end text-xs font-bold text-[#0d5c4d]">
+                                            <span className="shrink-0 text-end text-xs font-bold text-brand-600">
                                                 {t('portal.period')}{' '}
                                                 {entry.period}
                                                 {entry.starts_at ? (
@@ -714,13 +721,11 @@ export default function Dashboard() {
                                     ))}
                             </ol>
                         )}
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.outstandingInvoices')}
-                        icon={WalletCards}
-                        href={`/admin/schools/${school.id}/reports/finance`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         {widgets.outstandingInvoices.length === 0 ? (
                             <Empty>
@@ -733,13 +738,13 @@ export default function Dashboard() {
                                     .map((installment) => (
                                         <li
                                             key={installment.id}
-                                            className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                            className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                         >
                                             <span className="min-w-0">
-                                                <strong className="block truncate text-sm font-black text-[#17342f]">
+                                                <strong className="block truncate text-sm font-black text-foreground">
                                                     {installment.student}
                                                 </strong>
-                                                <small className="mt-1 block text-[#789087]">
+                                                <small className="mt-1 block text-muted-foreground">
                                                     {installment.number} · #
                                                     {installment.sequence}
                                                     {installment.dueOn
@@ -752,7 +757,7 @@ export default function Dashboard() {
                                                         : ''}
                                                 </small>
                                             </span>
-                                            <span className="shrink-0 text-end text-sm font-black text-[#17342f]">
+                                            <span className="shrink-0 text-end text-sm font-black text-foreground">
                                                 {formatMinor(
                                                     installment.outstandingMinor,
                                                     locale,
@@ -763,12 +768,9 @@ export default function Dashboard() {
                                     ))}
                             </ul>
                         )}
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
-                        title={t('dashboard.upcomingExams')}
-                        icon={GraduationCap}
-                    >
+                    <DashboardWidget title={t('dashboard.upcomingExams')}>
                         {metrics.upcomingExams.length === 0 ? (
                             <Empty>{t('portal.noUpcomingExams')}</Empty>
                         ) : (
@@ -778,20 +780,20 @@ export default function Dashboard() {
                                     .map((exam) => (
                                         <li
                                             key={exam.id}
-                                            className="rounded-2xl border border-[#edf2ed] p-3"
+                                            className="rounded-2xl border border-border p-3"
                                         >
                                             <div className="flex items-center justify-between gap-3">
-                                                <strong className="truncate text-sm font-black text-[#17342f]">
+                                                <strong className="truncate text-sm font-black text-foreground">
                                                     {subjectLabel(exam)}
                                                 </strong>
-                                                <span className="shrink-0 text-xs font-bold text-[#0d5c4d]">
+                                                <span className="shrink-0 text-xs font-bold text-brand-600">
                                                     {exam.starts_at}
                                                     {exam.ends_at
                                                         ? `–${exam.ends_at}`
                                                         : ''}
                                                 </span>
                                             </div>
-                                            <small className="mt-1 block text-[#789087]">
+                                            <small className="mt-1 block text-muted-foreground">
                                                 {exam.exam_date} ·{' '}
                                                 {exam.class_name} ·{' '}
                                                 {exam.section_name}
@@ -803,13 +805,11 @@ export default function Dashboard() {
                                     ))}
                             </ol>
                         )}
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.recentNotices')}
-                        icon={Megaphone}
-                        href={`/admin/schools/${school.id}/notices`}
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         {widgets.recentNotices.length === 0 ? (
                             <Empty>{t('dashboard.noNotices')}</Empty>
@@ -818,29 +818,27 @@ export default function Dashboard() {
                                 {widgets.recentNotices.map((notice) => (
                                     <li
                                         key={notice.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                     >
-                                        <strong className="min-w-0 truncate text-sm font-black text-[#17342f]">
+                                        <strong className="min-w-0 truncate text-sm font-black text-foreground">
                                             {notice.title}
                                         </strong>
                                         {notice.publishedAt ? (
-                                            <small className="shrink-0 text-xs text-[#789087]">
+                                            <small className="shrink-0 text-xs text-muted-foreground">
                                                 {new Date(
                                                     notice.publishedAt,
                                                 ).toLocaleDateString(locale)}
                                             </small>
                                         ) : null}
                                     </li>
-                                ))}
+                                )}
                             </ul>
                         )}
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
+                    <DashboardWidget
                         title={t('dashboard.notificationActivity')}
-                        icon={Bell}
-                        href="/admin/notifications/deliveries"
-                        actionLabel={t('dashboard.viewAll')}
+                        refreshable
                     >
                         <dl className="grid grid-cols-3 gap-3">
                             {(
@@ -862,23 +860,20 @@ export default function Dashboard() {
                             ).map(([key, value]) => (
                                 <div
                                     key={key}
-                                    className="rounded-2xl border border-[#edf2ed] p-3"
+                                    className="rounded-2xl border border-border p-3"
                                 >
-                                    <dt className="text-xs font-bold text-[#789087]">
+                                    <dt className="text-xs font-bold text-muted-foreground">
                                         {t(`dashboard.${key}`)}
                                     </dt>
-                                    <dd className="mt-1 text-lg font-black text-[#17342f]">
+                                    <dd className="mt-1 text-lg font-black text-foreground">
                                         {value}
                                     </dd>
                                 </div>
                             ))}
                         </dl>
-                    </Card>
+                    </DashboardWidget>
 
-                    <Card
-                        title={t('dashboard.recentActivity')}
-                        icon={TrendingUp}
-                    >
+                    <DashboardWidget title={t('dashboard.recentActivity')}>
                         {widgets.recentActivity.length === 0 ? (
                             <Empty>{t('dashboard.noActivity')}</Empty>
                         ) : (
@@ -886,18 +881,18 @@ export default function Dashboard() {
                                 {widgets.recentActivity.map((entry) => (
                                     <li
                                         key={entry.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                     >
                                         <span className="min-w-0">
-                                            <strong className="block truncate text-sm font-black text-[#17342f]">
+                                            <strong className="block truncate text-sm font-black text-foreground">
                                                 {humanizeAction(entry.action)}
                                             </strong>
-                                            <small className="mt-1 block text-[#789087]">
+                                            <small className="mt-1 block text-muted-foreground">
                                                 {entry.actor ?? '—'}
                                             </small>
                                         </span>
                                         {entry.at ? (
-                                            <small className="shrink-0 text-xs text-[#789087]">
+                                            <small className="shrink-0 text-xs text-muted-foreground">
                                                 {new Date(
                                                     entry.at,
                                                 ).toLocaleString(locale, {
@@ -910,7 +905,7 @@ export default function Dashboard() {
                                 ))}
                             </ol>
                         )}
-                    </Card>
+                    </DashboardWidget>
                 </div>
             </div>
         </>

@@ -31,11 +31,10 @@ export function Timeline({
         <div
             data-slot="timeline"
             className={cn(
-                "relative flex w-full min-h-0",
+                "relative flex w-full min-h-0 border-l border-border/50 pl-4",
                 className
             )}
         >
-            <div className="absolute inset-0 flex w-0.5 border-border/50" />
             <div className="flex flex-col flex-1 space-y-6 ps-4 pe-2">
                 {children}
             </div>
@@ -74,11 +73,11 @@ export function TimelineDot({
 }: TimelineDotProps) {
     const baseClasses = "flex h-3 w-3 items-center justify-center";
     const colorClasses = cn(
-        color === "success" && "bg-success",
-        color === "destructive" && "bg-destructive",
-        color === "warning" && "bg-warning",
-        !filled && "bg-border",
-        filled && !color && "bg-primary"
+        color === "success" && "bg-success/20 text-success",
+        color === "destructive" && "bg-destructive/20 text-destructive",
+        color === "warning" && "bg-warning/20 text-warning",
+        !filled && "bg-border/50",
+        filled && !color && "bg-primary/20 text-primary"
     );
 
     return (
@@ -87,13 +86,14 @@ export function TimelineDot({
             className={cn(
                 baseClasses,
                 colorClasses,
-                className
+                className,
+                "flex h-4 w-4 items-center justify-center rounded-full"
             )}
         >
             {filled ? (
-                <span className="h-1.5 w-1.5 bg-background" />
+                <span className="h-2.5 w-2.5 bg-current" />
             ) : (
-                <span className="h-2.5 w-2.5 border-2 border-current" />
+                <span className="h-3 w-3 border-2 border-current" />
             )}
         </span>
     );

@@ -9,6 +9,8 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
+import type { LayoutProps } from '@/types/shared';
+import type { BreadcrumbItem } from '@/types/navigation';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -28,14 +30,22 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function SettingsLayout({
+    children,
+    title = 'Settings',
+    description = 'Manage your profile and account settings',
+    className,
+    breadcrumbs = [],
+    active,
+    ...props
+}: LayoutProps) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (
-        <div className="px-4 py-6">
+        <div className={cn('px-4 py-6', className)}>
             <Heading
-                title="Settings"
-                description="Manage your profile and account settings"
+                title={title}
+                description={description}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

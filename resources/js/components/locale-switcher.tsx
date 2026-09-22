@@ -1,33 +1,40 @@
-import { router } from '@inertiajs/react';
+import { Globe2 } from 'lucide-react';
 import { usePageContext } from '@/hooks/use-page-context';
+import { cn } from '@/lib/utils';
 
-export default function LocaleSwitcher() {
-    const { locale, locales } = usePageContext();
+type Props = {
+    className?: string;
+};
 
-    if (Object.keys(locales).length < 2) {
+export default function LocaleSwitcher({ className }: Props) {
+    const { locale, locales, switchLocale } = usePageContext();
+    const available = Object.keys(locales ?? {});
+
+    if (available.length < 2) {
         return null;
     }
 
-    function changeLocale(nextLocale: string) {
-        document.cookie = `locale=${encodeURIComponent(nextLocale)}; path=/; max-age=31536000; samesite=lax`;
-        router.reload();
-    }
+    const nextLocale =
+        available.length === 2
+            ? available.find((l) => l !== locale) ?? locale
+            : locale;
 
     return (
-        <label className="text-muted-foreground inline-flex items-center gap-2 text-sm">
-            <span className="sr-only">Language</span>
-            <select
-                aria-label="Language"
-                className="border-input bg-background text-foreground rounded-md border px-2 py-1"
-                value={locale}
-                onChange={(event) => changeLocale(event.target.value)}
-            >
-                {Object.entries(locales).map(([code, language]) => (
-                    <option key={code} value={code}>
-                        {language.label}
-                    </option>
-                ))}
-            </select>
-        </label>
+        <button
+            type="button"
+            onClick={() => switchLocale(nextLocale)}
+            className={cn(
+                'inline-flex items-center gap-2 rounded-xl bg-muted px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
+                className,
+            )}
+            aria-label={
+                locale === 'ar'
+                    ? 'Switch language to English'
+                    : 'التبديل إلى العربية'
+            }
+        >
+            <Globe2 size={16} />
+            <span className="uppercase">{locale ?? 'ar'}</span>
+        </button>
     );
 }

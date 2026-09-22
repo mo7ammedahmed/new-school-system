@@ -1,3 +1,5 @@
+import type { BreadcrumbItem } from './navigation';
+
 export type LocaleDirection = 'ltr' | 'rtl';
 
 export type SharedLocale = {
@@ -51,4 +53,15 @@ export type SharedPageProps = {
         abilities: SharedAbilities;
         schools: SharedSchool[];
     };
+};
+
+export type LayoutProps = {
+    children: React.ReactNode;
+    breadcrumbs?: BreadcrumbItem[];
+    title?: string;
+    description?: string;
+    active?: string;
+    className?: string;
+    variant?: string;
+    [key: string]: any;
 };

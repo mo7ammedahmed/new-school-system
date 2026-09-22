@@ -1,15 +1,18 @@
 import { Link } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
+import { cn } from '@/lib/utils';
 import type { AuthLayoutProps } from '@/types';
 
 export default function AuthSimpleLayout({
     children,
     title,
     description,
+    className,
+    ...props
 }: AuthLayoutProps) {
     return (
-        <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+        <div className={cn('bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10', className)}>
             <div className="w-full max-w-sm">
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center gap-4">

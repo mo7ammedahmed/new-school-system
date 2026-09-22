@@ -18,4 +18,8 @@ export type AuthLayoutProps = {
     name?: string;
     title?: string;
     description?: string;
+    breadcrumbs?: BreadcrumbItem[];
+    active?: string;
+    className?: string;
+    variant?: string;
 };

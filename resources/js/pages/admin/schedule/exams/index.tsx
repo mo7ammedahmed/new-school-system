@@ -390,14 +390,14 @@ export default function ExamScheduleIndex() {
             <Head title={t('exams.title')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.5rem] bg-[#143e36] p-6 text-white">
-                    <p className="text-sm font-bold text-[#b7d7c5]">
+                <header className="rounded-[1.5rem] bg-hero-bg p-6 text-white">
+                    <p className="text-sm font-bold text-hero-muted">
                         {school.name}
                     </p>
                     <h1 className="mt-2 text-3xl font-black">
                         {t('exams.title')}
                     </h1>
-                    <p className="mt-2 max-w-2xl text-[#d2e6d8]">
+                    <p className="mt-2 max-w-2xl text-hero-accent">
                         {t('exams.subtitle')}
                     </p>
                 </header>
@@ -405,7 +405,7 @@ export default function ExamScheduleIndex() {
                 {props.flash?.success ? (
                     <p
                         role="status"
-                        className="rounded-xl bg-[#dcecdf] px-4 py-3 font-bold text-[#0d5c4d]"
+                        className="rounded-xl bg-[#dcecdf] px-4 py-3 font-bold text-brand-600"
                     >
                         {props.flash.success}
                     </p>
@@ -422,17 +422,17 @@ export default function ExamScheduleIndex() {
                 {/* Exam periods */}
                 <section
                     aria-labelledby="periods-heading"
-                    className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-6"
+                    className="rounded-[1.5rem] border border-border bg-card p-6"
                 >
                     <h2
                         id="periods-heading"
-                        className="text-xl font-black text-[#17342f]"
+                        className="text-xl font-black text-foreground"
                     >
                         {t('exams.periods')}
                     </h2>
 
                     {schedules.length === 0 ? (
-                        <p className="mt-3 text-sm text-[#6c837c]">
+                        <p className="mt-3 text-sm text-foreground">
                             {t('exams.noPeriods')}
                         </p>
                     ) : (
@@ -451,19 +451,19 @@ export default function ExamScheduleIndex() {
                                         }`}
                                     >
                                         <div className="flex items-center justify-between gap-2">
-                                            <span className="font-black text-[#17342f]">
+                                            <span className="font-black text-foreground">
                                                 {scheduleLabels(schedule)}
                                             </span>
-                                            <span className="rounded-full bg-[#eef4f0] px-2 py-1 text-xs font-bold text-[#0d5c4d]">
+                                            <span className="rounded-full bg-[#eef4f0] px-2 py-1 text-xs font-bold text-brand-600">
                                                 {t(`status.${schedule.status}`)}
                                             </span>
                                         </div>
-                                        <p className="mt-2 text-xs font-bold text-[#6c837c]">
+                                        <p className="mt-2 text-xs font-bold text-foreground">
                                             {schedule.starts_on} →{' '}
                                             {schedule.ends_on}
                                         </p>
                                         {schedule.papers_count !== null ? (
-                                            <p className="mt-1 text-xs text-[#6c837c]">
+                                            <p className="mt-1 text-xs text-foreground">
                                                 {t('exams.papersCount', {
                                                     count: schedule.papers_count,
                                                 })}
@@ -480,7 +480,7 @@ export default function ExamScheduleIndex() {
                             onSubmit={submitPeriod}
                             className="mt-6 grid gap-3 border-t border-[#eef4f0] pt-6 md:grid-cols-3"
                         >
-                            <h3 className="text-sm font-black text-[#17342f] md:col-span-3">
+                            <h3 className="text-sm font-black text-foreground md:col-span-3">
                                 {t('exams.newPeriod')}
                             </h3>
 
@@ -585,7 +585,7 @@ export default function ExamScheduleIndex() {
                                 <button
                                     type="submit"
                                     disabled={periodForm.processing}
-                                    className="inline-flex items-center gap-2 rounded-full bg-[#143e36] px-5 py-2 font-black text-white disabled:opacity-60"
+                                    className="inline-flex items-center gap-2 rounded-full bg-hero-bg px-5 py-2 font-black text-white disabled:opacity-60"
                                 >
                                     <Plus size={16} aria-hidden="true" />
                                     {t('exams.createPeriod')}
@@ -598,7 +598,7 @@ export default function ExamScheduleIndex() {
                 {selectedSchedule ? (
                     <>
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                            <h2 className="text-2xl font-black text-[#17342f]">
+                            <h2 className="text-2xl font-black text-foreground">
                                 {scheduleLabels(selectedSchedule)}
                             </h2>
                             <div className="flex flex-wrap gap-2 print:hidden">
@@ -682,12 +682,12 @@ export default function ExamScheduleIndex() {
                             {/* Month calendar */}
                             <section
                                 aria-labelledby="calendar-heading"
-                                className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-6"
+                                className="rounded-[1.5rem] border border-border bg-card p-6"
                             >
                                 <div className="flex items-center justify-between gap-3">
                                     <h2
                                         id="calendar-heading"
-                                        className="text-lg font-black text-[#17342f]"
+                                        className="text-lg font-black text-foreground"
                                     >
                                         <CalendarDays
                                             size={18}
@@ -716,7 +716,7 @@ export default function ExamScheduleIndex() {
                                                 className="hidden rtl:inline"
                                             />
                                         </button>
-                                        <span className="min-w-[7rem] text-center font-black text-[#17342f]">
+                                        <span className="min-w-[7rem] text-center font-black text-foreground">
                                             {month}
                                         </span>
                                         <button
@@ -750,7 +750,7 @@ export default function ExamScheduleIndex() {
                                             <div
                                                 key={day}
                                                 role="columnheader"
-                                                className="p-1 text-xs font-black text-[#6c837c]"
+                                                className="p-1 text-xs font-black text-foreground"
                                             >
                                                 {dayName(day)}
                                             </div>
@@ -818,7 +818,7 @@ export default function ExamScheduleIndex() {
                                     })()}
                                 </div>
 
-                                <p className="mt-4 text-xs font-bold text-[#6c837c]">
+                                <p className="mt-4 text-xs font-bold text-foreground">
                                     {t('exams.weekTotal')}: {weekTotal}
                                 </p>
                             </section>
@@ -826,15 +826,15 @@ export default function ExamScheduleIndex() {
                             {/* Day agenda */}
                             <section
                                 aria-labelledby="agenda-heading"
-                                className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-6"
+                                className="rounded-[1.5rem] border border-border bg-card p-6"
                             >
                                 <h2
                                     id="agenda-heading"
-                                    className="text-lg font-black text-[#17342f]"
+                                    className="text-lg font-black text-foreground"
                                 >
                                     {t('exams.selectedDay')}
                                 </h2>
-                                <p className="mt-1 text-sm font-bold text-[#6c837c]">
+                                <p className="mt-1 text-sm font-bold text-foreground">
                                     {selectedDate}
                                     {hijri ? ` · ${hijri}` : ''}
                                     {selectedDate
@@ -843,7 +843,7 @@ export default function ExamScheduleIndex() {
                                 </p>
 
                                 {dayAgenda.length === 0 ? (
-                                    <p className="mt-4 text-sm text-[#6c837c]">
+                                    <p className="mt-4 text-sm text-foreground">
                                         {t('exams.noPapersOnDay')}
                                     </p>
                                 ) : (
@@ -854,7 +854,7 @@ export default function ExamScheduleIndex() {
                                                 className="rounded-2xl border border-[#eef4f0] p-4"
                                             >
                                                 <div className="flex items-center justify-between gap-3">
-                                                    <span className="font-black text-[#17342f]">
+                                                    <span className="font-black text-foreground">
                                                         {subjectName({
                                                             subject_name_en:
                                                                 row.subject_name_en,
@@ -862,12 +862,12 @@ export default function ExamScheduleIndex() {
                                                                 row.subject_name_ar,
                                                         })}
                                                     </span>
-                                                    <span className="text-xs font-bold text-[#0d5c4d]">
+                                                    <span className="text-xs font-bold text-brand-600">
                                                         {row.starts_at} –{' '}
                                                         {row.ends_at}
                                                     </span>
                                                 </div>
-                                                <p className="mt-1 text-xs font-bold text-[#6c837c]">
+                                                <p className="mt-1 text-xs font-bold text-foreground">
                                                     {row.class_name} ·{' '}
                                                     {t('exams.section')}{' '}
                                                     {row.section_name}
@@ -876,7 +876,7 @@ export default function ExamScheduleIndex() {
                                                         : ''}
                                                 </p>
                                                 {row.invigilators.length > 0 ? (
-                                                    <p className="mt-1 text-xs text-[#6c837c]">
+                                                    <p className="mt-1 text-xs text-foreground">
                                                         {t(
                                                             'exams.invigilators',
                                                         )}
@@ -896,11 +896,11 @@ export default function ExamScheduleIndex() {
                         {can.manage && selectedSchedule.status === 'draft' ? (
                             <section
                                 aria-labelledby="paper-heading"
-                                className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-6 print:hidden"
+                                className="rounded-[1.5rem] border border-border bg-card p-6 print:hidden"
                             >
                                 <h2
                                     id="paper-heading"
-                                    className="text-lg font-black text-[#17342f]"
+                                    className="text-lg font-black text-foreground"
                                 >
                                     {t('exams.addPaper')}
                                 </h2>
@@ -1122,7 +1122,7 @@ export default function ExamScheduleIndex() {
                                         <button
                                             type="submit"
                                             disabled={paperForm.processing}
-                                            className="rounded-full bg-[#143e36] px-6 py-2 font-black text-white disabled:opacity-60"
+                                            className="rounded-full bg-hero-bg px-6 py-2 font-black text-white disabled:opacity-60"
                                         >
                                             {t('exams.addPaper')}
                                         </button>
@@ -1133,17 +1133,17 @@ export default function ExamScheduleIndex() {
                         {/* Papers table (printable) */}
                         <section
                             aria-labelledby="papers-heading"
-                            className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-6"
+                            className="rounded-[1.5rem] border border-border bg-card p-6"
                         >
                             <h2
                                 id="papers-heading"
-                                className="text-lg font-black text-[#17342f]"
+                                className="text-lg font-black text-foreground"
                             >
                                 {t('exams.papers')}
                             </h2>
 
                             {papers.length === 0 ? (
-                                <p className="mt-3 text-sm text-[#6c837c]">
+                                <p className="mt-3 text-sm text-foreground">
                                     {t('exams.noExams')}
                                 </p>
                             ) : (
@@ -1177,7 +1177,7 @@ export default function ExamScheduleIndex() {
                                                 <tr key={paper.id}>
                                                     <td className="border-b border-[#f4f8f5] p-2 font-bold">
                                                         {paper.exam_date}
-                                                        <span className="block text-xs font-normal text-[#6c837c]">
+                                                        <span className="block text-xs font-normal text-foreground">
                                                             {dayName(
                                                                 new Date(
                                                                     `${paper.exam_date}T00:00:00Z`,
@@ -1287,7 +1287,7 @@ export default function ExamScheduleIndex() {
                                 </div>
                             )}
 
-                            <p className="mt-4 hidden text-xs text-[#6c837c] print:block">
+                            <p className="mt-4 hidden text-xs text-foreground print:block">
                                 {school.name} ·{' '}
                                 {scheduleLabels(selectedSchedule)} · {locale}
                             </p>

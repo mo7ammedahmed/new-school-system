@@ -73,22 +73,22 @@ export default function TeacherDashboard() {
             <Head title={t('portal.teacherTitle')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-[#143e36] p-6 text-white md:p-8">
-                    <p className="text-sm font-bold text-[#b7d7c5]">
+                <header className="rounded-[1.75rem] bg-hero-bg p-6 text-white md:p-8">
+                    <p className="text-sm font-bold text-hero-muted">
                         {t('portal.today')} · {today.iso} ·{' '}
                         {dayName(today.weekday)}
                     </p>
                     <h1 className="mt-2 text-3xl font-black md:text-4xl">
                         {t('portal.teacherTitle')}
                     </h1>
-                    <p className="mt-3 max-w-xl leading-7 text-[#d2e6d8]">
+                    <p className="mt-3 max-w-xl leading-7 text-hero-accent">
                         {t('portal.teacherSubtitle')}
                     </p>
                     <div className="mt-5 flex flex-wrap gap-3">
-                        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
+                        <span className="rounded-full bg-card/10 px-4 py-2 text-sm font-bold">
                             {t('portal.sections')}: {counts.sections}
                         </span>
-                        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold">
+                        <span className="rounded-full bg-card/10 px-4 py-2 text-sm font-bold">
                             {t('portal.studentsCount', {
                                 count: counts.students,
                             })}
@@ -97,14 +97,14 @@ export default function TeacherDashboard() {
                 </header>
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
                             <CalendarDays size={19} aria-hidden="true" />
                             {t('portal.todayClasses')}
                         </h2>
 
                         {todayClasses.length === 0 ? (
-                            <p className="mt-4 text-sm text-[#789087]">
+                            <p className="mt-4 text-sm text-muted-foreground">
                                 {t('portal.noClassesToday')}
                             </p>
                         ) : (
@@ -112,18 +112,18 @@ export default function TeacherDashboard() {
                                 {todayClasses.map((entry) => (
                                     <li
                                         key={entry.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                     >
                                         <span className="min-w-0">
-                                            <strong className="block text-sm font-black text-[#17342f]">
+                                            <strong className="block text-sm font-black text-foreground">
                                                 {subjectLabel(entry)}
                                             </strong>
-                                            <small className="mt-1 block text-[#789087]">
+                                            <small className="mt-1 block text-muted-foreground">
                                                 {entry.class_name} ·{' '}
                                                 {entry.section_name}
                                             </small>
                                         </span>
-                                        <span className="shrink-0 text-end text-xs font-bold text-[#0d5c4d]">
+                                        <span className="shrink-0 text-end text-xs font-bold text-brand-600">
                                             {t('portal.period')}{' '}
                                             {entry.period_number}
                                             {entry.starts_at ? (
@@ -138,14 +138,14 @@ export default function TeacherDashboard() {
                         )}
                     </section>
 
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
                             <ClipboardList size={19} aria-hidden="true" />
                             {t('portal.invigilation')}
                         </h2>
 
                         {duties.length === 0 ? (
-                            <p className="mt-4 text-sm text-[#789087]">
+                            <p className="mt-4 text-sm text-muted-foreground">
                                 {t('portal.noDuties')}
                             </p>
                         ) : (
@@ -153,17 +153,17 @@ export default function TeacherDashboard() {
                                 {duties.map((duty) => (
                                     <li
                                         key={duty.id}
-                                        className="rounded-2xl border border-[#edf2ed] p-3"
+                                        className="rounded-2xl border border-border p-3"
                                     >
                                         <div className="flex items-center justify-between gap-3">
-                                            <strong className="text-sm font-black text-[#17342f]">
+                                            <strong className="text-sm font-black text-foreground">
                                                 {subjectLabel(duty)}
                                             </strong>
-                                            <span className="text-xs font-bold text-[#0d5c4d]">
+                                            <span className="text-xs font-bold text-brand-600">
                                                 {duty.starts_at}–{duty.ends_at}
                                             </span>
                                         </div>
-                                        <small className="mt-1 block text-[#789087]">
+                                        <small className="mt-1 block text-muted-foreground">
                                             {duty.exam_date} · {duty.class_name}{' '}
                                             · {duty.section_name}
                                             {duty.room
@@ -171,7 +171,7 @@ export default function TeacherDashboard() {
                                                 : ''}
                                         </small>
                                         {duty.schedule_title ? (
-                                            <small className="mt-1 block text-[#789087]">
+                                            <small className="mt-1 block text-muted-foreground">
                                                 {isArabic &&
                                                 duty.schedule_title_ar
                                                     ? duty.schedule_title_ar
@@ -185,14 +185,14 @@ export default function TeacherDashboard() {
                     </section>
                 </div>
 
-                <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                    <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                    <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
                         <UsersRound size={19} aria-hidden="true" />
                         {t('portal.mySections')}
                     </h2>
 
                     {sections.length === 0 ? (
-                        <p className="mt-4 text-sm text-[#789087]">
+                        <p className="mt-4 text-sm text-muted-foreground">
                             {t('portal.noSections')}
                         </p>
                     ) : (
@@ -200,15 +200,15 @@ export default function TeacherDashboard() {
                             {sections.map((section) => (
                                 <li
                                     key={section.id}
-                                    className="rounded-2xl border border-[#edf2ed] p-4"
+                                    className="rounded-2xl border border-border p-4"
                                 >
-                                    <strong className="block text-sm font-black text-[#17342f]">
+                                    <strong className="block text-sm font-black text-foreground">
                                         {section.class_name} · {section.name}
                                     </strong>
-                                    <small className="mt-1 block text-[#789087]">
+                                    <small className="mt-1 block text-muted-foreground">
                                         {section.school_name}
                                     </small>
-                                    <small className="mt-1 block text-[#0d5c4d]">
+                                    <small className="mt-1 block text-brand-600">
                                         {t('portal.studentsCount', {
                                             count: section.students_count,
                                         })}
@@ -219,21 +219,21 @@ export default function TeacherDashboard() {
                     )}
                 </section>
 
-                <section className="rounded-[1.75rem] border border-[#dbe8df] bg-[#f7f8f4] p-6">
-                    <h2 className="text-xl font-black text-[#17342f]">
+                <section className="rounded-[1.75rem] border border-border bg-card bg-muted p-6">
+                    <h2 className="text-xl font-black text-foreground">
                         {t('portal.quickLinks')}
                     </h2>
                     <div className="mt-4 flex flex-wrap gap-3">
                         <Link
                             href="/portal/teacher"
-                            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-black text-[#28544a] shadow-sm"
+                            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 font-black text-brand-700 shadow-sm"
                         >
                             <BookOpenCheck size={18} aria-hidden="true" />
                             {t('portal.myWorkspace')}
                         </Link>
                         <Link
                             href="/portal/notifications"
-                            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-black text-[#28544a] shadow-sm"
+                            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 font-black text-brand-700 shadow-sm"
                         >
                             <Bell size={18} aria-hidden="true" />
                             {t('portal.notifications')}

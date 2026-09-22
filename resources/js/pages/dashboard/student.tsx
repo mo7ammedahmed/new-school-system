@@ -78,15 +78,15 @@ export default function StudentDashboard() {
             <Head title={t('portal.studentTitle')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-[#143e36] p-6 text-white md:p-8">
-                    <p className="text-sm font-bold text-[#b7d7c5]">
+                <header className="rounded-[1.75rem] bg-hero-bg p-6 text-white md:p-8">
+                    <p className="text-sm font-bold text-hero-muted">
                         {t('portal.today')} · {today.iso} ·{' '}
                         {dayName(today.weekday)}
                     </p>
                     <h1 className="mt-2 text-3xl font-black md:text-4xl">
                         {student?.name ?? t('portal.studentTitle')}
                     </h1>
-                    <p className="mt-3 max-w-xl leading-7 text-[#d2e6d8]">
+                    <p className="mt-3 max-w-xl leading-7 text-hero-accent">
                         {student
                             ? `${student.class_name ?? ''} · ${student.section_name ?? ''} · ${student.school_name ?? ''}`
                             : t('portal.noSchool')}
@@ -94,14 +94,14 @@ export default function StudentDashboard() {
                 </header>
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
                             <CalendarDays size={19} aria-hidden="true" />
                             {t('portal.todayClasses')}
                         </h2>
 
                         {todayClasses.length === 0 ? (
-                            <p className="mt-4 text-sm text-[#789087]">
+                            <p className="mt-4 text-sm text-muted-foreground">
                                 {t('portal.noClassesToday')}
                             </p>
                         ) : (
@@ -109,7 +109,7 @@ export default function StudentDashboard() {
                                 {todayClasses.map((entry) => (
                                     <li
                                         key={entry.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                     >
                                         <span className="flex min-w-0 items-center gap-2">
                                             {entry.subject_color ? (
@@ -123,15 +123,15 @@ export default function StudentDashboard() {
                                                 />
                                             ) : null}
                                             <span className="min-w-0">
-                                                <strong className="block text-sm font-black text-[#17342f]">
+                                                <strong className="block text-sm font-black text-foreground">
                                                     {subjectLabel(entry)}
                                                 </strong>
-                                                <small className="mt-1 block text-[#789087]">
+                                                <small className="mt-1 block text-muted-foreground">
                                                     {entry.teacher_name}
                                                 </small>
                                             </span>
                                         </span>
-                                        <span className="shrink-0 text-end text-xs font-bold text-[#0d5c4d]">
+                                        <span className="shrink-0 text-end text-xs font-bold text-brand-600">
                                             {t('portal.period')}{' '}
                                             {entry.period_number}
                                             {entry.starts_at ? (
@@ -146,14 +146,14 @@ export default function StudentDashboard() {
                         )}
                     </section>
 
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
                             <ClipboardList size={19} aria-hidden="true" />
                             {t('portal.upcomingExams')}
                         </h2>
 
                         {upcomingExams.length === 0 ? (
-                            <p className="mt-4 text-sm text-[#789087]">
+                            <p className="mt-4 text-sm text-muted-foreground">
                                 {t('portal.noUpcomingExams')}
                             </p>
                         ) : (
@@ -161,17 +161,17 @@ export default function StudentDashboard() {
                                 {upcomingExams.map((exam) => (
                                     <li
                                         key={exam.id}
-                                        className="rounded-2xl border border-[#edf2ed] p-3"
+                                        className="rounded-2xl border border-border p-3"
                                     >
                                         <div className="flex items-center justify-between gap-3">
-                                            <strong className="text-sm font-black text-[#17342f]">
+                                            <strong className="text-sm font-black text-foreground">
                                                 {subjectLabel(exam)}
                                             </strong>
-                                            <span className="text-xs font-bold text-[#0d5c4d]">
+                                            <span className="text-xs font-bold text-brand-600">
                                                 {exam.starts_at}–{exam.ends_at}
                                             </span>
                                         </div>
-                                        <small className="mt-1 block text-[#789087]">
+                                        <small className="mt-1 block text-muted-foreground">
                                             {exam.exam_date}
                                             {exam.room
                                                 ? ` · ${t('portal.room')} ${exam.room}`
@@ -185,8 +185,8 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-[#17342f]">
+                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
                             <LineChart size={19} aria-hidden="true" />
                             {t('portal.attendance')}
                         </h2>
@@ -201,12 +201,12 @@ export default function StudentDashboard() {
                             ).map(([key, value]) => (
                                 <div
                                     key={key}
-                                    className="rounded-2xl bg-[#f7f8f4] p-4"
+                                    className="rounded-2xl bg-muted p-4"
                                 >
-                                    <dt className="text-xs font-bold text-[#789087]">
+                                    <dt className="text-xs font-bold text-muted-foreground">
                                         {t(`portal.${key}`)}
                                     </dt>
-                                    <dd className="mt-1 text-2xl font-black text-[#17342f]">
+                                    <dd className="mt-1 text-2xl font-black text-foreground">
                                         {value}
                                     </dd>
                                 </div>
@@ -214,13 +214,13 @@ export default function StudentDashboard() {
                         </dl>
                     </section>
 
-                    <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
-                        <h2 className="text-xl font-black text-[#17342f]">
+                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
+                        <h2 className="text-xl font-black text-foreground">
                             {t('portal.recentAssessments')}
                         </h2>
 
                         {recentAssessments.length === 0 ? (
-                            <p className="mt-4 text-sm text-[#789087]">
+                            <p className="mt-4 text-sm text-muted-foreground">
                                 {t('portal.noAssessments')}
                             </p>
                         ) : (
@@ -228,17 +228,17 @@ export default function StudentDashboard() {
                                 {recentAssessments.map((assessment) => (
                                     <li
                                         key={assessment.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-[#edf2ed] p-3"
+                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
                                     >
                                         <span>
-                                            <strong className="block text-sm font-black text-[#17342f]">
+                                            <strong className="block text-sm font-black text-foreground">
                                                 {assessment.title}
                                             </strong>
-                                            <small className="mt-1 block text-[#789087]">
+                                            <small className="mt-1 block text-muted-foreground">
                                                 {assessment.assessed_on}
                                             </small>
                                         </span>
-                                        <span className="text-sm font-black text-[#0d5c4d]">
+                                        <span className="text-sm font-black text-brand-600">
                                             {assessment.score} /{' '}
                                             {assessment.max_score}
                                         </span>
@@ -249,14 +249,14 @@ export default function StudentDashboard() {
                     </section>
                 </div>
 
-                <section className="rounded-[1.75rem] border border-[#dbe8df] bg-[#f7f8f4] p-6">
-                    <h2 className="text-xl font-black text-[#17342f]">
+                <section className="rounded-[1.75rem] border border-border bg-muted p-6">
+                    <h2 className="text-xl font-black text-foreground">
                         {t('portal.quickLinks')}
                     </h2>
                     <div className="mt-4 flex flex-wrap gap-3">
                         <Link
                             href="/portal/notifications"
-                            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-black text-[#28544a] shadow-sm"
+                            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 font-black text-brand-700 shadow-sm"
                         >
                             <Bell size={18} aria-hidden="true" />
                             {t('portal.notifications')}

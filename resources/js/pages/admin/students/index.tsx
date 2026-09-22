@@ -1,146 +1,186 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/data-display/data-table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Pagination } from '@/components/ui/pagination';
 import { SearchField } from '@/components/forms/search-field';
-import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
+import { paginated } from '@/lib/paginated';
+import { useT } from '@/hooks/useT';
 import { useState } from 'react';
 
-type Props = {
-    filters: Record<string, any>;
-    students: {
-        data: Array<{
-            id: number;
-            first_name: string;
-            last_name: string;
-            student_number: string;
-            // Additional fields that might be useful
-            email?: string;
-            phone?: string;
-            status?: string;
-            date_of_birth?: string;
-            gender?: string;
-        }>;
-        meta: {
-            total: number;
-            per_page: number;
-            current_page: number;
-            last_page: number;
-            from: number;
-            to: number;
-        };
-        links: {
-            prev: string | null;
-            next: string | null;
-        };
-    };
+type StudentRow = {
+    id: number;
+    name: string;
+    studentNumber: string;
+    status: string;
 };
 
-export default function StudentIndex({ filters, students }: Props) {
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+type Props = {
+    school: { id: number; name: string } | null;
+    filters: { search?: string; status?: string };
+    students: unknown;
+};
 
-    // Handle flash messages from Laravel session
-    // In a real implementation, you would check for flash messages in the page props
+const STATUSES = ['active', 'inactive', 'graduated', 'transferred'];
+
+const LIST_URL = '/portal/students';
+
+export default function StudentIndex({ filters, students }: Props) {
+    const { t } = useT();
+    const list = paginated<StudentRow>(students);
+    const [search, setSearch] = useState(filters.search ?? '');
+
+    const applyFilters = (next: { search?: string; status?: string }) => {
+        router.get(
+            LIST_URL,
+            {
+                search: next.search || undefined,
+                status: next.status || undefined,
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
 
     return (
         <>
-            <Head title="Students" />
+            <Head title={t('shell.students')} />
             <div className="space-y-6 p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Students</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
-                        <Button
-                            href="/admin/students/create"
-                            className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                        >
-                            New Student
-                        </Button>
-                    </div>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-semibold">
+                        {t('shell.students')}
+                    </h1>
+                    <Button asChild>
+                        <Link href={`${LIST_URL}/create`}>
+                            {t('students.new')}
+                        </Link>
+                    </Button>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-4 md:flex-row">
+                    <form
+                        className="w-full md:max-w-sm"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            applyFilters({ ...filters, search });
+                        }}
+                    >
                         <SearchField
-                            placeholder="Search students..."
-                            value={filters.search ?? ''}
-                            onChange={(value) => {
-                                // In a real implementation, you would update the URL query params
-                                // and trigger a refetch
-                            }}
+                            placeholder={t('students.searchPlaceholder')}
+                            value={search}
+                            onChange={setSearch}
                         />
-                        <Select
-                            value={filters.status ?? ''}
-                            onValueChange={(value) => {
-                                // In a real implementation, you would update the URL query params
-                                // and trigger a refetch
-                            }}
-                            placeholder="Filter by status"
-                        >
-                            <option value="">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="graduated">Graduated</option>
-                            <option value="transferred">Transferred</option>
-                        </Select>
-                    </div>
+                    </form>
 
-                    <DataTable
-                        columns={[
-                            { accessorKey: 'student_number', header: 'Student ID' },
-                            { accessorKey: 'last_name', header: 'Last Name' },
-                            { accessorKey: 'first_name', header: 'First Name' },
-                            { accessorKey: 'email', header: 'Email' },
-                            { accessorKey: 'phone', header: 'Phone' },
-                            { accessorKey: 'date_of_birth', header: 'Date of Birth' },
-                            { accessorKey: 'gender', header: 'Gender' },
-                            { accessorKey: 'status', header: 'Status' },
-                            { accessorKey: 'actions', header: 'Actions' },
-                        ]}
-                        data={students.data.map((student) => ({
-                            ...student,
-                            actions: (
-                                <DropdownMenu className="w-[80px]">
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon">
-                                            {/* More vertical icon would go here */}
-                                            ⋮
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" side="right">
-                                        <DropdownMenuItem>
-                                            <Link href={`/admin/students/${student.id}`}>
-                                                View
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Link href={`/admin/students/${student.id}/edit`}>
-                                                Edit
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={/* handle delete */}>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ),
-                        }))}
-                        withBorders
-                        withRowActions
-                    />
-
-                    <Pagination
-                        page={students.meta.current_page}
-                        lastPage={students.meta.last_page}
-                        href={(page: number) => `/admin/students?page=${page}`}
-                    />
+                    <select
+                        aria-label={t('students.filterStatus')}
+                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                        value={filters.status ?? ''}
+                        onChange={(event) =>
+                            applyFilters({
+                                ...filters,
+                                status: event.target.value,
+                            })
+                        }
+                    >
+                        <option value="">{t('students.allStatuses')}</option>
+                        {STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                                {t(`students.status.${status}`)}
+                            </option>
+                        ))}
+                    </select>
                 </div>
+
+                <DataTable
+                    columns={[
+                        {
+                            accessorKey: 'studentNumber',
+                            header: t('students.studentNumber'),
+                        },
+                        { accessorKey: 'name', header: t('students.name') },
+                        {
+                            accessorKey: 'status',
+                            header: t('students.statusLabel'),
+                            cell: (value: string) =>
+                                t(`students.status.${value}`),
+                        },
+                        {
+                            accessorKey: 'actions',
+                            header: t('common.actions'),
+                        },
+                    ]}
+                    data={list.data.map((student) => ({
+                        ...student,
+                        actions: (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <span aria-hidden="true">⋮</span>
+                                        <span className="sr-only">
+                                            {t('common.actions')}
+                                        </span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`${LIST_URL}/${student.id}`}>
+                                            {t('common.view')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={`${LIST_URL}/${student.id}/edit`}
+                                        >
+                                            {t('actions.edit')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onSelect={() => {
+                                            if (
+                                                window.confirm(
+                                                    t('students.confirmDelete'),
+                                                )
+                                            ) {
+                                                router.delete(
+                                                    `${LIST_URL}/${student.id}`,
+                                                    {
+                                                        preserveScroll: true,
+                                                    },
+                                                );
+                                            }
+                                        }}
+                                    >
+                                        {t('actions.delete')}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ),
+                    }))}
+                    emptyMessage={
+                        filters.search || filters.status
+                            ? t('students.emptyFiltered')
+                            : t('students.empty')
+                    }
+                />
+
+                <Pagination
+                    page={list.meta.current_page}
+                    lastPage={list.meta.last_page}
+                    href={(page: number) =>
+                        `${LIST_URL}?page=${page}${filters.search ? `&search=${encodeURIComponent(filters.search)}` : ''}${filters.status ? `&status=${filters.status}` : ''}`
+                    }
+                    labels={{
+                        previous: t('common.previous'),
+                        next: t('common.next'),
+                        page: t('common.page'),
+                        of: t('common.of'),
+                    }}
+                />
             </div>
         </>
     );

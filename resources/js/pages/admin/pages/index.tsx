@@ -31,19 +31,87 @@ export default function PageIndex({ school, pages }: Props) {
             <Head title={`Pages — ${school.name}`} />
             <div className="space-y-8 p-6">
                 <header>
-                    <h1 className="text-2xl font-semibold">{school.name} pages</h1>
-                    <p className="text-sm text-muted-foreground">Manage English and Arabic public content.</p>
+                    <h1 className="text-2xl font-semibold">
+                        {school.name} pages
+                    </h1>
+                    <p className="text-muted-foreground text-sm">
+                        Manage English and Arabic public content.
+                    </p>
                 </header>
-                <form onSubmit={submit} className="grid gap-3 rounded-lg border p-4">
-                    <input className="rounded border p-2" placeholder="Slug" value={form.data.slug} onChange={(event) => form.setData('slug', event.target.value)} />
-                    <input className="rounded border p-2" placeholder="English title" value={form.data.title.en} onChange={(event) => form.setData('title', { ...form.data.title, en: event.target.value })} />
-                    <input className="rounded border p-2" dir="rtl" placeholder="العنوان بالعربية" value={form.data.title.ar} onChange={(event) => form.setData('title', { ...form.data.title, ar: event.target.value })} />
-                    <textarea className="rounded border p-2" placeholder="English body" value={form.data.body.en} onChange={(event) => form.setData('body', { ...form.data.body, en: event.target.value })} />
-                    <textarea className="rounded border p-2" dir="rtl" placeholder="النص بالعربية" value={form.data.body.ar} onChange={(event) => form.setData('body', { ...form.data.body, ar: event.target.value })} />
-                    <button className="rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50" disabled={form.processing}>Save draft</button>
+                <form
+                    onSubmit={submit}
+                    className="grid gap-3 rounded-lg border p-4"
+                >
+                    <input
+                        className="rounded border p-2"
+                        placeholder="Slug"
+                        value={form.data.slug}
+                        onChange={(event) =>
+                            form.setData('slug', event.target.value)
+                        }
+                    />
+                    <input
+                        className="rounded border p-2"
+                        placeholder="English title"
+                        value={form.data.title.en}
+                        onChange={(event) =>
+                            form.setData('title', {
+                                ...form.data.title,
+                                en: event.target.value,
+                            })
+                        }
+                    />
+                    <input
+                        className="rounded border p-2"
+                        dir="rtl"
+                        placeholder="العنوان بالعربية"
+                        value={form.data.title.ar}
+                        onChange={(event) =>
+                            form.setData('title', {
+                                ...form.data.title,
+                                ar: event.target.value,
+                            })
+                        }
+                    />
+                    <textarea
+                        className="rounded border p-2"
+                        placeholder="English body"
+                        value={form.data.body.en}
+                        onChange={(event) =>
+                            form.setData('body', {
+                                ...form.data.body,
+                                en: event.target.value,
+                            })
+                        }
+                    />
+                    <textarea
+                        className="rounded border p-2"
+                        dir="rtl"
+                        placeholder="النص بالعربية"
+                        value={form.data.body.ar}
+                        onChange={(event) =>
+                            form.setData('body', {
+                                ...form.data.body,
+                                ar: event.target.value,
+                            })
+                        }
+                    />
+                    <button
+                        className="bg-primary text-primary-foreground rounded px-4 py-2 disabled:opacity-50"
+                        disabled={form.processing}
+                    >
+                        Save draft
+                    </button>
                 </form>
                 <ul className="divide-y rounded-lg border">
-                    {pages.map((page) => <li key={page.id} className="flex justify-between p-4"><span>{page.slug}</span><span className="text-sm text-muted-foreground">{page.status}</span></li>)}
+                    {pages.map((page) => (
+                        <li key={page.id} className="flex justify-between p-4">
+                            <span>{page.slug}</span>
+                            <span className="text-muted-foreground text-sm">
+                                {page.status}
+                            </span>
+                        </li>
+                    ))}
                 </ul>
             </div>
         </>

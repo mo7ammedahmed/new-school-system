@@ -2,13 +2,13 @@
 
 ## Documentation traceability
 
-| Requirement area | Product definition | Architecture baseline | Roadmap gate | Decision source |
-| --- | --- | --- | --- | --- |
-| Saudi-first, modular compliance | Product purpose and quality requirements | Localization and deferred choices | Phase 4 | Launch-market decision |
-| Hybrid-ready tenancy | Goals and personas | Tenant isolation model | Phase 1 | Tenancy decision |
-| Core-operations V1 | Scope by delivery stage | Core modules | Phases 2 and 3 | V1 scope decision |
-| Stripe-first billing | Finance and parent portal | Payments seam | Phase 3 | Payments decision |
-| Responsive web only | Non-goals and parent portal | REST integration direction | Phase 3 | Mobile-scope decision |
+| Requirement area                | Product definition                       | Architecture baseline             | Roadmap gate   | Decision source        |
+| ------------------------------- | ---------------------------------------- | --------------------------------- | -------------- | ---------------------- |
+| Saudi-first, modular compliance | Product purpose and quality requirements | Localization and deferred choices | Phase 4        | Launch-market decision |
+| Hybrid-ready tenancy            | Goals and personas                       | Tenant isolation model            | Phase 1        | Tenancy decision       |
+| Core-operations V1              | Scope by delivery stage                  | Core modules                      | Phases 2 and 3 | V1 scope decision      |
+| Stripe-first billing            | Finance and parent portal                | Payments seam                     | Phase 3        | Payments decision      |
+| Responsive web only             | Non-goals and parent portal              | REST integration direction        | Phase 3        | Mobile-scope decision  |
 
 ## Phase-level acceptance scenarios
 

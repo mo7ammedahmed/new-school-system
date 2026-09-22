@@ -1,8 +1,16 @@
 import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
+import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -14,13 +22,15 @@ type Props = {
 };
 
 export default function UserCreate({ school }: Props) {
-    const { data, setData, post, processing, recentSuccessfulSubmit } = useForm({
-        name: '',
-        email: '',
-        role: '',
-        phone: '',
-        status: '',
-    });
+    const { data, setData, post, processing, errors } = useForm(
+        {
+            name: '',
+            email: '',
+            role: '',
+            phone: '',
+            status: '',
+        },
+    );
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -41,7 +51,7 @@ export default function UserCreate({ school }: Props) {
                 setToastType('error');
                 setShowToast(true);
                 // In a real implementation, the form errors would be displayed automatically
-            }
+            },
         });
     };
 
@@ -51,7 +61,7 @@ export default function UserCreate({ school }: Props) {
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">New User</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button
                             href={`/admin/schools/${school.id}/users`}
                             variant="outline"
@@ -71,6 +81,8 @@ export default function UserCreate({ school }: Props) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <FormErrors errors={errors} />
+
                         <FormSection>
                             <FormField
                                 label="Name"
@@ -79,7 +91,9 @@ export default function UserCreate({ school }: Props) {
                                 <Input
                                     placeholder="Full name"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     required
                                     maxLength={255}
                                 />
@@ -94,7 +108,9 @@ export default function UserCreate({ school }: Props) {
                                 <Input
                                     placeholder="email@example.com"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('email', e.target.value)
+                                    }
                                     type="email"
                                     required
                                     maxLength={255}
@@ -109,12 +125,18 @@ export default function UserCreate({ school }: Props) {
                             >
                                 <Select
                                     value={data.role}
-                                    onValueChange={(value) => setData('role', value)}
+                                    onValueChange={(value) =>
+                                        setData('role', value)
+                                    }
                                     placeholder="Select role"
                                 >
                                     <option value="">Select role</option>
-                                    <option value="organization_admin">Organization Admin</option>
-                                    <option value="school_admin">School Admin</option>
+                                    <option value="organization_admin">
+                                        Organization Admin
+                                    </option>
+                                    <option value="school_admin">
+                                        School Admin
+                                    </option>
                                     <option value="teacher">Teacher</option>
                                     <option value="staff">Staff</option>
                                     <option value="guardian">Guardian</option>
@@ -130,7 +152,9 @@ export default function UserCreate({ school }: Props) {
                                 <Input
                                     placeholder="Phone number"
                                     value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('phone', e.target.value)
+                                    }
                                     maxLength={40}
                                 />
                             </FormField>
@@ -143,7 +167,9 @@ export default function UserCreate({ school }: Props) {
                             >
                                 <Select
                                     value={data.status}
-                                    onValueChange={(value) => setData('status', value)}
+                                    onValueChange={(value) =>
+                                        setData('status', value)
+                                    }
                                     placeholder="Select status"
                                 >
                                     <option value="">Select status</option>
@@ -163,10 +189,7 @@ export default function UserCreate({ school }: Props) {
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            isLoading={processing}
-                        >
+                        <Button onClick={handleSubmit} isLoading={processing}>
                             Create User
                         </Button>
                     </CardFooter>
@@ -175,28 +198,3 @@ export default function UserCreate({ school }: Props) {
         </>
     );
 }
-
-UserCreate.layout = {
-    breadcrumbs: [
-        {
-            title: 'Dashboard',
-            href: '/dashboard',
-        },
-        {
-            title: 'Schools',
-            href: '/admin/schools',
-        },
-        {
-            title: (school) => school.name,
-            href: `/admin/schools/${school.id}`,
-        },
-        {
-            title: 'Users',
-            href: `/admin/schools/${school.id}/users`,
-        },
-        {
-            title: 'New User',
-            href: `/admin/schools/${school.id}/users/create`,
-        },
-    ],
-};

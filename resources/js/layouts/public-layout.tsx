@@ -253,9 +253,7 @@ export default function PublicLayout({ children, active }: PublicLayoutProps) {
                                   ? 'تسجيل الدخول'
                                   : 'Log in'}
                         </Link>
-                        <span
-                            className="group flex items-center gap-2 rounded-full bg-[#0d5c4d] px-5 py-2.5 text-sm font-bold text-white transition hover:bg:#08483d"
-                        >
+                        <span className="group hover:bg:#08483d flex items-center gap-2 rounded-full bg-[#0d5c4d] px-5 py-2.5 text-sm font-bold text-white transition">
                             {isArabic ? 'ابدأ الآن' : 'Get started'}{' '}
                             <ArrowUpLeft
                                 size={16}

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GuardianRequest;
 use App\Models\Guardian;
 use App\Models\School;
 use App\Services\AuditLogger;
-use App\Http\Requests\GuardianRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,7 +19,7 @@ class GuardianController
     public function index(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('view', Guardian::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $guardians = Guardian::query()
             ->where('school_id', $schoolModel->id)
@@ -28,7 +27,7 @@ class GuardianController
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('guardians/index', [
+        return Inertia::render('admin/guardians/index', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'guardians' => $guardians,
         ]);
@@ -40,9 +39,9 @@ class GuardianController
     public function create(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', Guardian::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('guardians/create', [
+        return Inertia::render('admin/guardians/create', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
         ]);
     }
@@ -53,14 +52,14 @@ class GuardianController
     public function store(GuardianRequest $request, int $school, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', Guardian::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
         $guardian = Guardian::create([...$validated, 'organization_id' => $schoolModel->organization_id, 'school_id' => $schoolModel->id]);
 
         $audit->record('guardian.created', $guardian, after: $guardian->only([
-            'name', 'email', 'phone', 'address', 'occupation', 'relationship'
+            'name', 'email', 'phone', 'address', 'occupation', 'relationship',
         ]));
 
         return redirect()->route('guardians.index', $schoolModel->id)
@@ -79,9 +78,9 @@ class GuardianController
             ->with('students')
             ->firstOrFail();
 
-        Gate::authorize('view', $guardianModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('guardians/show', [
+        return Inertia::render('admin/guardians/show', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'guardian' => [
                 'id' => $guardianModel->id,
@@ -94,7 +93,7 @@ class GuardianController
                 'students' => $guardianModel->students->map(function ($student) {
                     return [
                         'id' => $student->id,
-                        'name' => trim($student->first_name . ' ' . $student->last_name),
+                        'name' => trim($student->first_name.' '.$student->last_name),
                         'student_number' => $student->student_number,
                     ];
                 }),
@@ -113,9 +112,9 @@ class GuardianController
             ->where('id', $guardian)
             ->firstOrFail();
 
-        Gate::authorize('update', $guardianModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('guardians/edit', [
+        return Inertia::render('admin/guardians/edit', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'guardian' => [
                 'id' => $guardianModel->id,
@@ -140,19 +139,19 @@ class GuardianController
             ->where('id', $guardian)
             ->firstOrFail();
 
-        Gate::authorize('update', $guardianModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
         // Store old values for audit
         $oldValues = $guardianModel->only([
-            'name', 'email', 'phone', 'address', 'occupation', 'relationship'
+            'name', 'email', 'phone', 'address', 'occupation', 'relationship',
         ]);
 
         $guardianModel->update($validated);
 
         $audit->record('guardian.updated', $guardianModel, before: $oldValues, after: $guardianModel->only([
-            'name', 'email', 'phone', 'address', 'occupation', 'relationship'
+            'name', 'email', 'phone', 'address', 'occupation', 'relationship',
         ]));
 
         return back()->with('success', 'Guardian updated successfully.');
@@ -169,11 +168,11 @@ class GuardianController
             ->where('id', $guardian)
             ->firstOrFail();
 
-        Gate::authorize('delete', $guardianModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         // Store values for audit before deletion
         $recordValues = $guardianModel->only([
-            'name', 'email', 'phone', 'address', 'occupation', 'relationship'
+            'name', 'email', 'phone', 'address', 'occupation', 'relationship',
         ]);
 
         $guardianModel->delete();

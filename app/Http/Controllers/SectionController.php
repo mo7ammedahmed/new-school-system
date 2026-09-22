@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AcademicClass;
-use App\Models\Section;
-use App\Models\School;
-use App\Services\AuditLogger;
 use App\Http\Requests\SectionRequest;
+use App\Models\AcademicClass;
+use App\Models\School;
+use App\Models\Section;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,15 +21,16 @@ class SectionController
     public function index(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('view', Section::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $sections = Section::query()
             ->where('school_id', $schoolModel->id)
             ->with('academicClass')
+            ->withCount('enrollments')
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('sections/index', [
+        return Inertia::render('admin/sections/index', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'sections' => $sections,
         ]);
@@ -41,10 +42,11 @@ class SectionController
     public function create(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', Section::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('sections/create', [
+        return Inertia::render('admin/sections/create', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
+            'academicClasses' => $this->academicClasses($schoolModel),
         ]);
     }
 
@@ -54,10 +56,11 @@ class SectionController
     public function store(SectionRequest $request, int $school, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', Section::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
+        /** @var AcademicClass $academicClass */
         $academicClass = AcademicClass::query()->where('school_id', $schoolModel->id)->findOrFail($validated['class_id']);
         $section = $academicClass->sections()->create([
             ...$validated,
@@ -66,7 +69,7 @@ class SectionController
         ]);
 
         $audit->record('section.created', $section, after: $section->only([
-            'class_id', 'name'
+            'class_id', 'name',
         ]));
 
         return redirect()->route('sections.index', $schoolModel->id)
@@ -84,9 +87,9 @@ class SectionController
             ->where('id', $section)
             ->firstOrFail();
 
-        Gate::authorize('view', $sectionModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('sections/show', [
+        return Inertia::render('admin/sections/show', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'section' => [
                 'id' => $sectionModel->id,
@@ -110,18 +113,20 @@ class SectionController
             ->where('id', $section)
             ->firstOrFail();
 
-        Gate::authorize('update', $sectionModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('sections/edit', [
+        return Inertia::render('admin/sections/edit', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'section' => [
                 'id' => $sectionModel->id,
                 'name' => $sectionModel->name,
+                'class_id' => $sectionModel->class_id,
                 'class' => [
                     'id' => $sectionModel->academicClass->id,
                     'name' => $sectionModel->academicClass->name,
                 ],
             ],
+            'academicClasses' => $this->academicClasses($schoolModel),
         ]);
     }
 
@@ -136,19 +141,19 @@ class SectionController
             ->where('id', $section)
             ->firstOrFail();
 
-        Gate::authorize('update', $sectionModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
         // Store old values for audit
         $oldValues = $sectionModel->only([
-            'class_id', 'name'
+            'class_id', 'name',
         ]);
 
         $sectionModel->update($validated);
 
         $audit->record('section.updated', $sectionModel, before: $oldValues, after: $sectionModel->only([
-            'class_id', 'name'
+            'class_id', 'name',
         ]));
 
         return back()->with('success', 'Section updated successfully.');
@@ -165,11 +170,11 @@ class SectionController
             ->where('id', $section)
             ->firstOrFail();
 
-        Gate::authorize('delete', $sectionModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         // Store values for audit before deletion
         $recordValues = $sectionModel->only([
-            'class_id', 'name'
+            'class_id', 'name',
         ]);
 
         $sectionModel->delete();
@@ -183,5 +188,16 @@ class SectionController
     private function school(int $id): School
     {
         return School::query()->findOrFail($id);
+    }
+
+    /**
+     * @return Collection<int, AcademicClass>
+     */
+    private function academicClasses(School $school): Collection
+    {
+        return AcademicClass::query()
+            ->where('school_id', $school->id)
+            ->orderBy('name')
+            ->get(['id', 'name']);
     }
 }

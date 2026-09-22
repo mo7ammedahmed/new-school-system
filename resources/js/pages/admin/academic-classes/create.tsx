@@ -1,8 +1,16 @@
 import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
+import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toast } from '@/components/ui/toast';
@@ -13,9 +21,11 @@ type Props = {
 };
 
 export default function AcademicClassCreate({ school }: Props) {
-    const { data, setData, post, processing, recentSuccessfulSubmit } = useForm({
-        name: '',
-    });
+    const { data, setData, post, processing, errors } = useForm(
+        {
+            name: '',
+        },
+    );
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -35,7 +45,7 @@ export default function AcademicClassCreate({ school }: Props) {
                 setToastMessage('Something went wrong. Please try again.');
                 setToastType('error');
                 setShowToast(true);
-            }
+            },
         });
     };
 
@@ -44,8 +54,10 @@ export default function AcademicClassCreate({ school }: Props) {
             <Head title={`New Academic Class — ${school.name}`} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">New Academic Class</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <h1 className="text-2xl font-semibold">
+                        New Academic Class
+                    </h1>
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button
                             href={`/admin/schools/${school.id}/academic-classes`}
                             variant="outline"
@@ -65,6 +77,8 @@ export default function AcademicClassCreate({ school }: Props) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <FormErrors errors={errors} />
+
                         <FormSection>
                             <FormField
                                 label="Name"
@@ -73,7 +87,9 @@ export default function AcademicClassCreate({ school }: Props) {
                                 <Input
                                     placeholder="Grade 1"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     required
                                 />
                             </FormField>
@@ -89,10 +105,7 @@ export default function AcademicClassCreate({ school }: Props) {
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            isLoading={processing}
-                        >
+                        <Button onClick={handleSubmit} isLoading={processing}>
                             Create Academic Class
                         </Button>
                     </CardFooter>

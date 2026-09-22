@@ -1,7 +1,14 @@
 import { Head, usePage, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { type ComponentType } from 'react';
 
@@ -30,16 +37,20 @@ export default function GuardianShow({ school, guardian }: Props) {
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">Guardian Details</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Link
                             href={`/admin/schools/${school.id}/guardians/${guardian.id}/edit`}
-                            className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
                         >
                             Edit Guardian
                         </Link>
                         <Button
                             onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this guardian?')) {
+                                if (
+                                    window.confirm(
+                                        'Are you sure you want to delete this guardian?',
+                                    )
+                                ) {
                                     // In a real implementation, you would send a DELETE request
                                     // For now, we'll just show an alert
                                     alert('Guardian deleted successfully!');
@@ -67,14 +78,18 @@ export default function GuardianShow({ school, guardian }: Props) {
                     <CardContent>
                         <div className="space-y-6">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-xl">
                                     <User className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-semibold">{guardian.name}</h2>
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <h2 className="text-xl font-semibold">
+                                        {guardian.name}
+                                    </h2>
+                                    <div className="text-muted-foreground flex items-center gap-2 text-sm">
                                         {guardian.relationship && (
-                                            <Badge variant="secondary">{guardian.relationship}</Badge>
+                                            <Badge variant="secondary">
+                                                {guardian.relationship}
+                                            </Badge>
                                         )}
                                     </div>
                                 </div>
@@ -82,20 +97,36 @@ export default function GuardianShow({ school, guardian }: Props) {
 
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
-                                    <p className="mt-1 block truncate">{guardian.email}</p>
+                                    <h3 className="text-muted-foreground text-sm font-medium">
+                                        Email
+                                    </h3>
+                                    <p className="mt-1 block truncate">
+                                        {guardian.email}
+                                    </p>
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-medium text-muted-foreground">Phone</h3>
-                                    <p className="mt-1 block truncate">{guardian.phone ?? 'N/A'}</p>
+                                    <h3 className="text-muted-foreground text-sm font-medium">
+                                        Phone
+                                    </h3>
+                                    <p className="mt-1 block truncate">
+                                        {guardian.phone ?? 'N/A'}
+                                    </p>
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-medium text-muted-foreground">Address</h3>
-                                    <p className="mt-1 block truncate">{guardian.address ?? 'N/A'}</p>
+                                    <h3 className="text-muted-foreground text-sm font-medium">
+                                        Address
+                                    </h3>
+                                    <p className="mt-1 block truncate">
+                                        {guardian.address ?? 'N/A'}
+                                    </p>
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-medium text-muted-foreground">Occupation</h3>
-                                    <p className="mt-1 block truncate">{guardian.occupation ?? 'N/A'}</p>
+                                    <h3 className="text-muted-foreground text-sm font-medium">
+                                        Occupation
+                                    </h3>
+                                    <p className="mt-1 block truncate">
+                                        {guardian.occupation ?? 'N/A'}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -110,14 +141,22 @@ export default function GuardianShow({ school, guardian }: Props) {
                         <CardContent>
                             <div className="space-y-4">
                                 {guardian.students.map((student) => (
-                                    <div key={student.id} className="border border-muted/20 rounded-lg p-4">
+                                    <div
+                                        key={student.id}
+                                        className="border-muted/20 rounded-lg border p-4"
+                                    >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-muted/20 flex items-center justify-center text-muted-foreground">
+                                            <div className="bg-muted/20 text-muted-foreground flex h-10 w-10 items-center justify-center rounded-xl">
                                                 <User className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold">{student.name}</h4>
-                                                <p className="text-sm text-muted-foreground">Student ID: {student.student_number}</p>
+                                                <h4 className="font-semibold">
+                                                    {student.name}
+                                                </h4>
+                                                <p className="text-muted-foreground text-sm">
+                                                    Student ID:{' '}
+                                                    {student.student_number}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

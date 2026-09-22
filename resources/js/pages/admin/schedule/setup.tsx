@@ -53,9 +53,12 @@ type ScheduleSetupProps = {
 };
 
 export default function ScheduleSetup() {
-    const { school, subjects, teachingAssignments, bellSchedules, settings } = usePage<ScheduleSetupProps>().props;
+    const { school, subjects, teachingAssignments, bellSchedules, settings } =
+        usePage<ScheduleSetupProps>().props;
     const { t, dayName, locale, isArabic } = useT();
-    const [activePanel, setActivePanel] = useState<'subjects' | 'assignments' | 'bell' | 'settings'>('subjects');
+    const [activePanel, setActivePanel] = useState<
+        'subjects' | 'assignments' | 'bell' | 'settings'
+    >('subjects');
 
     const subjectForm = useForm({
         code: '',
@@ -70,13 +73,15 @@ export default function ScheduleSetup() {
             <Head title={t('nav.schedule')} />
             <div className="space-y-6 p-6">
                 <div className="flex items-center gap-4 border-b pb-3">
-                    {(['subjects', 'assignments', 'bell', 'settings'] as const).map((panel) => (
+                    {(
+                        ['subjects', 'assignments', 'bell', 'settings'] as const
+                    ).map((panel) => (
                         <button
                             key={panel}
                             onClick={() => setActivePanel(panel)}
                             className={`px-4 py-2 text-sm font-medium ${
                                 activePanel === panel
-                                    ? 'border-b-2 border-primary text-primary'
+                                    ? 'border-primary text-primary border-b-2'
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
@@ -102,35 +107,53 @@ export default function ScheduleSetup() {
                         >
                             <input
                                 className="rounded border p-2 text-sm"
-                                placeholder={t('actions.add') + ' ' + t('setup.subjects').slice(0, -1)}
+                                placeholder={
+                                    t('actions.add') +
+                                    ' ' +
+                                    t('setup.subjects').slice(0, -1)
+                                }
                                 value={subjectForm.data.code}
-                                onChange={(e) => subjectForm.setData('code', e.target.value)}
+                                onChange={(e) =>
+                                    subjectForm.setData('code', e.target.value)
+                                }
                                 required
                             />
                             <input
                                 className="rounded border p-2 text-sm"
                                 placeholder="EN"
                                 value={subjectForm.data.name_en}
-                                onChange={(e) => subjectForm.setData('name_en', e.target.value)}
+                                onChange={(e) =>
+                                    subjectForm.setData(
+                                        'name_en',
+                                        e.target.value,
+                                    )
+                                }
                                 required
                             />
                             <input
                                 className="rounded border p-2 text-sm"
                                 placeholder="AR"
                                 value={subjectForm.data.name_ar}
-                                onChange={(e) => subjectForm.setData('name_ar', e.target.value)}
+                                onChange={(e) =>
+                                    subjectForm.setData(
+                                        'name_ar',
+                                        e.target.value,
+                                    )
+                                }
                                 required
                             />
                             <input
                                 type="color"
                                 className="h-9 w-full rounded border p-0"
                                 value={subjectForm.data.color || '#6b7280'}
-                                onChange={(e) => subjectForm.setData('color', e.target.value)}
+                                onChange={(e) =>
+                                    subjectForm.setData('color', e.target.value)
+                                }
                             />
                             <button
                                 type="submit"
                                 disabled={subjectForm.processing}
-                                className="rounded bg-primary px-3 py-2 text-sm font-medium text-primary-foreground"
+                                className="bg-primary text-primary-foreground rounded px-3 py-2 text-sm font-medium"
                             >
                                 {t('actions.add')}
                             </button>
@@ -140,29 +163,51 @@ export default function ScheduleSetup() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr>
-                                        <th className="p-2 text-left">{t('setup.code')}</th>
-                                        <th className="p-2 text-left">{isArabic ? 'Name (AR)' : 'Name (EN)'}</th>
-                                        <th className="p-2 text-left">{t('setup.color')}</th>
-                                        <th className="p-2 text-left">{t('setup.active')}</th>
+                                        <th className="p-2 text-left">
+                                            {t('setup.code')}
+                                        </th>
+                                        <th className="p-2 text-left">
+                                            {isArabic
+                                                ? 'Name (AR)'
+                                                : 'Name (EN)'}
+                                        </th>
+                                        <th className="p-2 text-left">
+                                            {t('setup.color')}
+                                        </th>
+                                        <th className="p-2 text-left">
+                                            {t('setup.active')}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {subjects.map((subject) => (
-                                        <tr key={subject.id} className="border-t">
-                                            <td className="p-2">{subject.code}</td>
+                                        <tr
+                                            key={subject.id}
+                                            className="border-t"
+                                        >
                                             <td className="p-2">
-                                                {isArabic ? subject.name_ar : subject.name_en}
+                                                {subject.code}
+                                            </td>
+                                            <td className="p-2">
+                                                {isArabic
+                                                    ? subject.name_ar
+                                                    : subject.name_en}
                                             </td>
                                             <td className="p-2">
                                                 {subject.color && (
                                                     <span
                                                         className="inline-block h-4 w-4 rounded"
-                                                        style={{ backgroundColor: subject.color }}
+                                                        style={{
+                                                            backgroundColor:
+                                                                subject.color,
+                                                        }}
                                                     />
                                                 )}
                                             </td>
                                             <td className="p-2">
-                                                {subject.is_active ? t('status.published') : '—'}
+                                                {subject.is_active
+                                                    ? t('status.published')
+                                                    : '—'}
                                             </td>
                                         </tr>
                                     ))}
@@ -173,13 +218,13 @@ export default function ScheduleSetup() {
                 )}
 
                 {activePanel === 'assignments' && (
-                    <div className="text-center text-sm text-muted-foreground">
+                    <div className="text-muted-foreground text-center text-sm">
                         {t('timetable.byTeacher')}
                     </div>
                 )}
 
                 {activePanel === 'bell' && (
-                    <div className="text-center text-sm text-muted-foreground">
+                    <div className="text-muted-foreground text-center text-sm">
                         {t('timetable.bySection')}
                     </div>
                 )}
@@ -187,13 +232,20 @@ export default function ScheduleSetup() {
                 {settings && (
                     <div className="space-y-4">
                         <div className="rounded border p-4">
-                            <h3 className="font-medium mb-2">{t('setup.workingDays')}</h3>
+                            <h3 className="mb-2 font-medium">
+                                {t('setup.workingDays')}
+                            </h3>
                             <div className="flex flex-wrap gap-2">
                                 {[0, 1, 2, 3, 4, 5, 6].map((day) => (
-                                    <label key={day} className="flex items-center gap-2">
+                                    <label
+                                        key={day}
+                                        className="flex items-center gap-2"
+                                    >
                                         <input
                                             type="checkbox"
-                                            checked={settings!.working_days.includes(day)}
+                                            checked={settings!.working_days.includes(
+                                                day,
+                                            )}
                                             readOnly
                                             className="rounded"
                                         />
@@ -202,13 +254,17 @@ export default function ScheduleSetup() {
                                 ))}
                             </div>
                         </div>
-                        <div className="rounded border p-4 space-y-2">
-                            <h3 className="font-medium">{t('setup.maxExamsPerDay')}</h3>
+                        <div className="space-y-2 rounded border p-4">
+                            <h3 className="font-medium">
+                                {t('setup.maxExamsPerDay')}
+                            </h3>
                             <input
                                 type="number"
                                 min={1}
-                                defaultValue={settings.max_exams_per_day_per_section}
-                                className="rounded border p-1 text-sm w-20"
+                                defaultValue={
+                                    settings.max_exams_per_day_per_section
+                                }
+                                className="w-20 rounded border p-1 text-sm"
                             />
                         </div>
                     </div>

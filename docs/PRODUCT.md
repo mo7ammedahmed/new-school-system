@@ -24,15 +24,15 @@ The product launches Saudi-first. Arabic and English are equal product languages
 
 ## Personas and permissions
 
-| Persona | Scope | Primary capabilities |
-| --- | --- | --- |
-| Platform Super Admin | Platform | Manage SaaS organizations, platform configuration, and cross-organization oversight. |
-| Organization Owner or Admin | Organization | Manage schools, branches, organization configuration, and authorized users. |
-| School Admin | School or Branch | Run public-site configuration, admissions, student operations, and local staff access. |
-| Finance Staff | Assigned School or Branch | Manage fee structures, invoices, payments, receipts, and finance reports. |
-| Teacher | Assigned classes | Record attendance, manage authorized grades, and communicate through approved channels. |
-| Guardian | Linked Students | View approved student information, attendance, grades, notices, invoices, and payments. |
-| Student | Own record when enabled | View only the academic and communication information granted by the school. |
+| Persona                     | Scope                     | Primary capabilities                                                                    |
+| --------------------------- | ------------------------- | --------------------------------------------------------------------------------------- |
+| Platform Super Admin        | Platform                  | Manage SaaS organizations, platform configuration, and cross-organization oversight.    |
+| Organization Owner or Admin | Organization              | Manage schools, branches, organization configuration, and authorized users.             |
+| School Admin                | School or Branch          | Run public-site configuration, admissions, student operations, and local staff access.  |
+| Finance Staff               | Assigned School or Branch | Manage fee structures, invoices, payments, receipts, and finance reports.               |
+| Teacher                     | Assigned classes          | Record attendance, manage authorized grades, and communicate through approved channels. |
+| Guardian                    | Linked Students           | View approved student information, attendance, grades, notices, invoices, and payments. |
+| Student                     | Own record when enabled   | View only the academic and communication information granted by the school.             |
 
 Authorization always combines a role with the active tenant and the person’s relationship to the record. A role name alone never grants cross-organization or cross-school access.
 
@@ -64,12 +64,12 @@ V1 adds assessment schedules, grades, report cards, and notifications. Staff-to-
 
 ## Scope by delivery stage
 
-| Stage | Included | Explicitly deferred |
-| --- | --- | --- |
-| Phase 1 foundation | Tenant hierarchy, identity, roles, localization, auditability, queues, shared UI baseline | Business workflows and external providers |
-| Phase 2 MVP | CMS, public site, admissions, students, guardians, academic structure, classes, attendance | Finance, grades, parent portal |
-| Phase 3 V1 | Billing, Stripe payments, receipts, finance reporting, grades, report cards, parent web portal, notifications | ZATCA integration, native apps, payroll, add-on modules |
-| Phase 4 expansion | ZATCA, HR records and leave, analytics, additional gateway adapters, selected add-ons | Payroll and other expansion items until separately approved |
+| Stage              | Included                                                                                                      | Explicitly deferred                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Phase 1 foundation | Tenant hierarchy, identity, roles, localization, auditability, queues, shared UI baseline                     | Business workflows and external providers                   |
+| Phase 2 MVP        | CMS, public site, admissions, students, guardians, academic structure, classes, attendance                    | Finance, grades, parent portal                              |
+| Phase 3 V1         | Billing, Stripe payments, receipts, finance reporting, grades, report cards, parent web portal, notifications | ZATCA integration, native apps, payroll, add-on modules     |
+| Phase 4 expansion  | ZATCA, HR records and leave, analytics, additional gateway adapters, selected add-ons                         | Payroll and other expansion items until separately approved |
 
 ## Quality requirements
 

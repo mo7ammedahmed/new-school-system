@@ -2,5 +2,130 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Check, Sparkles } from 'lucide-react';
 import PublicLayout from '@/layouts/public-layout';
 import { usePublicLocale } from '@/hooks/use-public-locale';
-const plans = { ar: [{ name: 'الأساسية', note: 'للمدارس الصغيرة التي تبدأ بتركيز', items: ['إدارة الطلاب والصفوف', 'الحضور والانضباط', 'بوابة ولي الأمر'] }, { name: 'النمو', note: 'للمدارس التي تريد رؤية أوسع', items: ['كل ما في الأساسية', 'المالية والفواتير والأقساط', 'التقارير والإشعارات'] }, { name: 'المؤسسية', note: 'للمجموعات التعليمية متعددة الفروع', items: ['كل ما في النمو', 'تعدد المؤسسات والفروع', 'مدير نجاح مخصص'] }], en: [{ name: 'Essentials', note: 'For focused, growing schools', items: ['Student and class management', 'Attendance and discipline', 'Family portal'] }, { name: 'Growth', note: 'For schools seeking a wider view', items: ['Everything in Essentials', 'Finance, billing, and installments', 'Reports and notifications'] }, { name: 'Enterprise', note: 'For multi-branch education groups', items: ['Everything in Growth', 'Multiple institutions and branches', 'Dedicated success manager'] }] };
-export default function Pricing() { const { locale } = usePublicLocale(); const isArabic = locale === 'ar'; return <PublicLayout active="/pricing"><Head title={isArabic ? 'الأسعار — مدرستي' : 'Pricing — Madrasati'} /><section className="mx-auto max-w-7xl px-5 pb-24 pt-20 sm:px-8"><div className="mx-auto max-w-2xl text-center"><p className="inline-flex items-center gap-2 text-sm font-black text-[#c56a3b]"><Sparkles size={15} /> {isArabic ? 'استثمار واضح في يوم مدرستك' : 'A clear investment in your school day'}</p><h1 className="mt-4 text-5xl font-black leading-tight tracking-tight sm:text-6xl">{isArabic ? 'خطة تناسب مرحلتكم.' : 'A plan for your next stage.'}</h1><p className="mt-6 text-lg leading-8 text-[#5d746c]">{isArabic ? 'ابدؤوا بما تحتاجونه اليوم، وتوسعوا عندما تكبر رؤيتكم.' : 'Start with what you need today and expand as your vision grows.'}</p></div><div className="mt-14 grid gap-5 lg:grid-cols-3">{plans[locale].map((plan, index) => <article key={plan.name} className={`rounded-[2rem] border p-8 ${index === 1 ? 'border-[#0d5c4d] bg-[#0d5c4d] text-white shadow-[0_25px_60px_-25px_#0d5c4d]' : 'border-[#dbe8df] bg-white'}`}><h2 className="text-2xl font-black">{plan.name}</h2><p className={`mt-3 min-h-12 text-sm leading-6 ${index === 1 ? 'text-[#c9e0d0]' : 'text-[#6c837c]'}`}>{plan.note}</p><p className="mt-8 text-3xl font-black">{isArabic ? 'تواصل معنا' : 'Let’s talk'}</p><Link href="/contact" className={`mt-8 flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black ${index === 1 ? 'bg-white text-[#0d5c4d]' : 'bg-[#0d5c4d] text-white'}`}>{isArabic ? 'طلب عرض' : 'Request a demo'} <ArrowLeft size={16} /></Link><ul className={`mt-8 space-y-4 border-t pt-7 text-sm ${index === 1 ? 'border-white/20' : 'border-[#e1ebe2]'}`}>{plan.items.map((item) => <li key={item} className="flex items-center gap-3"><span className="grid size-5 place-items-center rounded-full bg-[#e1efe2] text-[#0d5c4d]"><Check size={13} /></span>{item}</li>)}</ul></article>)}</div></section></PublicLayout>; }
+const plans = {
+    ar: [
+        {
+            name: 'الأساسية',
+            note: 'للمدارس الصغيرة التي تبدأ بتركيز',
+            items: ['إدارة الطلاب والصفوف', 'الحضور والانضباط', 'بوابة ولي الأمر'],
+        },
+        {
+            name: 'النمو',
+            note: 'للمدارس التي تريد رؤية أوسع',
+            items: [
+                'كل ما في الأساسية',
+                'المالية والفواتير والأقساط',
+                'التقارير والإشعارات',
+            ],
+        },
+        {
+            name: 'المؤسسية',
+            note: 'للمجموعات التعليمية متعددة الفروع',
+            items: [
+                'كل ما في النمو',
+                'تعدد المؤسسات والفروع',
+                'مدير نجاح مخصص',
+            ],
+        },
+    ],
+    en: [
+        {
+            name: 'Essentials',
+            note: 'For focused, growing schools',
+            items: [
+                'Student and class management',
+                'Attendance and discipline',
+                'Family portal',
+            ],
+        },
+        {
+            name: 'Growth',
+            note: 'For schools seeking a wider view',
+            items: [
+                'Everything in Essentials',
+                'Finance, billing, and installments',
+                'Reports and notifications',
+            ],
+        },
+        {
+            name: 'Enterprise',
+            note: 'For multi-branch education groups',
+            items: [
+                'Everything in Growth',
+                'Multiple institutions and branches',
+                'Dedicated success manager',
+            ],
+        },
+    ],
+};
+export default function Pricing() {
+    const { locale } = usePublicLocale();
+    const isArabic = locale === 'ar';
+    return (
+        <PublicLayout active="/pricing">
+            <Head
+                title={isArabic ? 'الأسعار — مدرستي' : 'Pricing — Madrasati'}
+            />
+            <section className="mx-auto max-w-7xl px-5 pt-20 pb-24 sm:px-8">
+                <div className="mx-auto max-w-2xl text-center">
+                    <p className="inline-flex items-center gap-2 text-sm font-black text-[#c56a3b]">
+                        <Sparkles size={15} />{' '}
+                        {isArabic
+                            ? 'استثمار واضح في يوم مدرستك'
+                            : 'A clear investment in your school day'}
+                    </p>
+                    <h1 className="mt-4 text-5xl leading-tight font-black tracking-tight sm:text-6xl">
+                        {isArabic
+                            ? 'خطة تناسب مرحلتكم.'
+                            : 'A plan for your next stage.'}
+                    </h1>
+                    <p className="mt-6 text-lg leading-8 text-[#5d746c]">
+                        {isArabic
+                            ? 'ابدؤوا بما تحتاجونه اليوم، وتوسعوا عندما تكبر رؤيتكم.'
+                            : 'Start with what you need today and expand as your vision grows.'}
+                    </p>
+                </div>
+                <div className="mt-14 grid gap-5 lg:grid-cols-3">
+                    {plans[locale].map((plan, index) => (
+                        <article
+                            key={plan.name}
+                            className={`rounded-[2rem] border p-8 ${index === 1 ? 'border-[#0d5c4d] bg-[#0d5c4d] text-white shadow-[0_25px_60px_-25px_#0d5c4d]' : 'border-[#dbe8df] bg-white'}`}
+                        >
+                            <h2 className="text-2xl font-black">{plan.name}</h2>
+                            <p
+                                className={`mt-3 min-h-12 text-sm leading-6 ${index === 1 ? 'text-[#c9e0d0]' : 'text-[#6c837c]'}`}
+                            >
+                                {plan.note}
+                            </p>
+                            <p className="mt-8 text-3xl font-black">
+                                {isArabic ? 'تواصل معنا' : 'Let’s talk'}
+                            </p>
+                            <Link
+                                href="/contact"
+                                className={`mt-8 flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black ${index === 1 ? 'bg-white text-[#0d5c4d]' : 'bg-[#0d5c4d] text-white'}`}
+                            >
+                                {isArabic ? 'طلب عرض' : 'Request a demo'}{' '}
+                                <ArrowLeft size={16} />
+                            </Link>
+                            <ul
+                                className={`mt-8 space-y-4 border-t pt-7 text-sm ${index === 1 ? 'border-white/20' : 'border-[#e1ebe2]'}`}
+                            >
+                                {plan.items.map((item) => (
+                                    <li
+                                        key={item}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <span className="grid size-5 place-items-center rounded-full bg-[#e1efe2] text-[#0d5c4d]">
+                                            <Check size={13} />
+                                        </span>
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </article>
+                    ))}
+                </div>
+            </section>
+        </PublicLayout>
+    );
+}

@@ -1,9 +1,24 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { DataTable } from '@/components/data-display/data-table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Pagination } from '@/components/ui/pagination';
+import { confirmDelete } from '@/lib/confirm-delete';
+import { paginated, related } from '@/lib/paginated';
+import { DateCell } from '@/components/data-display/date-cell';
 import { SearchField } from '@/components/forms/search-field';
 import { Select } from '@/components/ui/select';
 import { Toast } from '@/components/ui/toast';
@@ -51,7 +66,12 @@ type Props = {
     filters: Record<string, any>;
 };
 
-export default function EnrollmentIndex({ school, enrollments, filters }: Props) {
+export default function EnrollmentIndex({
+    school,
+    enrollments,
+    filters = {},
+}: Props) {
+    const list = paginated<Props['enrollments']['data'][number]>(enrollments);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
@@ -65,10 +85,10 @@ export default function EnrollmentIndex({ school, enrollments, filters }: Props)
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">Enrollments</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Link
                             href={`/admin/schools/${school.id}/enrollments/create`}
-                            className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
                         >
                             New Enrollment
                         </Link>
@@ -78,7 +98,7 @@ export default function EnrollmentIndex({ school, enrollments, filters }: Props)
                 {/* Toast would go here in a real implementation */}
 
                 <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <SearchField
                             placeholder="Search enrollments..."
                             value={filters.search ?? ''}
@@ -104,52 +124,106 @@ export default function EnrollmentIndex({ school, enrollments, filters }: Props)
 
                     <DataTable
                         columns={[
-                            { accessorKey: 'student.student_number', header: 'Student ID' },
-                            { accessorKey: 'student.last_name', header: 'Student Last Name' },
-                            { accessorKey: 'student.first_name', header: 'Student First Name' },
-                            { accessorKey: 'academicYear.name', header: 'Academic Year' },
-                            { accessorKey: 'academicClass.name', header: 'Class' },
-                            { accessorKey: 'section?.name', header: 'Section' },
-                            { accessorKey: 'enrolled_on', header: 'Enrolled On' },
+                            {
+                                accessorKey: 'studentNumber',
+                                header: 'Student ID',
+                            },
+                            {
+                                accessorKey: 'studentName',
+                                header: 'Student',
+                            },
+                            {
+                                accessorKey: 'yearName',
+                                header: 'Academic Year',
+                            },
+                            {
+                                accessorKey: 'className',
+                                header: 'Class',
+                            },
+                            { accessorKey: 'sectionName', header: 'Section' },
+                            {
+                                accessorKey: 'enrolled_on',
+                                header: 'Enrolled On',
+                                cell: (value: string) => (
+                                    <DateCell value={value} />
+                                ),
+                            },
                             { accessorKey: 'status', header: 'Status' },
                             { accessorKey: 'actions', header: 'Actions' },
                         ]}
-                        data={enrollments.data.map((enrollment) => ({
+                        data={list.data.map((enrollment) => ({
                             ...enrollment,
+                            studentNumber: related<{ student_number: string }>(enrollment, 'student')
+                                ?.student_number ?? '',
+                            studentName: [
+                                related<{ first_name?: string }>(enrollment, 'student')
+                                    ?.first_name,
+                                related<{ last_name?: string }>(enrollment, 'student')
+                                    ?.last_name,
+                            ]
+                                .filter(Boolean)
+                                .join(' '),
+                            yearName:
+                                related<{ name: string }>(
+                                    enrollment,
+                                    'academic_year',
+                                )?.name ?? '',
+                            className:
+                                related<{ name: string }>(
+                                    enrollment,
+                                    'academic_class',
+                                )?.name ?? '',
+                            sectionName:
+                                related<{ name: string }>(enrollment, 'section')
+                                    ?.name ?? '—',
                             actions: (
-                                <DropdownMenu className="w-[80px]">
+                                <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" size="icon">
                                             {/* More vertical icon would go here */}
                                             ⋮
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" side="right">
+                                    <DropdownMenuContent
+                                        align="end"
+                                        side="right"
+                                    >
                                         <DropdownMenuItem>
-                                            <Link href={`/admin/schools/${school.id}/enrollments/${enrollment.id}`}>
+                                            <Link
+                                                href={`/admin/schools/${school.id}/enrollments/${enrollment.id}`}
+                                            >
                                                 View
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem>
-                                            <Link href={`/admin/schools/${school.id}/enrollments/${enrollment.id}/edit`}>
+                                            <Link
+                                                href={`/admin/schools/${school.id}/enrollments/${enrollment.id}/edit`}
+                                            >
                                                 Edit
                                             </Link>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={/* handle delete */}>
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                confirmDelete(
+                                                    `/admin/schools/${school.id}/enrollments/${enrollment.id}`,
+                                                    { preserveScroll: true },
+                                                )
+                                            }
+                                        >
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ),
                         }))}
-                        withBorders
-                        withRowActions
                     />
 
                     <Pagination
-                        page={enrollments.meta.current_page}
-                        lastPage={enrollments.meta.last_page}
-                        href={(page: number) => `/admin/schools/${school.id}/enrollments?page=${page}`}
+                        page={list.meta.current_page}
+                        lastPage={list.meta.last_page}
+                        href={(page: number) =>
+                            `/admin/schools/${school.id}/enrollments?page=${page}`
+                        }
                     />
                 </div>
             </div>

@@ -28,6 +28,7 @@ export type SharedAbilities = {
     publishSchedule: boolean;
     manageAdmissions: boolean;
     manageEnrollment: boolean;
+    manageUsers: boolean;
     manageContent: boolean;
     viewAttendanceReports: boolean;
 };

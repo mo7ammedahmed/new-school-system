@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EnrollmentRequest;
 use App\Models\AcademicClass;
 use App\Models\AcademicYear;
 use App\Models\Enrollment;
@@ -9,9 +10,7 @@ use App\Models\School;
 use App\Models\Section;
 use App\Models\Student;
 use App\Services\AuditLogger;
-use App\Http\Requests\EnrollmentRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,7 +23,7 @@ class EnrollmentController
     public function index(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('view', Enrollment::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $enrollments = Enrollment::query()
             ->where('school_id', $schoolModel->id)
@@ -33,7 +32,7 @@ class EnrollmentController
             ->paginate(10)
             ->withQueryString();
 
-        return Inertia::render('enrollments/index', [
+        return Inertia::render('admin/enrollments/index', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'enrollments' => $enrollments,
         ]);
@@ -45,7 +44,7 @@ class EnrollmentController
     public function create(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', Enrollment::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $students = Student::query()
             ->where('school_id', $schoolModel->id)
@@ -64,11 +63,18 @@ class EnrollmentController
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return Inertia::render('enrollments/create', [
+        $sections = Section::query()
+            ->where('school_id', $schoolModel->id)
+            ->with('academicClass:id,name')
+            ->orderBy('name')
+            ->get(['id', 'name', 'academic_class_id']);
+
+        return Inertia::render('admin/enrollments/create', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'students' => $students,
             'academicYears' => $academicYears,
             'academicClasses' => $academicClasses,
+            'sections' => $sections,
         ]);
     }
 
@@ -78,7 +84,7 @@ class EnrollmentController
     public function store(EnrollmentRequest $request, int $school, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', Enrollment::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
@@ -94,7 +100,7 @@ class EnrollmentController
         ]);
 
         $audit->record('enrollment.created', $enrollment, after: $enrollment->only([
-            'student_id', 'academic_year_id', 'class_id', 'section_id'
+            'student_id', 'academic_year_id', 'class_id', 'section_id',
         ]));
 
         return redirect()->route('enrollments.index', $schoolModel->id)
@@ -113,15 +119,15 @@ class EnrollmentController
             ->with(['student', 'academicYear', 'academicClass', 'section'])
             ->firstOrFail();
 
-        Gate::authorize('view', $enrollmentModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('enrollments/show', [
+        return Inertia::render('admin/enrollments/show', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'enrollment' => [
                 'id' => $enrollmentModel->id,
                 'student' => [
                     'id' => $enrollmentModel->student->id,
-                    'name' => trim($enrollmentModel->student->first_name . ' ' . $enrollmentModel->student->last_name),
+                    'name' => trim($enrollmentModel->student->first_name.' '.$enrollmentModel->student->last_name),
                     'student_number' => $enrollmentModel->student->student_number,
                 ],
                 'academicYear' => [
@@ -138,7 +144,6 @@ class EnrollmentController
                         'name' => $enrollmentModel->section->name,
                     ]
                     : null,
-                ],
             ],
         ]);
     }
@@ -155,7 +160,7 @@ class EnrollmentController
             ->with(['student', 'academicYear', 'academicClass'])
             ->firstOrFail();
 
-        Gate::authorize('update', $enrollmentModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $academicYears = AcademicYear::query()
             ->where('school_id', $schoolModel->id)
@@ -167,7 +172,19 @@ class EnrollmentController
             ->orderBy('name')
             ->get(['id', 'name']);
 
-        return Inertia::render('enrollments/edit', [
+        $sections = Section::query()
+            ->where('school_id', $schoolModel->id)
+            ->with('academicClass:id,name')
+            ->orderBy('name')
+            ->get(['id', 'name', 'academic_class_id']);
+
+        $students = Student::query()
+            ->where('school_id', $schoolModel->id)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get(['id', 'first_name', 'last_name', 'student_number']);
+
+        return Inertia::render('admin/enrollments/edit', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'enrollment' => [
                 'id' => $enrollmentModel->id,
@@ -178,6 +195,8 @@ class EnrollmentController
             ],
             'academicYears' => $academicYears,
             'academicClasses' => $academicClasses,
+            'sections' => $sections,
+            'students' => $students,
         ]);
     }
 
@@ -192,19 +211,19 @@ class EnrollmentController
             ->where('id', $enrollment)
             ->firstOrFail();
 
-        Gate::authorize('update', $enrollmentModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
         // Store old values for audit
         $oldValues = $enrollmentModel->only([
-            'student_id', 'academic_year_id', 'class_id', 'section_id'
+            'student_id', 'academic_year_id', 'class_id', 'section_id',
         ]);
 
         $enrollmentModel->update($validated);
 
         $audit->record('enrollment.updated', $enrollmentModel, before: $oldValues, after: $enrollmentModel->only([
-            'student_id', 'academic_year_id', 'class_id', 'section_id'
+            'student_id', 'academic_year_id', 'class_id', 'section_id',
         ]));
 
         return back()->with('success', 'Enrollment updated successfully.');
@@ -221,11 +240,11 @@ class EnrollmentController
             ->where('id', $enrollment)
             ->firstOrFail();
 
-        Gate::authorize('delete', $enrollmentModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         // Store values for audit before deletion
         $recordValues = $enrollmentModel->only([
-            'student_id', 'academic_year_id', 'class_id', 'section_id'
+            'student_id', 'academic_year_id', 'class_id', 'section_id',
         ]);
 
         $enrollmentModel->delete();

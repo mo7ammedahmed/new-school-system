@@ -20,21 +20,21 @@ The seed command is intentionally restricted to local and testing environments. 
 
 ## Acceptance checklist
 
-| Area | Acceptance condition | Evidence | Status |
-| --- | --- | --- | --- |
-| Bootstrap | Laravel, Inertia, React, TypeScript, Tailwind, and MySQL configuration loads successfully. | `php artisan about`, `npm run build` | Pending runtime validation |
-| Schema | Organization, School, Branch, users, audit, media, jobs, and failed-jobs tables migrate successfully. | `php artisan migrate:fresh --seed` | Pending runtime validation |
-| Tenant isolation | Tenant-owned model queries resolve only the active Organization. | `TenantFoundationTest`, `AuditFoundationTest`, `MediaFoundationTest` | Implemented; runtime pending |
-| Referential integrity | A Branch cannot reference a School belonging to another Organization. | `TenantFoundationTest` | Implemented; runtime pending |
-| Authentication context | Authenticated routes bind and then clear `currentOrganization`. | `TenantFoundationTest` | Implemented; runtime pending |
-| Authorization | Role gates combine role and Organization ownership; platform operators use an explicit override. | `AuthorizationFoundationTest` | Implemented; runtime pending |
-| Localization | English and Arabic resolve per request and expose LTR/RTL metadata. | `LocalizationFoundationTest`, `InertiaContextTest` | Implemented; runtime pending |
-| Shared UI | React receives typed user, organization, capability, locale, and direction data. | `npm run types:check`, `npm run build` | Implemented; runtime pending |
-| Audit | High-value events preserve actor, tenant, target, before/after data, and request metadata; records cannot be changed or deleted. | `AuditFoundationTest` | Implemented; runtime pending |
-| Queue context | Tenant-aware jobs restore organization context and clear it after execution. | `QueueFoundationTest` | Implemented; runtime pending |
-| Media security | Files are private, organization-owned, and downloadable only through authenticated signed URLs. | `MediaFoundationTest` | Implemented; runtime pending |
-| Operations | Readiness reports database, storage, and queue status without secrets. | `HealthCheckTest`, `GET /health/ready` | Implemented; runtime pending |
-| Development setup | Demo fixtures are idempotent and never seeded automatically in production. | `DemoSchoolSeeder`, `DatabaseSeeder`, `foundation:smoke` | Implemented; runtime pending |
+| Area                   | Acceptance condition                                                                                                             | Evidence                                                             | Status                       |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------- |
+| Bootstrap              | Laravel, Inertia, React, TypeScript, Tailwind, and MySQL configuration loads successfully.                                       | `php artisan about`, `npm run build`                                 | Pending runtime validation   |
+| Schema                 | Organization, School, Branch, users, audit, media, jobs, and failed-jobs tables migrate successfully.                            | `php artisan migrate:fresh --seed`                                   | Pending runtime validation   |
+| Tenant isolation       | Tenant-owned model queries resolve only the active Organization.                                                                 | `TenantFoundationTest`, `AuditFoundationTest`, `MediaFoundationTest` | Implemented; runtime pending |
+| Referential integrity  | A Branch cannot reference a School belonging to another Organization.                                                            | `TenantFoundationTest`                                               | Implemented; runtime pending |
+| Authentication context | Authenticated routes bind and then clear `currentOrganization`.                                                                  | `TenantFoundationTest`                                               | Implemented; runtime pending |
+| Authorization          | Role gates combine role and Organization ownership; platform operators use an explicit override.                                 | `AuthorizationFoundationTest`                                        | Implemented; runtime pending |
+| Localization           | English and Arabic resolve per request and expose LTR/RTL metadata.                                                              | `LocalizationFoundationTest`, `InertiaContextTest`                   | Implemented; runtime pending |
+| Shared UI              | React receives typed user, organization, capability, locale, and direction data.                                                 | `npm run types:check`, `npm run build`                               | Implemented; runtime pending |
+| Audit                  | High-value events preserve actor, tenant, target, before/after data, and request metadata; records cannot be changed or deleted. | `AuditFoundationTest`                                                | Implemented; runtime pending |
+| Queue context          | Tenant-aware jobs restore organization context and clear it after execution.                                                     | `QueueFoundationTest`                                                | Implemented; runtime pending |
+| Media security         | Files are private, organization-owned, and downloadable only through authenticated signed URLs.                                  | `MediaFoundationTest`                                                | Implemented; runtime pending |
+| Operations             | Readiness reports database, storage, and queue status without secrets.                                                           | `HealthCheckTest`, `GET /health/ready`                               | Implemented; runtime pending |
+| Development setup      | Demo fixtures are idempotent and never seeded automatically in production.                                                       | `DemoSchoolSeeder`, `DatabaseSeeder`, `foundation:smoke`             | Implemented; runtime pending |
 
 ## Phase 2 entry criteria
 

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $student_number
  * @property string $first_name
  * @property string $last_name
- * @property CarbonImmutable $date_of_birth
+ * @property CarbonImmutable|null $date_of_birth
  * @property string $status
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at

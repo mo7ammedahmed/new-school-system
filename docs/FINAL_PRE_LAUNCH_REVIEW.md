@@ -6,19 +6,19 @@
 
 ## Completed review areas
 
-| Area | Result | Evidence |
-|---|---|---|
-| Tenant isolation and authorization | Implemented and covered by Feature tests | `AuthorizationIsolationTest`, existing foundation tests |
-| Finance workflows | Implemented and covered | `FinanceWorkflowTest`, `FinanceNegativeValidationTest` |
-| Finance reports and receipts | Implemented and covered | `FinanceReportingRegressionTest` |
-| Notifications and email delivery | Implemented and covered | `NotificationDeliveryTest` |
-| Queue health and scheduler commands | Implemented and covered | `QueueWorkerHealthTest`, `SchedulerCommandIntegrationTest` |
-| Audit immutability and attribution | Implemented and covered | `AuditIntegrityRegressionTest`, immutable model hooks |
-| Security headers and webhook throttling | Implemented and covered | `SecurityHeaders`, `SecurityHardeningTest` |
-| Public website and admissions funnel | Implemented | Complete bilingual homepage with real links, public pages, school CTA, admissions form, privacy consent, SEO metadata, sitemap, and robots endpoint |
-| Authenticated dashboard overview | UI implemented; data wiring pending | Bilingual operational summary with safe school-context navigation; live metrics and task counts must be supplied by the authenticated dashboard response before production approval |
-| Release gate and operations | Documented and implemented | `app:release-check`, `docs/DEPLOYMENT.md` |
-| Migration integrity | Duplicate generated migrations identified and neutralized | `docs/DATABASE_INTEGRITY.md` |
+| Area                                    | Result                                                    | Evidence                                                                                                                                                                            |
+| --------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tenant isolation and authorization      | Implemented and covered by Feature tests                  | `AuthorizationIsolationTest`, existing foundation tests                                                                                                                             |
+| Finance workflows                       | Implemented and covered                                   | `FinanceWorkflowTest`, `FinanceNegativeValidationTest`                                                                                                                              |
+| Finance reports and receipts            | Implemented and covered                                   | `FinanceReportingRegressionTest`                                                                                                                                                    |
+| Notifications and email delivery        | Implemented and covered                                   | `NotificationDeliveryTest`                                                                                                                                                          |
+| Queue health and scheduler commands     | Implemented and covered                                   | `QueueWorkerHealthTest`, `SchedulerCommandIntegrationTest`                                                                                                                          |
+| Audit immutability and attribution      | Implemented and covered                                   | `AuditIntegrityRegressionTest`, immutable model hooks                                                                                                                               |
+| Security headers and webhook throttling | Implemented and covered                                   | `SecurityHeaders`, `SecurityHardeningTest`                                                                                                                                          |
+| Public website and admissions funnel    | Implemented                                               | Complete bilingual homepage with real links, public pages, school CTA, admissions form, privacy consent, SEO metadata, sitemap, and robots endpoint                                 |
+| Authenticated dashboard overview        | UI implemented; data wiring pending                       | Bilingual operational summary with safe school-context navigation; live metrics and task counts must be supplied by the authenticated dashboard response before production approval |
+| Release gate and operations             | Documented and implemented                                | `app:release-check`, `docs/DEPLOYMENT.md`                                                                                                                                           |
+| Migration integrity                     | Duplicate generated migrations identified and neutralized | `docs/DATABASE_INTEGRITY.md`                                                                                                                                                        |
 
 ## Mandatory go-live gates
 

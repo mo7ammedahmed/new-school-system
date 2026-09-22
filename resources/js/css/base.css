@@ -7,266 +7,278 @@
  */
 
 :root {
-  /* Colors */
-  /* Primary */
-  --color-primary-50: #eff6f3;
-  --color-primary-100: #dcecdf;
-  --color-primary-200: #bcd9c0;
-  --color-primary-300: #8fc194;
-  --color-primary-400: #5fa368;
-  --color-primary-500: #3d8548;
-  --color-primary-600: #2f6b3a;
-  --color-primary-700: #275430;
-  --color-primary-800: #21432a;
-  --color-primary-900: #1d3825;
-  --color-primary-950: #0d1f13;
+    /* Colors */
+    /* Primary */
+    --color-primary-50: #eff6f3;
+    --color-primary-100: #dcecdf;
+    --color-primary-200: #bcd9c0;
+    --color-primary-300: #8fc194;
+    --color-primary-400: #5fa368;
+    --color-primary-500: #3d8548;
+    --color-primary-600: #2f6b3a;
+    --color-primary-700: #275430;
+    --color-primary-800: #21432a;
+    --color-primary-900: #1d3825;
+    --color-primary-950: #0d1f13;
 
-  /* Secondary */
-  --color-secondary-50: #f8f4f3;
-  --color-secondary-100: #f0e9e5;
-  --color-secondary-200: #e2cfc8;
-  --color-secondary-300: #ccb5a9;
-  --color-secondary-400: #b59c8b;
-  --color-secondary-500: #9f836e;
-  --color-secondary-600: #7f6958;
-  --color-secondary-700: #665247;
-  --color-secondary-800: #52423b;
-  --color-secondary-900: #3f312c;
-  --color-secondary-950: #2c2420;
+    /* Secondary */
+    --color-secondary-50: #f8f4f3;
+    --color-secondary-100: #f0e9e5;
+    --color-secondary-200: #e2cfc8;
+    --color-secondary-300: #ccb5a9;
+    --color-secondary-400: #b59c8b;
+    --color-secondary-500: #9f836e;
+    --color-secondary-600: #7f6958;
+    --color-secondary-700: #665247;
+    --color-secondary-800: #52423b;
+    --color-secondary-900: #3f312c;
+    --color-secondary-950: #2c2420;
 
-  /* Neutral */
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-300: #d4d4d4;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-500: #737373;
-  --color-neutral-600: #525252;
-  --color-neutral-700: #404040;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-  --color-neutral-950: #0a0a0a;
+    /* Neutral */
+    --color-neutral-50: #fafafa;
+    --color-neutral-100: #f5f5f5;
+    --color-neutral-200: #e5e5e5;
+    --color-neutral-300: #d4d4d4;
+    --color-neutral-400: #a3a3a3;
+    --color-neutral-500: #737373;
+    --color-neutral-600: #525252;
+    --color-neutral-700: #404040;
+    --color-neutral-800: #262626;
+    --color-neutral-900: #171717;
+    --color-neutral-950: #0a0a0a;
 
-  /* Semantic */
-  --color-success-light: #dcfce7;
-  --color-success: #22c55e;
-  --color-success-dark: #166534;
-  --color-warning-light: #fef3c7;
-  --color-warning: #f59e0b;
-  --color-warning-dark: #92400e;
-  --color-error-light: #fee2e2;
-  --color-error: #ef4444;
-  --color-error-dark: #991b1b;
-  --color-info-light: #dbeafe;
-  --color-info: #3b82f6;
-  --color-info-dark: #1e40af;
+    /* Semantic */
+    --color-success-light: #dcfce7;
+    --color-success: #22c55e;
+    --color-success-dark: #166534;
+    --color-warning-light: #fef3c7;
+    --color-warning: #f59e0b;
+    --color-warning-dark: #92400e;
+    --color-error-light: #fee2e2;
+    --color-error: #ef4444;
+    --color-error-dark: #991b1b;
+    --color-info-light: #dbeafe;
+    --color-info: #3b82f6;
+    --color-info-dark: #1e40af;
 
-  /* Premium */
-  /* Gold */
-  --color-premium-gold-50: #fffbeb;
-  --color-premium-gold-100: #fef3c7;
-  --color-premium-gold-200: #fde68a;
-  --color-premium-gold-300: #fcd34d;
-  --color-premium-gold-400: #fbbf24;
-  --color-premium-gold-500: #f59e0b;
-  --color-premium-gold-600: #d97706;
-  --color-premium-gold-700: #b45309;
-  --color-premium-gold-800: #92400e;
-  --color-premium-gold-900: #78350f;
+    /* Premium */
+    /* Gold */
+    --color-premium-gold-50: #fffbeb;
+    --color-premium-gold-100: #fef3c7;
+    --color-premium-gold-200: #fde68a;
+    --color-premium-gold-300: #fcd34d;
+    --color-premium-gold-400: #fbbf24;
+    --color-premium-gold-500: #f59e0b;
+    --color-premium-gold-600: #d97706;
+    --color-premium-gold-700: #b45309;
+    --color-premium-gold-800: #92400e;
+    --color-premium-gold-900: #78350f;
 
-  /* Platinum */
-  --color-premium-platinum-50: #f8fafc;
-  --color-premium-platinum-100: #f1f5f9;
-  --color-premium-platinum-200: #e2e8f0;
-  --color-premium-platinum-300: #cbd5e1;
-  --color-premium-platinum-400: #94a3b8;
-  --color-premium-platinum-500: #64748b;
-  --color-premium-platinum-600: #475569;
-  --color-premium-platinum-700: #334155;
-  --color-premium-platinum-800: #1e293b;
-  --color-premium-platinum-900: #0f172a;
+    /* Platinum */
+    --color-premium-platinum-50: #f8fafc;
+    --color-premium-platinum-100: #f1f5f9;
+    --color-premium-platinum-200: #e2e8f0;
+    --color-premium-platinum-300: #cbd5e1;
+    --color-premium-platinum-400: #94a3b8;
+    --color-premium-platinum-500: #64748b;
+    --color-premium-platinum-600: #475569;
+    --color-premium-platinum-700: #334155;
+    --color-premium-platinum-800: #1e293b;
+    --color-premium-platinum-900: #0f172a;
 
-  /* Typography */
-  /* Font families */
-  --font-family-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-family-arabic: "Instrument Sans", Tajawal, ui-sans-serif, system-ui, sans-serif;
-  --font-family-mono: "UiMono", "UI Monospace", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* Typography */
+    /* Font families */
+    --font-family-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-family-arabic:
+        'Instrument Sans', Tajawal, ui-sans-serif, system-ui, sans-serif;
+    --font-family-mono:
+        'UiMono', 'UI Monospace', SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
 
-  /* Font sizes */
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
-  --font-size-5xl: 3rem;
-  --font-size-6xl: 3.75rem;
-  --font-size-7xl: 4.5rem;
-  --font-size-8xl: 6rem;
-  --font-size-9xl: 8rem;
+    /* Font sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    --font-size-5xl: 3rem;
+    --font-size-6xl: 3.75rem;
+    --font-size-7xl: 4.5rem;
+    --font-size-8xl: 6rem;
+    --font-size-9xl: 8rem;
 
-  /* Line heights */
-  --line-height-none: 1;
-  --line-height-tight: 1.25;
-  --line-height-snug: 1.375;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
-  --line-height-loose: 2;
+    /* Line heights */
+    --line-height-none: 1;
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
 
-  /* Font weights */
-  --font-weight-thin: 100;
-  --font-weight-extralight: 200;
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
-  --font-weight-black: 900;
+    /* Font weights */
+    --font-weight-thin: 100;
+    --font-weight-extralight: 200;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
 
-  /* Letter spacing */
-  --letter-spacing-tighter: -0.05em;
-  --letter-spacing-tight: -0.025em;
-  --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.025em;
-  --letter-spacing-wider: 0.05em;
-  --letter-spacing-widest: 0.1em;
+    /* Letter spacing */
+    --letter-spacing-tighter: -0.05em;
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+    --letter-spacing-widest: 0.1em;
 
-  /* Spacing */
-  --spacing-0: 0;
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-7: 1.75rem;
-  --spacing-8: 2rem;
-  --spacing-9: 2.25rem;
-  --spacing-10: 2.5rem;
-  --spacing-11: 2.75rem;
-  --spacing-12: 3rem;
-  --spacing-14: 3.5rem;
-  --spacing-16: 4rem;
-  --spacing-20: 5rem;
-  --spacing-24: 6rem;
-  --spacing-28: 7rem;
-  --spacing-32: 8rem;
-  --spacing-36: 9rem;
-  --spacing-40: 10rem;
-  --spacing-44: 11rem;
-  --spacing-48: 12rem;
-  --spacing-52: 13rem;
-  --spacing-56: 14rem;
-  --spacing-60: 15rem;
-  --spacing-64: 16rem;
-  --spacing-72: 18rem;
-  --spacing-80: 20rem;
-  --spacing-88: 22rem;
-  --spacing-96: 24rem;
+    /* Spacing */
+    --spacing-0: 0;
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-7: 1.75rem;
+    --spacing-8: 2rem;
+    --spacing-9: 2.25rem;
+    --spacing-10: 2.5rem;
+    --spacing-11: 2.75rem;
+    --spacing-12: 3rem;
+    --spacing-14: 3.5rem;
+    --spacing-16: 4rem;
+    --spacing-20: 5rem;
+    --spacing-24: 6rem;
+    --spacing-28: 7rem;
+    --spacing-32: 8rem;
+    --spacing-36: 9rem;
+    --spacing-40: 10rem;
+    --spacing-44: 11rem;
+    --spacing-48: 12rem;
+    --spacing-52: 13rem;
+    --spacing-56: 14rem;
+    --spacing-60: 15rem;
+    --spacing-64: 16rem;
+    --spacing-72: 18rem;
+    --spacing-80: 20rem;
+    --spacing-88: 22rem;
+    --spacing-96: 24rem;
 
-  /* Border radius */
-  --radius-none: 0;
-  --radius-sm: 0.25rem;
-  --radius-default: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.625rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
-  --radius-3xl: 1.5rem;
-  --radius-4xl: 1.875rem;
-  --radius-5xl: 2.25rem;
-  --radius-6xl: 2.5rem;
-  --radius-7xl: 3rem;
-  --radius-full: 9999px;
+    /* Border radius */
+    --radius-none: 0;
+    --radius-sm: 0.25rem;
+    --radius-default: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.625rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+    --radius-4xl: 1.875rem;
+    --radius-5xl: 2.25rem;
+    --radius-6xl: 2.5rem;
+    --radius-7xl: 3rem;
+    --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-default: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --shadow-3xl: 0 35px 60px -15px rgb(0 0 0 / 0.25);
-  --shadow-4xl: 0 45px 75px -20px rgb(0 0 0 / 0.25);
-  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
-  --shadow-focus-ring: 0 0 0 3px rgb(76 175 80 / 0.4);
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-default:
+        0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md:
+        0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg:
+        0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl:
+        0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --shadow-3xl: 0 35px 60px -15px rgb(0 0 0 / 0.25);
+    --shadow-4xl: 0 45px 75px -20px rgb(0 0 0 / 0.25);
+    --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+    --shadow-focus-ring: 0 0 0 3px rgb(76 175 80 / 0.4);
 
-  /* Z-index */
-  --z-index-base: 0;
-  --z-index-dropdown: 1000;
-  --z-index-sticky: 1020;
-  --z-index-fixed: 1030;
-  --z-index-modal-backdrop: 1040;
-  --z-index-modal: 1050;
-  --z-index-popover: 1060;
-  --z-index-tooltip: 1070;
-  --z-index-header: 1100;
-  --z-index-sidebar: 1150;
-  --z-index-navbar: 1200;
-  --z-index-overlay: 1300;
-  --z-index-modal-overlay: 1310;
-  --z-index-drawer: 1320;
-  --z-index-toast: 1400;
-  --z-index-notification: 1410;
-  --z-index-debug: 9999;
+    /* Z-index */
+    --z-index-base: 0;
+    --z-index-dropdown: 1000;
+    --z-index-sticky: 1020;
+    --z-index-fixed: 1030;
+    --z-index-modal-backdrop: 1040;
+    --z-index-modal: 1050;
+    --z-index-popover: 1060;
+    --z-index-tooltip: 1070;
+    --z-index-header: 1100;
+    --z-index-sidebar: 1150;
+    --z-index-navbar: 1200;
+    --z-index-overlay: 1300;
+    --z-index-modal-overlay: 1310;
+    --z-index-drawer: 1320;
+    --z-index-toast: 1400;
+    --z-index-notification: 1410;
+    --z-index-debug: 9999;
 
-  /* Transitions */
-  /* Duration */
-  --transition-duration-fastest: 50ms;
-  --transition-duration-faster: 100ms;
-  --transition-duration-fast: 150ms;
-  --transition-duration-default: 200ms;
-  --transition-duration-slow: 300ms;
-  --transition-duration-slower: 400ms;
-  --transition-duration-slowest: 500ms;
+    /* Transitions */
+    /* Duration */
+    --transition-duration-fastest: 50ms;
+    --transition-duration-faster: 100ms;
+    --transition-duration-fast: 150ms;
+    --transition-duration-default: 200ms;
+    --transition-duration-slow: 300ms;
+    --transition-duration-slower: 400ms;
+    --transition-duration-slowest: 500ms;
 
-  /* Easing */
-  --transition-easing-easeInOut: cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-easing-easeOut: cubic-bezier(0.0, 0, 0.2, 1);
-  --transition-easing-easeIn: cubic-bezier(0.4, 0, 1, 1);
-  --transition-easing-easeOutBack: cubic-bezier(0.12, 0.4, 0.29, 1.46);
-  --transition-easing-easeInBack: cubic-bezier(0.48, -0.12, 0.88, 1);
-  --transition-easing-easeInOutBack: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --transition-easing-easeInCirc: cubic-bezier(0, 0.65, 0.55, 1);
-  --transition-easing-easeOutCirc: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  --transition-easing-easeInOutCirc: cubic-bezier(0.85, 0, 0.15, 1);
-  --transition-easing-easeInQuad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
-  --transition-easing-easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-easing-easeInOutQuad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
-  --transition-easing-easeInCubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  --transition-easing-easeOutCubic: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --transition-easing-easeInOutCubic: cubic-bezier(0.645, 0.045, 0.355, 1);
-  --transition-easing-easeInQuart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  --transition-easing-easeOutQuart: cubic-bezier(0.165, 0.84, 0.44, 1);
-  --transition-easing-easeInOutQuart: cubic-bezier(0.77, 0, 0.175, 1);
-  --transition-easing-easeInQuint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-  --transition-easing-easeOutQuint: cubic-bezier(0.23, 1, 0.32, 1);
-  --transition-easing-easeInOutQuint: cubic-bezier(0.86, 0, 0.07, 1);
-  --transition-easing-easeInSine: cubic-bezier(0.47, 0, 0.745, 0.715);
-  --transition-easing-easeOutSine: cubic-bezier(0.39, 0.575, 0.565, 1);
-  --transition-easing-easeInOutSine: cubic-bezier(0.445, 0.05, 0.55, 0.95);
-  --transition-easing-easeInExpo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
-  --transition-easing-easeOutExpo: cubic-bezier(0.19, 1, 0.22, 1);
-  --transition-easing-easeInOutExpo: cubic-bezier(0.87, 0, 0.13, 1);
-  --transition-easing-easeOutElastic: cubic-bezier(0.104, 0.176, 0.215, 0.931);
-  --transition-easing-easeInElastic: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  --transition-easing-easeInOutElastic: cubic-bezier(0.85, 0, 0.15, 1);
-  --transition-easing-easeOutBounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --transition-easing-easeInBounce: cubic-bezier(0.48, -0.28, 0.535, 0.035);
-  --transition-easing-easeInOutBounce: cubic-bezier(0.58, -0.18, 0.59, 0.99);
+    /* Easing */
+    --transition-easing-easeInOut: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-easing-easeOut: cubic-bezier(0, 0, 0.2, 1);
+    --transition-easing-easeIn: cubic-bezier(0.4, 0, 1, 1);
+    --transition-easing-easeOutBack: cubic-bezier(0.12, 0.4, 0.29, 1.46);
+    --transition-easing-easeInBack: cubic-bezier(0.48, -0.12, 0.88, 1);
+    --transition-easing-easeInOutBack: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-easing-easeInCirc: cubic-bezier(0, 0.65, 0.55, 1);
+    --transition-easing-easeOutCirc: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    --transition-easing-easeInOutCirc: cubic-bezier(0.85, 0, 0.15, 1);
+    --transition-easing-easeInQuad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    --transition-easing-easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-easing-easeInOutQuad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    --transition-easing-easeInCubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    --transition-easing-easeOutCubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+    --transition-easing-easeInOutCubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+    --transition-easing-easeInQuart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+    --transition-easing-easeOutQuart: cubic-bezier(0.165, 0.84, 0.44, 1);
+    --transition-easing-easeInOutQuart: cubic-bezier(0.77, 0, 0.175, 1);
+    --transition-easing-easeInQuint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    --transition-easing-easeOutQuint: cubic-bezier(0.23, 1, 0.32, 1);
+    --transition-easing-easeInOutQuint: cubic-bezier(0.86, 0, 0.07, 1);
+    --transition-easing-easeInSine: cubic-bezier(0.47, 0, 0.745, 0.715);
+    --transition-easing-easeOutSine: cubic-bezier(0.39, 0.575, 0.565, 1);
+    --transition-easing-easeInOutSine: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+    --transition-easing-easeInExpo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+    --transition-easing-easeOutExpo: cubic-bezier(0.19, 1, 0.22, 1);
+    --transition-easing-easeInOutExpo: cubic-bezier(0.87, 0, 0.13, 1);
+    --transition-easing-easeOutElastic: cubic-bezier(
+        0.104,
+        0.176,
+        0.215,
+        0.931
+    );
+    --transition-easing-easeInElastic: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+    --transition-easing-easeInOutElastic: cubic-bezier(0.85, 0, 0.15, 1);
+    --transition-easing-easeOutBounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-easing-easeInBounce: cubic-bezier(0.48, -0.28, 0.535, 0.035);
+    --transition-easing-easeInOutBounce: cubic-bezier(0.58, -0.18, 0.59, 0.99);
 
-  /* Predefined transition combinations */
-  --transition-default: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* Predefined transition combinations */
+    --transition-default: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Dark mode overrides can be added here */
 .dark {
-  /* Example: --color-primary-500: #...; */
+    /* Example: --color-primary-500: #...; */
 }
 
 /* Optional: utility classes for using tokens */

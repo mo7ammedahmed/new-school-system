@@ -149,6 +149,6 @@
 
 @layer components {
     .field {
-        @apply w-full rounded-xl border border-[#cbded2] bg-[#fbfdf9] px-4 py-3 text-[#17342f] outline-none transition placeholder:text-[#9aae9f] focus:border-[#0d5c4d] focus:ring-2 focus:ring-[#cde9d5];
+        @apply w-full rounded-xl border border-[#cbded2] bg-[#fbfdf9] px-4 py-3 text-[#17342f] transition outline-none placeholder:text-[#9aae9f] focus:border-[#0d5c4d] focus:ring-2 focus:ring-[#cde9d5];
     }
 }

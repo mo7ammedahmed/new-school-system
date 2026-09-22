@@ -3,358 +3,479 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Models\Assessment;
+use App\Models\AttendanceRecord;
+use App\Models\AuditLog;
+use App\Models\BellPeriod;
 use App\Models\ExamPaper;
-use App\Models\ExamSchedule;
-use App\Models\School;
-use App\Services\Portal\PortalDashboardService;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Gate;
-use Inertia\Inertia;
-use Inertia\Response;
-use App\Models\School;
-use App\Models\Student;
-use App\Models\User;
-use App\Models\AcademicClass;
-use App\Models\Application;
-use App\Models\Invoice;
-use App\Models\PaymentIntent;
-use App\Models\Notice;
+use App\Models\Installment;
 use App\Models\Notification;
 use App\Models\NotificationDelivery;
-use App\Models\AttendanceRecord;
-use App\Models\AttendanceSession;
-use Carbon\Carbon;
-use App\Enums\UserRole;
+use App\Models\PaymentIntent;
+use App\Models\Receipt;
+use App\Models\School;
+use App\Models\TeacherAssignment;
+use App\Models\TimetableEntry;
+use App\Models\TimetableVersion;
+use App\Models\User;
+use App\Services\Portal\PortalDashboardService;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
+use Inertia\Response;
 
+/**
+ * The single authenticated landing page.
+ *
+ * The payload is chosen by the signed-in user's role: teachers, guardians and
+ * students get their purpose-built portal dashboard from the portal service,
+ * while administration roles get a school command centre built exclusively
+ * from live records — never placeholder numbers.
+ */
 class DashboardController extends Controller
 {
+    private const CACHE_TTL_SECONDS = 300;
+
     public function __invoke(Request $request, PortalDashboardService $portal): Response
     {
-        $organization = $request->user()?->organization;
-        $school = $organization?->schools()->first();
+        $user = $request->user();
 
-        if (!$school) {
-            return Inertia::render('dashboard', [
-                'school' => null,
-                'metrics' => [],
-                'widgets' => [],
-            ]);
+        if ($user === null) {
+            abort(401);
         }
 
-        // Check if user has permission to view dashboard
-        // Gate::authorize('view-dashboard', $school); // Temporarily commented out as policy doesn't exist yet
-
-        // Cache key for dashboard data
-        $cacheKey = "dashboard_school_{$school->id}";
-
-        // Try to get cached data (cache for 5 minutes)
-        $dashboardData = Cache::get($cacheKey);
-
-        if (!$dashboardData) {
-            // Fetch fresh data
-            $dashboardData = $this->fetchDashboardData($school);
-
-            // Cache for 5 minutes
-            Cache::put($cacheKey, $dashboardData, 5);
+        if ($user->hasRole(UserRole::Teacher)) {
+            return Inertia::render('dashboard/teacher', $portal->teacher($user));
         }
+
+        if ($user->hasRole(UserRole::Guardian)) {
+            return Inertia::render('dashboard/guardian', $portal->guardian($user));
+        }
+
+        if ($user->hasRole(UserRole::Student)) {
+            return Inertia::render('dashboard/student', $portal->student($user));
+        }
+
+        $school = $user->accessibleSchools()->first();
+
+        if ($school === null) {
+            return Inertia::render('dashboard', $this->emptyPayload());
+        }
+
+        $payload = Cache::remember(
+            "dashboard.school.{$school->id}",
+            self::CACHE_TTL_SECONDS,
+            fn (): array => $this->adminPayload($school),
+        );
 
         return Inertia::render('dashboard', [
-            'school' => $school?->only(['id', 'name']),
-            'metrics' => $dashboardData['metrics'],
-            'widgets' => $dashboardData['widgets'],
+            'school' => ['id' => $school->id, 'name' => $school->name],
+            ...$payload,
         ]);
     }
 
     /**
-     * Fetch all dashboard data for a school
+     * @return array<string, mixed>
      */
-    protected function fetchDashboardData(School $school)
+    private function emptyPayload(): array
     {
-        $today = Carbon::today();
-        $startOfDay = $today->startOfDay();
-        $endOfDay = $today->endOfDay();
+        return [
+            'school' => null,
+            'metrics' => [
+                'students' => ['total' => 0, 'active' => 0, 'inactive' => 0],
+                'teachers' => ['total' => 0, 'assigned' => 0],
+                'attendanceToday' => $this->attendanceTotals(collect()),
+                'activeClasses' => 0,
+                'pendingAdmissions' => 0,
+                'outstandingBalances' => ['amountMinor' => 0, 'formatted' => '0.00'],
+                'paymentsToday' => ['amountMinor' => 0, 'count' => 0, 'formattedAmount' => '0.00'],
+                'upcomingExams' => [],
+                'assessmentStats' => $this->emptyAssessmentStats(),
+            ],
+            'widgets' => [
+                'attendanceOverview' => ['today' => $this->attendanceTotals(collect())],
+                'admissionsPipeline' => [
+                    'pending' => 0,
+                    'reviewing' => 0,
+                    'accepted' => 0,
+                    'rejected' => 0,
+                    'withdrawn' => 0,
+                ],
+                'financeSummary' => ['income' => ['today' => 0, 'month' => 0], 'outstandingMinor' => 0, 'currency' => 'SAR'],
+                'todaysTimetable' => [],
+                'recentNotices' => [],
+                'paymentStatus' => ['successful' => 0, 'failed' => 0, 'pending' => 0],
+                'outstandingInvoices' => [],
+                'notificationActivity' => ['sentToday' => 0, 'readToday' => 0, 'deliveredToday' => 0],
+                'recentActivity' => [],
+                'quickActions' => [],
+            ],
+        ];
+    }
 
-        // Students metrics
+    /**
+     * @return array{metrics: array<string, mixed>, widgets: array<string, mixed>}
+     */
+    private function adminPayload(School $school): array
+    {
+        $today = CarbonImmutable::today();
+        $windowStart = $today->startOfDay();
+        $windowEnd = $today->endOfDay();
+        $monthStart = $today->startOfMonth();
+        $assessmentSince = $today->subDays(30);
+
         $totalStudents = $school->students()->count();
         $activeStudents = $school->students()->where('status', 'active')->count();
-        $inactiveStudents = $totalStudents - $activeStudents;
 
-        // Teachers metrics (users with Teacher role in this school)
-        $totalTeachers = $school->users()->where('role', UserRole::Teacher->value)->count();
-        $activeTeachers = $school->users()->where('role', UserRole::Teacher->value)->where('status', 'active')->count();
-        $teachersOnLeave = $school->users()->where('role', UserRole::Teacher->value)->where('status', 'on_leave')->count();
-
-        // Attendance today
-        $attendanceToday = $school->attendanceRecords()
-            ->whereDate('date', $today)
-            ->get();
-
-        $totalAttendanceToday = $attendanceToday->count();
-        $presentToday = $attendanceToday->where('status', 'present')->count();
-        $absentToday = $attendanceToday->where('status', 'absent')->count();
-        $lateToday = $attendanceToday->where('status', 'late')->count();
-        $excusedToday = $attendanceToday->where('status', 'excused')->count();
-
-        $attendancePercentages = $totalAttendanceToday > 0 ? [
-            'present' => round(($presentToday / $totalAttendanceToday) * 100, 1),
-            'absent' => round(($absentToday / $totalAttendanceToday) * 100, 1),
-            'late' => round(($lateToday / $totalAttendanceToday) * 100, 1),
-            'excused' => round(($excusedToday / $totalAttendanceToday) * 100, 1),
-        ] : [
-            'present' => 0,
-            'absent' => 0,
-            'late' => 0,
-            'excused' => 0,
-        ];
-
-        // Active classes count (classes with active enrollments)
-        $activeClassesCount = $school->academicClasses()
-            ->whereHas('enrollments', function ($query) {
-                $query->where('status', 'active');
-            })
+        // Teachers belong to the organization, which is how every other
+        // teacher lookup in the app resolves them.
+        $totalTeachers = User::query()
+            ->where('organization_id', $school->organization_id)
+            ->where('role', UserRole::Teacher)
             ->count();
 
-        // Pending admissions count
-        $pendingAdmissionsCount = $school->applications()
-            ->where('status', 'pending')
+        $assignedTeachers = TeacherAssignment::query()
+            ->where('school_id', $school->id)
+            ->distinct('teacher_id')
+            ->count('teacher_id');
+
+        $attendanceCounts = AttendanceRecord::query()
+            ->whereHas('session', fn ($query) => $query->where('school_id', $school->id)->whereDate('attendance_date', $today))
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $activeClasses = $school->academicClasses()
+            ->whereHas('enrollments', fn ($query) => $query->where('status', 'active'))
             ->count();
 
-        // Outstanding balances amount
-        $outstandingBalancesAmount = $school->invoices()
-            ->where('status', '!=', 'paid')
-            ->where('due_date', '<', $today->endOfDay())
-            ->sum('amount_due');
+        $pipeline = $school->applications()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
-        // Payments today
-        $paymentsToday = $school->paymentIntents()
-            ->whereBetween('created_at', [$startOfDay, $endOfDay])
-            ->where('status', 'succeeded')
-            ->get();
+        $outstandingMinor = (int) Installment::query()
+            ->where('school_id', $school->id)
+            ->whereColumn('paid_minor', '<', 'amount_minor')
+            ->selectRaw('COALESCE(SUM(amount_minor - paid_minor), 0) as total')
+            ->value('total');
 
-        $paymentsTodayAmount = $paymentsToday->sum('amount');
-        $paymentsTodayCount = $paymentsToday->count();
+        $paymentsToday = PaymentIntent::query()
+            ->where('school_id', $school->id)
+            ->whereBetween('created_at', [$windowStart, $windowEnd]);
 
-        // For now, we'll use placeholder data for exams since there's no exam model
-        // In a real implementation, this would come from an exam/schedule system
-        $upcomingExams = collect([
-            [
-                'id' => 1,
-                'title' => 'Midterm Mathematics',
-                'date' => $today->addDays(2)->format('Y-m-d'),
-                'subject' => 'Mathematics',
-                'class' => 'Grade 10A',
-            ],
-            [
-                'id' => 2,
-                'title' => 'Science Quiz',
-                'date' => $today->addDays(5)->format('Y-m-d'),
-                'subject' => 'Science',
-                'class' => 'Grade 8B',
-            ],
-            [
-                'id' => 3,
-                'title' => 'English Literature',
-                'date' => $today->addDays(7)->format('Y-m-d'),
-                'subject' => 'English',
-                'class' => 'Grade 9A',
-            ],
-        ]);
+        $paymentsTodaySucceeded = (clone $paymentsToday)->where('status', 'succeeded')->get(['amount_minor']);
+        $paymentsTodayCount = $paymentsTodaySucceeded->count();
+        $paymentsTodayMinor = (int) $paymentsTodaySucceeded->sum('amount_minor');
 
-        // Prepare metrics
-        $metrics = [
-            'students' => [
-                'total' => $totalStudents,
-                'active' => $activeStudents,
-                'inactive' => $inactiveStudents,
-                'trend' => '+6.4%', // This would be calculated from historical data
-            ],
-            'teachers' => [
-                'total' => $totalTeachers,
-                'active' => $activeTeachers,
-                'onLeave' => $teachersOnLeave,
-                'trend' => '+3.2%', // This would be calculated from historical data
-            ],
-            'attendanceToday' => [
-                'present' => $presentToday,
-                'absent' => $absentToday,
-                'late' => $lateToday,
-                'excused' => $excusedToday,
-                'presentPercentage' => $attendancePercentages['present'],
-                'absentPercentage' => $attendancePercentages['absent'],
-                'latePercentage' => $attendancePercentages['late'],
-                'excusedPercentage' => $attendancePercentages['excused'],
-            ],
-            'activeClasses' => $activeClassesCount,
-            'pendingAdmissions' => $pendingAdmissionsCount,
-            'outstandingBalances' => [
-                'amount' => $outstandingBalancesAmount,
-                'formatted' => number_format($outstandingBalancesAmount, 2),
-            ],
-            'paymentsToday' => [
-                'amount' => $paymentsTodayAmount,
-                'count' => $paymentsTodayCount,
-                'formattedAmount' => number_format($paymentsTodayAmount, 2),
-            ],
-            'upcomingExams' => $upcomingExams,
+        $paymentCounts = (clone $paymentsToday)
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $incomeTodayMinor = (int) Receipt::query()
+            ->where('school_id', $school->id)
+            ->whereBetween('issued_at', [$windowStart, $windowEnd])
+            ->sum('amount_minor');
+
+        $incomeMonthMinor = (int) Receipt::query()
+            ->where('school_id', $school->id)
+            ->where('issued_at', '>=', $monthStart)
+            ->sum('amount_minor');
+
+        $upcomingExams = ExamPaper::query()
+            ->where('school_id', $school->id)
+            ->whereDate('exam_date', '>=', $today)
+            ->inPublishedPeriod()
+            ->with(['section:id,name', 'section.academicClass:id,name', 'subject:id,name_en,name_ar'])
+            ->orderBy('exam_date')
+            ->orderBy('starts_at')
+            ->limit(8)
+            ->get()
+            ->map(fn (ExamPaper $paper): array => [
+                'id' => $paper->id,
+                'exam_date' => $paper->exam_date->toDateString(),
+                'starts_at' => substr((string) $paper->starts_at, 0, 5),
+                'ends_at' => substr((string) $paper->ends_at, 0, 5),
+                'room' => $paper->room,
+                'class_name' => $paper->section?->academicClass?->name,
+                'section_name' => $paper->section?->name,
+                'subject_name_en' => $paper->subject?->name_en,
+                'subject_name_ar' => $paper->subject?->name_ar,
+            ])
+            ->values()
+            ->all();
+
+        $outstandingInvoices = Installment::query()
+            ->where('school_id', $school->id)
+            ->whereColumn('paid_minor', '<', 'amount_minor')
+            ->with(['invoice.student:id,first_name,last_name,student_number'])
+            ->orderBy('due_on')
+            ->limit(8)
+            ->get()
+            ->map(fn (Installment $installment): array => [
+                'id' => $installment->id,
+                'number' => $installment->invoice?->number,
+                'student' => trim((string) $installment->invoice?->student?->first_name.' '.(string) $installment->invoice?->student?->last_name),
+                'studentNumber' => $installment->invoice?->student?->student_number,
+                'sequence' => $installment->sequence,
+                'amountMinor' => $installment->amount_minor,
+                'paidMinor' => $installment->paid_minor,
+                'outstandingMinor' => $installment->amount_minor - $installment->paid_minor,
+                'currency' => (string) $installment->invoice?->currency,
+                'dueOn' => $installment->due_on?->toDateString(),
+                'status' => $installment->status,
+            ])
+            ->values()
+            ->all();
+
+        $notificationQuery = Notification::query()
+            ->where('organization_id', $school->organization_id)
+            ->whereBetween('created_at', [$windowStart, $windowEnd]);
+
+        $notificationActivity = [
+            'sentToday' => (clone $notificationQuery)->count(),
+            'readToday' => (clone $notificationQuery)->whereNotNull('read_at')->count(),
+            'deliveredToday' => NotificationDelivery::query()
+                ->where('organization_id', $school->organization_id)
+                ->whereBetween('created_at', [$windowStart, $windowEnd])
+                ->whereNotNull('sent_at')
+                ->count(),
         ];
 
-        // Prepare widgets data
-        $widgets = [
-            'attendanceOverview' => [
-                'today' => [
-                    'present' => $presentToday,
-                    'absent' => $absentToday,
-                    'late' => $lateToday,
-                    'excused' => $excusedToday,
-                ],
-                'weekly' => [ // This would be calculated from historical data
-                    'present' => 85,
-                    'absent' => 10,
-                    'late' = 3,
-                    'excused' = 2,
-                ],
-            ],
-            'admissionsPipeline' => [
-                'new' => $school->applications()->where('status', 'new')->count(),
-                'pending' => $pendingAdmissionsCount,
-                'accepted' => $school->applications()->where('status', 'accepted')->count(),
-                'enrolled' = $school->applications()->where('status', 'enrolled')->count(),
-                'rejected' = $school->applications()->where('status', 'rejected')->count(),
-            ],
-            'financeSummary' => [
-                'income' => [
-                    'today' = $paymentsTodayAmount,
-                    'month' = $school->paymentIntents()
-                        ->whereMonth('created_at', '=', $today->month)
-                        ->whereYear('created_at', '=', $today->year)
-                        ->where('status', 'succeeded')
-                        ->sum('amount'),
-                ],
-                'expenses' = [
-                    'today' = 0, // This would come from expense tracking
-                    'month' = 0,
-                ],
-                'balance' = $outstandingBalancesAmount,
-            ],
-            'upcomingExamsList' = $upcomingExams->take(3), // Show top 3 upcoming exams
-            'todaysTimetable' = [ // Placeholder data - would come from timetable system
-                [
-                    'time' = '08:00 - 09:00',
-                    'subject' = 'Mathematics',
-                    'teacher' = 'Mr. Ahmed',
-                    'room' = 'Room 101',
-                ],
-                [
-                    'time' = '09:00 - 10:00',
-                    'subject' = 'Science',
-                    'teacher' = 'Ms. Fatima',
-                    'room' = 'Lab 2',
-                ],
-                [
-                    'time' = '10:00 - 11:00',
-                    'subject' = 'English',
-                    'teacher' = 'Ms. Noura',
-                    'room' = 'Room 105',
-                ],
-            ],
-            'recentActivity' = [ // This would come from activity logs
-                [
-                    'type' = 'student_enrolled',
-                    'description' = 'New student enrolled in Grade 5',
-                    'time' = '2 hours ago',
-                ],
-                [
-                    'type' = 'payment_received',
-                    'description' = 'Payment received for Invoice #INV-00123',
-                    'time' = '5 hours ago',
-                ],
-                [
-                    'type' = 'assessment_recorded',
-                    'description' = 'Assessment recorded for Section 8B',
-                    'time' = '1 hour ago',
-                ],
-            ],
-            'recentNotices' = $school->notices()
-                ->where('is_published', true)
-                ->orderByDesc('created_at')
-                ->take(5)
-                ->get()
-                ->map(function ($notice) {
-                    return [
-                        'id' = $notice->id,
-                        'title' = $notice->title,
-                        'created_at' = $notice->created_at->diffForHumans(),
-                    ];
-                }),
-            'paymentStatus' = [
-                'successful' = $paymentsTodayCount,
-                'failed' = $school->paymentIntents()
-                    ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                    ->where('status', 'failed')
-                    ->count(),
-                'pending' = $school->paymentIntents()
-                    ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                    ->where('status', 'pending')
-                    ->count(),
-            ],
-            'outstandingInvoices' = $school->invoices()
-                ->where('status', '!=', 'paid')
-                ->orderBy('due_date')
-                ->take(10)
-                ->get()
-                ->map(function ($invoice) {
-                    return [
-                        'id' = $invoice->id,
-                        'number' = $invoice->invoice_number,
-                        'student' = $invoice->student?->name ?? 'Unknown',
-                        'amount' = $invoice->amount_due,
-                        'due_date' = $invoice->due_date->format('Y-m-d'),
-                        'status' = $invoice->status,
-                    ];
-                }),
-            'notificationActivity' = [
-                'sentToday' = $school->notifications()
-                    ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                    ->count(),
-                'readToday' = $school->notifications()
-                    ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                    ->where('is_read', true)
-                    ->count(),
-                'deliveredToday' = $school->notificationDeliveries()
-                    ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                    ->where('status', 'delivered')
-                    ->count(),
-            ],
-            'quickActions' = [
-                [
-                    'title' = 'Take Attendance',
-                    'href' = route('admin.reports.attendance', ['school' = $school->id]),
-                    'icon' = 'ClipboardList',
-                ],
-                [
-                    'title' = 'View Applications',
-                    'href' = route('admin.admissions.index', ['school' = $school->id]),
-                    'icon' = 'Users',
-                ],
-                [
-                    'title' = 'Create Invoice',
-                    'href' = route('admin.finance.invoices.store', ['school' = $school->id]),
-                    'icon' = 'CreditCard',
-                ],
-                [
-                    'title' = 'Send Notice',
-                    'href' = route('admin.notices.store', ['school' = $school->id]),
-                    'icon' = 'Megaphone',
-                ],
-            ],
-        ];
+        $recentActivity = AuditLog::query()
+            ->where('organization_id', $school->organization_id)
+            ->with('user:id,name')
+            ->latest('created_at')
+            ->limit(8)
+            ->get()
+            ->map(fn (AuditLog $log): array => [
+                'id' => $log->id,
+                'action' => $log->action,
+                'actor' => $log->user?->name,
+                'at' => $log->created_at->toIso8601String(),
+            ])
+            ->values()
+            ->all();
 
         return [
-            'metrics' = $metrics,
-            'widgets' = $widgets,
+            'metrics' => [
+                'students' => [
+                    'total' => $totalStudents,
+                    'active' => $activeStudents,
+                    'inactive' => $totalStudents - $activeStudents,
+                ],
+                'teachers' => [
+                    'total' => $totalTeachers,
+                    'assigned' => $assignedTeachers,
+                ],
+                'attendanceToday' => $this->attendanceTotals($attendanceCounts),
+                'activeClasses' => $activeClasses,
+                'pendingAdmissions' => (int) ($pipeline['pending'] ?? 0),
+                'outstandingBalances' => [
+                    'amountMinor' => $outstandingMinor,
+                    'formatted' => number_format($outstandingMinor / 100, 2),
+                ],
+                'paymentsToday' => [
+                    'amountMinor' => $paymentsTodayMinor,
+                    'count' => $paymentsTodayCount,
+                    'formattedAmount' => number_format($paymentsTodayMinor / 100, 2),
+                ],
+                'upcomingExams' => $upcomingExams,
+                'assessmentStats' => $this->assessmentStats($school, $assessmentSince),
+            ],
+            'widgets' => [
+                'attendanceOverview' => ['today' => $this->attendanceTotals($attendanceCounts)],
+                'admissionsPipeline' => [
+                    'pending' => (int) ($pipeline['pending'] ?? 0),
+                    'reviewing' => (int) ($pipeline['reviewing'] ?? 0),
+                    'accepted' => (int) ($pipeline['accepted'] ?? 0),
+                    'rejected' => (int) ($pipeline['rejected'] ?? 0),
+                    'withdrawn' => (int) ($pipeline['withdrawn'] ?? 0),
+                ],
+                'financeSummary' => [
+                    'income' => ['today' => $incomeTodayMinor, 'month' => $incomeMonthMinor],
+                    'outstandingMinor' => $outstandingMinor,
+                    'currency' => 'SAR',
+                ],
+                'todaysTimetable' => $this->timetableForDay($school, $today->dayOfWeek),
+                'recentNotices' => $school->notices()
+                    ->published()
+                    ->latest('published_at')
+                    ->limit(5)
+                    ->get(['id', 'title', 'published_at'])
+                    ->map(fn ($notice): array => [
+                        'id' => $notice->id,
+                        'title' => $notice->title,
+                        'publishedAt' => $notice->published_at?->toIso8601String(),
+                    ])
+                    ->values()
+                    ->all(),
+                'paymentStatus' => [
+                    'successful' => (int) ($paymentCounts['succeeded'] ?? 0),
+                    'failed' => (int) ($paymentCounts['failed'] ?? 0) + (int) ($paymentCounts['amount_mismatch'] ?? 0),
+                    'pending' => (int) ($paymentCounts['created'] ?? 0) + (int) ($paymentCounts['requires_action'] ?? 0),
+                ],
+                'outstandingInvoices' => $outstandingInvoices,
+                'notificationActivity' => $notificationActivity,
+                'recentActivity' => $recentActivity,
+                'quickActions' => $this->quickActions($school),
+            ],
         ];
+    }
+
+    /**
+     * @param  Collection<int|string, mixed>  $counts
+     * @return array<string, int|float>
+     */
+    private function attendanceTotals(Collection $counts): array
+    {
+        $present = (int) $counts->get('present', 0);
+        $absent = (int) $counts->get('absent', 0);
+        $late = (int) $counts->get('late', 0);
+        $excused = (int) $counts->get('excused', 0);
+        $recorded = $present + $absent + $late + $excused;
+
+        return [
+            'present' => $present,
+            'absent' => $absent,
+            'late' => $late,
+            'excused' => $excused,
+            'recorded' => $recorded,
+            'presentPercentage' => $recorded > 0 ? round($present / $recorded * 100, 1) : 0.0,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function emptyAssessmentStats(): array
+    {
+        return ['total' => 0, 'averagePercent' => 0.0, 'passRate' => 0.0, 'recent' => []];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function assessmentStats(School $school, CarbonImmutable $since): array
+    {
+        $aggregate = Assessment::query()
+            ->where('school_id', $school->id)
+            ->whereDate('assessed_on', '>=', $since)
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('AVG(score / NULLIF(max_score, 0) * 100) as average_percent')
+            ->selectRaw('SUM(CASE WHEN score / NULLIF(max_score, 0) >= 0.6 THEN 1 ELSE 0 END) as passing')
+            ->first();
+
+        $total = (int) $aggregate->getAttribute('total');
+
+        if ($total === 0) {
+            return $this->emptyAssessmentStats();
+        }
+
+        return [
+            'total' => $total,
+            'averagePercent' => round((float) $aggregate->getAttribute('average_percent'), 1),
+            'passRate' => round((int) $aggregate->getAttribute('passing') / $total * 100, 1),
+            'recent' => Assessment::query()
+                ->where('school_id', $school->id)
+                ->whereDate('assessed_on', '>=', $since)
+                ->with(['section:id,name', 'student:id,first_name,last_name'])
+                ->latest('assessed_on')
+                ->limit(5)
+                ->get()
+                ->map(fn (Assessment $assessment): array => [
+                    'id' => $assessment->id,
+                    'title' => $assessment->title,
+                    'assessedOn' => $assessment->assessed_on?->toDateString(),
+                    'sectionName' => $assessment->section?->name,
+                    'student' => trim((string) $assessment->student?->first_name.' '.(string) $assessment->student?->last_name),
+                    'score' => (float) $assessment->score,
+                    'maxScore' => (float) $assessment->max_score,
+                ])
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * Published timetable entries for one weekday, resolved against the bell
+     * schedule that gives each period its time.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function timetableForDay(School $school, int $dayOfWeek): array
+    {
+        $version = TimetableVersion::query()
+            ->where('school_id', $school->id)
+            ->published()
+            ->latest('published_at')
+            ->first();
+
+        if ($version === null) {
+            return [];
+        }
+
+        $startsByPeriod = [];
+
+        foreach (BellPeriod::query()->where('bell_schedule_id', $version->bell_schedule_id)->get(['number', 'starts_at', 'ends_at']) as $period) {
+            $startsByPeriod[(string) $period->number] = [
+                'starts_at' => substr((string) $period->starts_at, 0, 5),
+                'ends_at' => substr((string) $period->ends_at, 0, 5),
+            ];
+        }
+
+        return TimetableEntry::query()
+            ->where('timetable_version_id', $version->id)
+            ->where('day_of_week', $dayOfWeek)
+            ->with([
+                'section:id,name',
+                'section.academicClass:id,name',
+                'subject:id,name_en,name_ar,color',
+                'teacher:id,name',
+            ])
+            ->orderBy('period_number')
+            ->get()
+            ->map(fn (TimetableEntry $entry): array => [
+                'id' => $entry->id,
+                'period' => $entry->period_number,
+                'starts_at' => $startsByPeriod[(string) $entry->period_number]['starts_at'] ?? null,
+                'ends_at' => $startsByPeriod[(string) $entry->period_number]['ends_at'] ?? null,
+                'class_name' => $entry->section?->academicClass?->name,
+                'section_name' => $entry->section?->name,
+                'subject_name_en' => $entry->subject?->name_en,
+                'subject_name_ar' => $entry->subject?->name_ar,
+                'subject_color' => $entry->subject?->color,
+                'teacher_name' => $entry->teacher?->name,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Only links this school's administration can actually reach.
+     *
+     * @return array<int, array{key: string, href: string}>
+     */
+    private function quickActions(School $school): array
+    {
+        $user = auth()->user();
+
+        $actions = [
+            ['key' => 'take_attendance', 'ability' => 'view-attendance-report', 'href' => route('admin.reports.attendance', $school->id)],
+            ['key' => 'view_applications', 'ability' => 'manage-admissions', 'href' => route('admin.admissions.index', $school->id)],
+            ['key' => 'manage_finance', 'ability' => 'manage-finance', 'href' => route('admin.finance.index', $school->id)],
+            ['key' => 'manage_timetable', 'ability' => 'manage-schedule', 'href' => route('admin.schedule.timetable.index', $school->id)],
+            ['key' => 'manage_exams', 'ability' => 'manage-schedule', 'href' => route('admin.schedule.exams.index', $school->id)],
+            ['key' => 'manage_academics', 'ability' => 'manage-enrollment', 'href' => route('admin.academics.index', $school->id)],
+        ];
+
+        return collect($actions)
+            ->filter(fn (array $action): bool => $user !== null && $user->can($action['ability'], $school))
+            ->map(fn (array $action): array => ['key' => $action['key'], 'href' => $action['href']])
+            ->values()
+            ->all();
     }
 }

@@ -27,6 +27,7 @@ use App\Models\SchoolMembership;
 use App\Models\Section;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Models\TeacherAssignment;
 use App\Models\TimetableEntry;
 use App\Models\TimetableVersion;
 use App\Models\User;
@@ -132,10 +133,15 @@ class RouteSweepTest extends TestCase
 
         $guardianUser = User::factory()->create(['organization_id' => $org->id, 'role' => UserRole::Guardian]);
         $guardian = Guardian::create([
-            'organization_id' => $org->id, 'user_id' => $guardianUser->id,
+            'organization_id' => $org->id, 'school_id' => $school->id, 'user_id' => $guardianUser->id,
             'name' => 'Sweep Guardian', 'email' => $guardianUser->email,
         ]);
         $guardian->students()->attach($student->id, ['organization_id' => $org->id]);
+
+        $teacherAssignment = TeacherAssignment::create([
+            'organization_id' => $org->id, 'school_id' => $school->id,
+            'section_id' => $section->id, 'teacher_id' => $teacher->id,
+        ]);
 
         $session = AttendanceSession::create([
             'organization_id' => $org->id, 'school_id' => $school->id,
@@ -211,6 +217,8 @@ class RouteSweepTest extends TestCase
             'teacher' => $teacher->id,
             'attendanceSession' => $session->id,
             'invoice' => $invoice->id,
+            'guardian' => $guardian->id,
+            'teacherAssignment' => $teacherAssignment->id,
         ];
 
         $this->users = [

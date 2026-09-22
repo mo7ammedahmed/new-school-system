@@ -1,8 +1,16 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
+import { FormErrors } from '@/components/forms/form-errors';
 import { Select } from '@/components/ui/select';
 import { Toast } from '@/components/ui/toast';
 import { useState } from 'react';
@@ -23,8 +31,13 @@ type Props = {
     }>;
 };
 
-export default function TeacherAssignmentEdit({ school, assignment, teachers, sections }: Props) {
-    const { data, setData, put, processing, recentSuccessfulSubmit } = useForm({
+export default function TeacherAssignmentEdit({
+    school,
+    assignment,
+    teachers,
+    sections,
+}: Props) {
+    const { data, setData, put, processing, errors } = useForm({
         teacher_id: assignment.teacher_id,
         section_id: assignment.section_id,
     });
@@ -35,21 +48,24 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/schools/${school.id}/teacher-assignments/${assignment.id}`, {
-            onSuccess: () => {
-                // Show success toast
-                setToastMessage('Teacher assignment updated successfully.');
-                setToastType('success');
-                setShowToast(true);
+        put(
+            `/admin/schools/${school.id}/teacher-assignments/${assignment.id}`,
+            {
+                onSuccess: () => {
+                    // Show success toast
+                    setToastMessage('Teacher assignment updated successfully.');
+                    setToastType('success');
+                    setShowToast(true);
+                },
+                onError: (errors) => {
+                    // Show error toast
+                    setToastMessage('Please correct the errors and try again.');
+                    setToastType('error');
+                    setShowToast(true);
+                    // In a real implementation, the form errors would be displayed automatically
+                },
             },
-            onError: (errors) => {
-                // Show error toast
-                setToastMessage('Please correct the errors and try again.');
-                setToastType('error');
-                setShowToast(true);
-                // In a real implementation, the form errors would be displayed automatically
-            }
-        });
+        );
     };
 
     return (
@@ -57,8 +73,10 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
             <Head title="Edit Teacher Assignment" />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Edit Teacher Assignment</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <h1 className="text-2xl font-semibold">
+                        Edit Teacher Assignment
+                    </h1>
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button
                             href={`/admin/schools/${school.id}/teacher-assignments`}
                             variant="outline"
@@ -78,6 +96,8 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <FormErrors errors={errors} />
+
                         <FormSection>
                             <FormField
                                 label="Teacher"
@@ -85,13 +105,18 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
                             >
                                 <Select
                                     value={data.teacher_id}
-                                    onValueChange={(value) => setData('teacher_id', value)}
+                                    onValueChange={(value) =>
+                                        setData('teacher_id', value)
+                                    }
                                     placeholder="Select teacher"
                                     required
                                 >
                                     <option value="">Select teacher</option>
                                     {teachers.map((teacher) => (
-                                        <option key={teacher.id} value={teacher.id}>
+                                        <option
+                                            key={teacher.id}
+                                            value={teacher.id}
+                                        >
                                             {teacher.name}
                                         </option>
                                     ))}
@@ -106,14 +131,20 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
                             >
                                 <Select
                                     value={data.section_id}
-                                    onValueChange={(value) => setData('section_id', value)}
+                                    onValueChange={(value) =>
+                                        setData('section_id', value)
+                                    }
                                     placeholder="Select section"
                                     required
                                 >
                                     <option value="">Select section</option>
                                     {sections.map((section) => (
-                                        <option key={section.id} value={section.id}>
-                                            {section.name} ({section.academic_class.name})
+                                        <option
+                                            key={section.id}
+                                            value={section.id}
+                                        >
+                                            {section.name} (
+                                            {section.academic_class.name})
                                         </option>
                                     ))}
                                 </Select>
@@ -130,10 +161,7 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            isLoading={processing}
-                        >
+                        <Button onClick={handleSubmit} isLoading={processing}>
                             Update Assignment
                         </Button>
                     </CardFooter>
@@ -142,28 +170,3 @@ export default function TeacherAssignmentEdit({ school, assignment, teachers, se
         </>
     );
 }
-
-TeacherAssignmentEdit.layout = {
-    breadcrumbs: [
-        {
-            title: 'Dashboard',
-            href: '/dashboard',
-        },
-        {
-            title: 'Schools',
-            href: '/admin/schools',
-        },
-        {
-            title: (school) => school.name,
-            href: `/admin/schools/${school.id}`,
-        },
-        {
-            title: 'Teacher Assignments',
-            href: `/admin/schools/${school.id}/teacher-assignments`,
-        },
-        {
-            title: 'Edit Teacher Assignment',
-            href: `/admin/schools/${school.id}/teacher-assignments/${assignment.id}/edit`,
-        },
-    ],
-};

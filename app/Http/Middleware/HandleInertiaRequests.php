@@ -95,6 +95,7 @@ class HandleInertiaRequests extends Middleware
                     'publishSchedule' => $this->allows($request, 'publish-schedule', $primarySchool),
                     'manageAdmissions' => $this->allows($request, 'manage-admissions', $primarySchool),
                     'manageEnrollment' => $this->allows($request, 'manage-enrollment', $primarySchool),
+                    'manageUsers' => $this->allows($request, 'manage-users', $primarySchool),
                     'manageContent' => $this->allows($request, 'manage-content', $primarySchool),
                     'viewAttendanceReports' => $this->allows($request, 'view-attendance-report', $primarySchool),
                 ],

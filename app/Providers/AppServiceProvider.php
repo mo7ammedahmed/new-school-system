@@ -96,6 +96,11 @@ class AppServiceProvider extends ServiceProvider
                 && $user->hasRole(UserRole::OrganizationAdmin, UserRole::SchoolAdmin);
         });
 
+        Gate::define('manage-users', function (User $user, School $school): bool {
+            return $user->belongsToOrganization($school->organization)
+                && $user->hasRole(UserRole::OrganizationAdmin, UserRole::SchoolAdmin);
+        });
+
         Gate::define('view-student', function (User $user, Student $student): bool {
             if ($user->hasRole(UserRole::Guardian)) {
                 return $user->organization_id === $student->organization_id

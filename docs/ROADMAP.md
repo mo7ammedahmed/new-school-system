@@ -2,13 +2,13 @@
 
 Each phase is a release gate, not only a feature list. Work may be parallelized within a phase once the stated dependencies are satisfied, but a phase is not complete until its exit criteria are demonstrated.
 
-| Phase | Objective | Depends on |
-| --- | --- | --- |
-| 0 | Establish a shared product and engineering baseline. | Confirmed product direction |
-| 1 | Build secure, tenant-aware application foundations. | Phase 0 |
-| 2 | Deliver the public-site, admissions, and core SIS MVP. | Phase 1 |
-| 3 | Deliver V1 finance, academics, and parent responsive web. | Phase 2 |
-| 4 | Add Saudi compliance and prioritized expansion capability. | Proven Phase 3 finance workflows |
+| Phase | Objective                                                  | Depends on                       |
+| ----- | ---------------------------------------------------------- | -------------------------------- |
+| 0     | Establish a shared product and engineering baseline.       | Confirmed product direction      |
+| 1     | Build secure, tenant-aware application foundations.        | Phase 0                          |
+| 2     | Deliver the public-site, admissions, and core SIS MVP.     | Phase 1                          |
+| 3     | Deliver V1 finance, academics, and parent responsive web.  | Phase 2                          |
+| 4     | Add Saudi compliance and prioritized expansion capability. | Proven Phase 3 finance workflows |
 
 ## Phase 0: Product and technical foundation
 

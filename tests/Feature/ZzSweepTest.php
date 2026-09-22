@@ -30,8 +30,10 @@ use App\Models\TimetableEntry;
 use App\Models\TimetableVersion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 use Tests\TestCase;
 
 class ZzSweepTest extends TestCase
@@ -252,7 +254,7 @@ class ZzSweepTest extends TestCase
                 // carry no view, so only Inertia-rendered pages are inspected.
                 $base = $response->baseResponse;
 
-                if ($status === 200 && $base instanceof \Illuminate\Http\Response && $base->original instanceof \Illuminate\View\View) {
+                if ($status === 200 && $base instanceof Response && $base->original instanceof View) {
                     $data = $base->original->getData();
                     $page = is_array($data) ? ($data['page'] ?? null) : null;
                     $component = is_array($page) ? ($page['component'] ?? null) : null;

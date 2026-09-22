@@ -2,37 +2,59 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Student;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StudentRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Authorization is enforced in the controller via Gate::authorize.
      */
     public function authorize(): bool
     {
-        // Authorization will be handled in the controller via Gate::authorize
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $student = $this->route('student');
+        $organizationId = $student !== null
+            ? Student::query()->whereKey($student)->value('organization_id')
+            : $this->organizationId();
+
         return [
             'first_name' => ['required', 'string', 'max:160'],
             'last_name' => ['required', 'string', 'max:160'],
-            'student_number' => ['required', 'string', 'max:80', 'unique:students,student_number'],
+            'student_number' => [
+                'required',
+                'string',
+                'max:80',
+                Rule::unique('students', 'student_number')
+                    ->where(fn ($query) => $query->where('organization_id', $organizationId))
+                    ->ignore($student),
+            ],
             'date_of_birth' => ['nullable', 'date', 'before:today'],
-            'gender' => ['nullable', 'string', 'in:male,female,other'],
-            'phone' => ['nullable', 'string', 'max:40'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:students,email'],
-            'address' => ['nullable', 'string'],
-            'status' => ['sometimes', 'string', 'in:active,inactive,graduated,withdrawn'],
+            'status' => ['sometimes', 'string', Rule::in(['active', 'inactive', 'graduated', 'withdrawn'])],
         ];
+    }
+
+    /**
+     * Platform operators create records inside whichever school they can reach
+     * first; everyone else is pinned to their own organization.
+     */
+    private function organizationId(): ?int
+    {
+        $user = $this->user();
+
+        if ($user === null) {
+            return null;
+        }
+
+        return $user->organization_id ?? $user->accessibleSchools()->first()?->organization_id;
     }
 }

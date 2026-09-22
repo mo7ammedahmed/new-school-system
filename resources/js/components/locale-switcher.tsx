@@ -14,11 +14,11 @@ export default function LocaleSwitcher() {
     }
 
     return (
-        <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <label className="text-muted-foreground inline-flex items-center gap-2 text-sm">
             <span className="sr-only">Language</span>
             <select
                 aria-label="Language"
-                className="rounded-md border border-input bg-background px-2 py-1 text-foreground"
+                className="border-input bg-background text-foreground rounded-md border px-2 py-1"
                 value={locale}
                 onChange={(event) => changeLocale(event.target.value)}
             >

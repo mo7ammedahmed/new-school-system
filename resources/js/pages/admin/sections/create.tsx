@@ -1,8 +1,16 @@
 import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
+import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -15,10 +23,12 @@ type Props = {
 };
 
 export default function SectionCreate({ school, academicClasses }: Props) {
-    const { data, setData, post, processing, recentSuccessfulSubmit } = useForm({
-        name: '',
-        academic_class_id: '',
-    });
+    const { data, setData, post, processing, errors } = useForm(
+        {
+            name: '',
+            class_id: '',
+        },
+    );
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -38,7 +48,7 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                 setToastMessage('Something went wrong. Please try again.');
                 setToastType('error');
                 setShowToast(true);
-            }
+            },
         });
     };
 
@@ -48,7 +58,7 @@ export default function SectionCreate({ school, academicClasses }: Props) {
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">New Section</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button
                             href={`/admin/schools/${school.id}/sections`}
                             variant="outline"
@@ -68,6 +78,8 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <FormErrors errors={errors} />
+
                         <FormSection>
                             <FormField
                                 label="Name"
@@ -76,7 +88,9 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                                 <Input
                                     placeholder="Section A"
                                     value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
                                     required
                                 />
                             </FormField>
@@ -88,13 +102,18 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                                 description="Select the academic class for this section"
                             >
                                 <Select
-                                    value={data.academic_class_id}
-                                    onValueChange={(value) => setData('academic_class_id', value)}
+                                    value={data.class_id}
+                                    onValueChange={(value) =>
+                                        setData('class_id', value)
+                                    }
                                     placeholder="Select academic class"
                                     required
                                 >
                                     {academicClasses.map((academicClass) => (
-                                        <option key={academicClass.id} value={academicClass.id}>
+                                        <option
+                                            key={academicClass.id}
+                                            value={academicClass.id}
+                                        >
                                             {academicClass.name}
                                         </option>
                                     ))}
@@ -112,10 +131,7 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            isLoading={processing}
-                        >
+                        <Button onClick={handleSubmit} isLoading={processing}>
                             Create Section
                         </Button>
                     </CardFooter>

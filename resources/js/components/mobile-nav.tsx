@@ -1,121 +1,75 @@
-import { usePage } from '@inertiajs/react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from '@inertiajs/react';
-import {
-  Calendar,
-  CheckCircle2,
-  Users,
-  Bell,
-  CreditCard,
-  BookOpen,
-  Building,
-  MessageSquare,
-  ShieldCheck,
-  Settings,
-  Megaphone,
-  User,
-  Zap,
-  BarChart3,
-} from 'lucide-react';
-import { useCallback } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useNavigation } from '@/lib/navigation';
+import type { NavItem } from '@/types';
 import { cn } from '@/lib/utils';
 
-// Define navigation items for different sections
-const navItems = {
-  dashboard: [
-    { name: 'Dashboard', href: () => import('@/routes').then(r => r.dashboard()), icon: Calendar },
-  ],
-  students: [
-    { name: 'Students', href: () => import('@/routes').then(r => r.students()), icon: Users },
-    { name: 'Attendance', href: () => import('@/routes').then(r => r.adminReportsAttendance()), icon: CheckCircle2 },
-    { name: 'Grades', href: '#', icon: BookOpen }, // Placeholder
-  ],
-  teachers: [
-    { name: 'Teachers', href: () => import('@/routes').then(r => r.teacher()), icon: Users },
-    { name: 'Timetable', href: '#', icon: Building }, // Placeholder
-    { name: 'Attendance', href: () => import('@/routes').then(r => r.adminReportsAttendance()), icon: CheckCircle2 },
-  ],
-  finance: [
-    { name: 'Finance', href: () => import('@/routes').then(r => r.adminFinance()), icon: CreditCard },
-    { name: 'Invoices', href: () => import('@/routes').then(r => r.adminFinanceInvoices()), icon: BookOpen },
-    { name: 'Reports', href: () => import('@/routes').then(r => r.adminFinanceReports()), icon: BarChart3 },
-  ],
-  communications: [
-    { name: 'Messages', href: () => import('@/routes').then(r => r.notifications()), icon: MessageSquare },
-    { name: 'Notices', href: () => import('@/routes').then(r => r.adminNotices()), icon: Megaphone },
-    { name: 'Notifications', href: () => import('@/routes').then(r => r.notificationsIndex()), icon: Bell },
-  ],
-  settings: [
-    { name: 'Settings', href: () => import('@/routes').then(r => r.settings()), icon: Settings },
-    { name: 'Profile', href: () => import('@/routes').then(r => r.settingsProfile()), icon: User },
-    { name: 'Security', href: () => import('@/routes').then(r => r.settingsSecurity()), icon: Zap },
-  ],
-};
+/**
+ * Destinations worth a permanent thumb slot on a phone, in priority order.
+ * Anything the user cannot reach is dropped, because the list is filtered
+ * through the same ability-gated navigation the sidebar uses.
+ */
+const PRIORITY = ['/portal/students', 'finance', 'notices'];
 
-// Default navigation items (dashboard)
-const DEFAULT_ITEMS = navItems.dashboard;
-
-// Helper to get current route name from inertia page
-function getCurrentRouteName(pageProps: any): keyof typeof navItems | 'default' {
-  const url = new URL(window.location.href);
-  const path = url.pathname;
-
-  // Simple route matching - in a real app, this would be more sophisticated
-  if (path.includes('/dashboard') || path === '/') return 'dashboard';
-  if (path.includes('/students')) return 'students';
-  if (path.includes('/teachers')) return 'teachers';
-  if (path.includes('/finance')) return 'finance';
-  if (path.includes('/notices') || path.includes('/notifications')) return 'communications';
-  if (path.includes('/settings')) return 'settings';
-
-  return 'default';
-}
+const MAX_ITEMS = 5;
 
 export function MobileNav() {
-  const isMobile = useIsMobile();
-  const { props: pageProps } = usePage();
+    const isMobile = useIsMobile();
+    const { isCurrentOrParentUrl } = useCurrentUrl();
+    const { flat } = useNavigation();
 
-  // Hide on desktop
-  if (!isMobile) {
-    return null;
-  }
+    if (!isMobile) {
+        return null;
+    }
 
-  const currentRoute = getCurrentRouteName(pageProps);
-  const items = navItems[currentRoute as keyof typeof navItems] || DEFAULT_ITEMS;
+    const dashboardItem = flat[0];
+    const notifications = flat.find(
+        (item) => item.href === '/portal/notifications',
+    );
+    const prioritised = PRIORITY.map((fragment) =>
+        flat.find((item) => String(item.href).includes(fragment)),
+    ).filter((item): item is NavItem => item !== undefined);
 
-  // Handle navigation with inertia
-  const navigateTo = useCallback((href: string) => {
-    // In a real implementation, this would use inertia's router
-    window.location.href = href;
-  }, []);
+    const items = [dashboardItem, ...prioritised, notifications]
+        .filter((item): item is NavItem => item !== undefined)
+        .filter(
+            (item, index, all) =>
+                all.findIndex((other) => other.href === item.href) === index,
+        )
+        .slice(0, MAX_ITEMS);
 
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 h-14 bg-background border-t border-muted flex items-center justify-center gap-1 z-50 shadow-lg">
-      {items.map((item, index) => {
-        const href = typeof item.href === 'function' ? item.href() : item.href;
-        return (
-          <Link
-            key={index}
-            href={typeof item.href === 'function' ? '#' : item.href}
-            onClick={(e) => {
-              if (typeof item.href === 'function') {
-                e.preventDefault();
-                // For dynamic imports, we'd need to handle this differently
-                // For now, we'll just navigate to the href
-                navigateTo(item.href instanceof Promise ? '#' : item.href);
-              }
-            }}
-            className={cn(
-              "flex flex-col items-center gap-1 p-1 rounded-md hover:bg-accent hover:text-accent-foreground",
-              "text-xs font-medium",
-              "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {item.icon && <item.icon className="h-4 w-4" />}
-            <span className="sr-only">{item.name}</span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
+    if (items.length === 0) {
+        return null;
+    }
+
+    return (
+        <nav
+            aria-label='Mobile navigation'
+            className='bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-14 border-t shadow-lg md:hidden'
+        >
+            {items.map((item) => {
+                const isActive = isCurrentOrParentUrl(item.href);
+
+                return (
+                    <Link
+                        key={String(item.href)}
+                        href={item.href}
+                        prefetch
+                        className={cn(
+                            'flex flex-1 flex-col items-center justify-center gap-0.5 px-1 text-[0.6875rem] font-medium transition-colors',
+                            isActive
+                                ? 'text-primary'
+                                : 'text-muted-foreground hover:text-foreground',
+                        )}
+                    >
+                        {item.icon && <item.icon className='size-4 shrink-0' />}
+                        <span className='max-w-full truncate'>
+                            {item.title}
+                        </span>
+                    </Link>
+                );
+            })}
+        </nav>
+    );
 }

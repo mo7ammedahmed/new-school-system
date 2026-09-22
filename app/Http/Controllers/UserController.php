@@ -2,196 +2,187 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
+use App\Http\Requests\UserRequest;
 use App\Models\School;
 use App\Models\User;
-use App\Enums\UserRole;
 use App\Services\AuditLogger;
-use App\Http\Requests\UserRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * The staff directory for one school.
+ *
+ * Only school-scoped staff roles are managed here; guardians and students have
+ * their own surfaces, and organization-level accounts stay with the
+ * organization administrator.
+ */
 class UserController
 {
-    /**
-     * Display a listing of users (teachers/staff).
-     */
+    /** @var list<UserRole> */
+    private const MANAGED_ROLES = [
+        UserRole::SchoolAdmin,
+        UserRole::AcademicCoordinator,
+        UserRole::Teacher,
+        UserRole::FinanceStaff,
+    ];
+
     public function index(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('view', User::class);
+        Gate::authorize('manage-users', $schoolModel);
 
         $users = User::query()
             ->where('organization_id', $schoolModel->organization_id)
-            ->whereIn('role', [UserRole::Teacher, UserRole::Staff])
+            ->whereIn('role', self::MANAGED_ROLES)
             ->orderBy('name')
-            ->get();
+            ->get(['id', 'name', 'email', 'role'])
+            ->map(fn (User $user): array => $this->payload($user))
+            ->values()
+            ->all();
 
-        return Inertia::render('users/index', [
-            'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
+        return Inertia::render('admin/users/index', [
+            'school' => $this->schoolPayload($schoolModel),
             'users' => $users,
         ]);
     }
 
-    /**
-     * Show the form for creating a new user (teacher/staff).
-     */
     public function create(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', User::class);
+        Gate::authorize('manage-users', $schoolModel);
 
-        return Inertia::render('users/create', [
-            'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
-            'roles' => [
-                UserRole::Teacher => 'Teacher',
-                UserRole::Staff => 'Staff',
-            ],
+        return Inertia::render('admin/users/create', [
+            'school' => $this->schoolPayload($schoolModel),
+            'roles' => $this->roleOptions(),
         ]);
     }
 
-    /**
-     * Store a newly created user in storage.
-     */
     public function store(UserRequest $request, int $school, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', User::class);
+        Gate::authorize('manage-users', $schoolModel);
 
-        $validated = $request->validated();
+        $user = User::create([
+            ...$request->validated(),
+            'organization_id' => $schoolModel->organization_id,
+        ]);
 
-        // Hash the password if provided
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        }
-
-        $user = User::create([...$validated, 'organization_id' => $schoolModel->organization_id]);
-
-        $audit->record('user.created', $user, after: $user->only([
-            'name', 'email', 'role', 'phone', 'status'
-        ]));
+        $audit->record('user.created', $user, after: $user->only(['name', 'email', 'role']));
 
         return redirect()->route('users.index', $schoolModel->id)
             ->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified user.
-     */
     public function show(int $school, int $user): Response
     {
         $schoolModel = $this->school($school);
-        $userModel = User::query()
-            ->where('organization_id', $schoolModel->organization_id)
-            ->where('id', $user)
-            ->firstOrFail();
+        Gate::authorize('manage-users', $schoolModel);
 
-        Gate::authorize('view', $userModel);
-
-        return Inertia::render('users/show', [
-            'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
-            'user' => [
-                'id' => $userModel->id,
-                'name' => $userModel->name,
-                'email' => $userModel->email,
-                'role' => $userModel->role,
-                'phone' => $userModel->phone,
-                'status' => $userModel->status,
-            ],
+        return Inertia::render('admin/users/show', [
+            'school' => $this->schoolPayload($schoolModel),
+            'user' => $this->payload($this->staff($schoolModel, $user)),
         ]);
     }
 
-    /**
-     * Show the form for editing the specified user.
-     */
     public function edit(int $school, int $user): Response
     {
         $schoolModel = $this->school($school);
-        $userModel = User::query()
-            ->where('organization_id', $schoolModel->organization_id)
-            ->where('id', $user)
-            ->firstOrFail();
+        Gate::authorize('manage-users', $schoolModel);
 
-        Gate::authorize('update', $userModel);
-
-        return Inertia::render('users/edit', [
-            'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
-            'user' => [
-                'id' => $userModel->id,
-                'name' => $userModel->name,
-                'email' => $userModel->email,
-                'role' => $userModel->role,
-                'phone' => $userModel->phone,
-                'status' => $userModel->status,
-            ],
+        return Inertia::render('admin/users/edit', [
+            'school' => $this->schoolPayload($schoolModel),
+            'user' => $this->payload($this->staff($schoolModel, $user)),
+            'roles' => $this->roleOptions(),
         ]);
     }
 
-    /**
-     * Update the specified user in storage.
-     */
     public function update(UserRequest $request, int $school, int $user, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        $userModel = User::query()
-            ->where('organization_id', $schoolModel->organization_id)
-            ->where('id', $user)
-            ->firstOrFail();
+        Gate::authorize('manage-users', $schoolModel);
 
-        Gate::authorize('update', $userModel);
+        $record = $this->staff($schoolModel, $user);
+        $before = $record->only(['name', 'email', 'role']);
 
-        $validated = $request->validated();
+        $data = $request->validated();
 
-        // Store old values for audit
-        $oldValues = $userModel->only([
-            'name', 'email', 'role', 'phone', 'status'
-        ]);
-
-        // Hash the password if provided
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } elseif (isset($validated['password']) && empty($validated['password'])) {
-            // Remove empty password
-            unset($validated['password']);
+        // A blank password field means "leave the password alone".
+        if (empty($data['password'])) {
+            unset($data['password']);
         }
 
-        $userModel->update($validated);
+        $record->update($data);
 
-        $audit->record('user.updated', $userModel, before: $oldValues, after: $userModel->only([
-            'name', 'email', 'role', 'phone', 'status'
-        ]));
+        $audit->record('user.updated', $record, before: $before, after: $record->only(['name', 'email', 'role']));
 
         return back()->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified user from storage.
-     */
     public function destroy(int $school, int $user, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        $userModel = User::query()
-            ->where('organization_id', $schoolModel->organization_id)
-            ->where('id', $user)
-            ->firstOrFail();
+        Gate::authorize('manage-users', $schoolModel);
 
-        Gate::authorize('delete', $userModel);
+        $record = $this->staff($schoolModel, $user);
+        $before = $record->only(['name', 'email', 'role']);
 
-        // Store values for audit before deletion
-        $recordValues = $userModel->only([
-            'name', 'email', 'role', 'phone', 'status'
-        ]);
+        if ($record->id === auth()->id()) {
+            return back()->withErrors(['user' => 'You cannot delete your own account.']);
+        }
 
-        $userModel->delete();
+        $record->delete();
 
-        $audit->record('user.deleted', null, before: $recordValues);
+        $audit->record('user.deleted', null, before: $before);
 
         return redirect()->route('users.index', $schoolModel->id)
             ->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * @return array{id: int, name: string, email: string, role: string}
+     */
+    private function payload(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role->value,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function roleOptions(): array
+    {
+        $options = [];
+
+        foreach (self::MANAGED_ROLES as $role) {
+            $options[$role->value] = str($role->value)->replace('_', ' ')->title()->toString();
+        }
+
+        return $options;
+    }
+
+    /**
+     * @return array{id: int, name: string}
+     */
+    private function schoolPayload(School $school): array
+    {
+        return ['id' => $school->id, 'name' => $school->name];
+    }
+
+    private function staff(School $school, int $id): User
+    {
+        return User::query()
+            ->where('organization_id', $school->organization_id)
+            ->whereIn('role', self::MANAGED_ROLES)
+            ->whereKey($id)
+            ->firstOrFail();
     }
 
     private function school(int $id): School

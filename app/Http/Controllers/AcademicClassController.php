@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AcademicClassRequest;
 use App\Models\AcademicClass;
 use App\Models\School;
 use App\Services\AuditLogger;
-use App\Http\Requests\AcademicClassRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,15 +19,16 @@ class AcademicClassController
     public function index(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('view', AcademicClass::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $academicClasses = AcademicClass::query()
             ->where('school_id', $schoolModel->id)
             ->with('sections')
+            ->withCount('enrollments')
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('academic-classes/index', [
+        return Inertia::render('admin/academic-classes/index', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'academicClasses' => $academicClasses,
         ]);
@@ -40,9 +40,9 @@ class AcademicClassController
     public function create(int $school): Response
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', AcademicClass::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('academic-classes/create', [
+        return Inertia::render('admin/academic-classes/create', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
         ]);
     }
@@ -53,14 +53,14 @@ class AcademicClassController
     public function store(AcademicClassRequest $request, int $school, AuditLogger $audit): RedirectResponse
     {
         $schoolModel = $this->school($school);
-        Gate::authorize('create', AcademicClass::class);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
         $academicClass = AcademicClass::create([...$validated, 'organization_id' => $schoolModel->organization_id, 'school_id' => $schoolModel->id]);
 
         $audit->record('academic_class.created', $academicClass, after: $academicClass->only([
-            'name'
+            'name',
         ]));
 
         return redirect()->route('academic-classes.index', $schoolModel->id)
@@ -78,9 +78,9 @@ class AcademicClassController
             ->where('id', $academicClass)
             ->firstOrFail();
 
-        Gate::authorize('view', $academicClassModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('academic-classes/show', [
+        return Inertia::render('admin/academic-classes/show', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'academicClass' => [
                 'id' => $academicClassModel->id,
@@ -100,9 +100,9 @@ class AcademicClassController
             ->where('id', $academicClass)
             ->firstOrFail();
 
-        Gate::authorize('update', $academicClassModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
-        return Inertia::render('academic-classes/edit', [
+        return Inertia::render('admin/academic-classes/edit', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'academicClass' => [
                 'id' => $academicClassModel->id,
@@ -122,19 +122,19 @@ class AcademicClassController
             ->where('id', $academicClass)
             ->firstOrFail();
 
-        Gate::authorize('update', $academicClassModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         $validated = $request->validated();
 
         // Store old values for audit
         $oldValues = $academicClassModel->only([
-            'name'
+            'name',
         ]);
 
         $academicClassModel->update($validated);
 
         $audit->record('academic_class.updated', $academicClassModel, before: $oldValues, after: $academicClassModel->only([
-            'name'
+            'name',
         ]));
 
         return back()->with('success', 'Academic class updated successfully.');
@@ -151,11 +151,11 @@ class AcademicClassController
             ->where('id', $academicClass)
             ->firstOrFail();
 
-        Gate::authorize('delete', $academicClassModel);
+        Gate::authorize('manage-enrollment', $schoolModel);
 
         // Store values for audit before deletion
         $recordValues = $academicClassModel->only([
-            'name'
+            'name',
         ]);
 
         $academicClassModel->delete();

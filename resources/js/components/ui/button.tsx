@@ -1,4 +1,5 @@
 import { Slot } from "@radix-ui/react-slot"
+import { Link } from "@inertiajs/react"
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
@@ -35,33 +36,59 @@ const buttonVariants = cva(
   }
 )
 
+type ButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+    isLoading?: boolean
+    /** When set, the button renders as a link so it actually navigates. */
+    href?: string
+  }
+
 function Button({
   className,
   variant,
   size,
   asChild = false,
   isLoading = false,
+  href,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-    isLoading?: boolean
-  }) {
-  const Comp = asChild ? Slot : "button"
+}: ButtonProps) {
+  const classes = cn(buttonVariants({ variant, size, className }))
+
+  if (href !== undefined) {
+    return (
+      <Link
+        data-slot="button"
+        href={href}
+        className={cn(classes, isLoading && "pointer-events-none opacity-50")}
+        {...(props as Omit<React.ComponentProps<typeof Link>, 'href'>)}
+      >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {props.children}
+      </Link>
+    )
+  }
+
+  // Slot requires exactly one element child, so the loading spinner cannot be
+  // injected here without breaking `asChild` buttons.
+  if (asChild && !isLoading) {
+    return (
+      <Slot data-slot="button" className={classes} {...props}>
+        {props.children}
+      </Slot>
+    )
+  }
 
   return (
-    <Comp
+    <button
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      disabled={isLoading}
+      className={classes}
       {...props}
+      disabled={isLoading || props.disabled}
     >
-      {isLoading ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Slot>{props.children}</Slot>
-      )}
-    </Comp>
+      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {props.children}
+    </button>
   )
 }
 

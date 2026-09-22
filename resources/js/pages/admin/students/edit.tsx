@@ -1,8 +1,16 @@
 import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
+import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -25,17 +33,19 @@ type Props = {
 };
 
 export default function StudentEdit({ student }: Props) {
-    const { data, setData, post, processing, recentSuccessfulSubmit } = useForm({
-        first_name: student.first_name,
-        last_name: student.last_name,
-        student_number: student.student_number,
-        date_of_birth: student.date_of_birth ?? '',
-        gender: student.gender ?? '',
-        phone: student.phone ?? '',
-        email: student.email ?? '',
-        address: student.address ?? '',
-        status: student.status,
-    });
+    const { data, setData, post, put, processing, errors } = useForm(
+        {
+            first_name: student.first_name,
+            last_name: student.last_name,
+            student_number: student.student_number,
+            date_of_birth: student.date_of_birth ?? '',
+            gender: student.gender ?? '',
+            phone: student.phone ?? '',
+            email: student.email ?? '',
+            address: student.address ?? '',
+            status: student.status,
+        },
+    );
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -43,7 +53,7 @@ export default function StudentEdit({ student }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`/admin/students/${student.id}`, {
+        put(`/portal/students/${student.id}`, {
             onSuccess: () => {
                 // Show success toast
                 setToastMessage('Student updated successfully.');
@@ -56,21 +66,20 @@ export default function StudentEdit({ student }: Props) {
                 setToastType('error');
                 setShowToast(true);
                 // In a real implementation, the form errors would be displayed automatically
-            }
+            },
         });
     };
 
     return (
         <>
-            <Head title={`Edit Student: ${student.first_name} ${student.last_name}`} />
+            <Head
+                title={`Edit Student: ${student.first_name} ${student.last_name}`}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">Edit Student</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
-                        <Button
-                            href="/admin/students"
-                            variant="outline"
-                        >
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
+                        <Button href="/admin/students" variant="outline">
                             Back to Students
                         </Button>
                     </div>
@@ -86,6 +95,8 @@ export default function StudentEdit({ student }: Props) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <FormErrors errors={errors} />
+
                         <FormSection>
                             <FormField
                                 label="First Name"
@@ -94,7 +105,9 @@ export default function StudentEdit({ student }: Props) {
                                 <Input
                                     placeholder="First name"
                                     value={data.first_name}
-                                    onChange={(e) => setData('first_name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('first_name', e.target.value)
+                                    }
                                     required
                                     maxLength={160}
                                 />
@@ -109,7 +122,9 @@ export default function StudentEdit({ student }: Props) {
                                 <Input
                                     placeholder="Last name"
                                     value={data.last_name}
-                                    onChange={(e) => setData('last_name', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('last_name', e.target.value)
+                                    }
                                     required
                                     maxLength={160}
                                 />
@@ -124,7 +139,12 @@ export default function StudentEdit({ student }: Props) {
                                 <Input
                                     placeholder="STU001"
                                     value={data.student_number}
-                                    onChange={(e) => setData('student_number', e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            'student_number',
+                                            e.target.value,
+                                        )
+                                    }
                                     required
                                     maxLength={80}
                                 />
@@ -139,7 +159,9 @@ export default function StudentEdit({ student }: Props) {
                                 <input
                                     type="date"
                                     value={data.date_of_birth}
-                                    onChange={(e) => setData('date_of_birth', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('date_of_birth', e.target.value)
+                                    }
                                     className="input-input"
                                 />
                             </FormField>
@@ -152,7 +174,9 @@ export default function StudentEdit({ student }: Props) {
                             >
                                 <Select
                                     value={data.gender}
-                                    onValueChange={(value) => setData('gender', value)}
+                                    onValueChange={(value) =>
+                                        setData('gender', value)
+                                    }
                                     placeholder="Select gender"
                                 >
                                     <option value="">Select gender</option>
@@ -171,7 +195,9 @@ export default function StudentEdit({ student }: Props) {
                                 <Input
                                     placeholder="Phone number"
                                     value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('phone', e.target.value)
+                                    }
                                     maxLength={40}
                                 />
                             </FormField>
@@ -185,7 +211,9 @@ export default function StudentEdit({ student }: Props) {
                                 <Input
                                     placeholder="email@example.com"
                                     value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('email', e.target.value)
+                                    }
                                     type="email"
                                     maxLength={255}
                                 />
@@ -200,7 +228,9 @@ export default function StudentEdit({ student }: Props) {
                                 <Input
                                     placeholder="Address"
                                     value={data.address}
-                                    onChange={(e) => setData('address', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('address', e.target.value)
+                                    }
                                 />
                             </FormField>
                         </FormSection>
@@ -212,7 +242,9 @@ export default function StudentEdit({ student }: Props) {
                             >
                                 <Select
                                     value={data.status}
-                                    onValueChange={(value) => setData('status', value)}
+                                    onValueChange={(value) =>
+                                        setData('status', value)
+                                    }
                                     placeholder="Select status"
                                 >
                                     <option value="active">Active</option>
@@ -233,10 +265,7 @@ export default function StudentEdit({ student }: Props) {
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            isLoading={processing}
-                        >
+                        <Button onClick={handleSubmit} isLoading={processing}>
                             Update Student
                         </Button>
                     </CardFooter>

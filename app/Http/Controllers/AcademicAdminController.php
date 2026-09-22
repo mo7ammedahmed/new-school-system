@@ -13,6 +13,7 @@ use App\Models\Student;
 use App\Models\TeacherAssignment;
 use App\Models\User;
 use App\Services\AuditLogger;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -38,8 +39,6 @@ class AcademicAdminController
         ]);
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Bind an existing student login to a student record.
      *
@@ -146,14 +145,10 @@ class AcademicAdminController
         return back();
     }
 
->>>>>>> origin/main
     private function school(int $id): School
     {
         return School::query()->findOrFail($id);
     }
-<<<<<<< HEAD
-}
-=======
 
     /**
      * Student logins in this organization that are not bound to a record yet,
@@ -183,4 +178,3 @@ class AcademicAdminController
             ->all();
     }
 }
->>>>>>> origin/main

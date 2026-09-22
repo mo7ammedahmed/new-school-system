@@ -1,8 +1,16 @@
 import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
+import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from '@inertiajs/react';
@@ -12,20 +20,33 @@ import { useState } from 'react';
 
 type Props = {
     school: { id: number; name: string };
-    students: Array<{ id: number; first_name: string; last_name: string; student_number: string }>;
+    students: Array<{
+        id: number;
+        first_name: string;
+        last_name: string;
+        student_number: string;
+    }>;
     academicYears: Array<{ id: number; name: string }>;
     academicClasses: Array<{ id: number; name: string }>;
     sections: Array<{ id: number; name: string }>;
 };
 
-export default function EnrollmentCreate({ school, students, academicYears, academicClasses, sections }: Props) {
-    const { data, setData, post, processing, recentSuccessfulSubmit } = useForm({
-        student_id: '',
-        academic_year_id: '',
-        class_id: '',
-        section_id: '',
-        enrolled_on: '',
-    });
+export default function EnrollmentCreate({
+    school,
+    students,
+    academicYears,
+    academicClasses,
+    sections,
+}: Props) {
+    const { data, setData, post, processing, errors } = useForm(
+        {
+            student_id: '',
+            academic_year_id: '',
+            class_id: '',
+            section_id: '',
+            enrolled_on: '',
+        },
+    );
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -46,7 +67,7 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                 setToastType('error');
                 setShowToast(true);
                 // In a real implementation, the form errors would be displayed automatically
-            }
+            },
         });
     };
 
@@ -56,10 +77,10 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">New Enrollment</h1>
-                    <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Link
                             href={`/admin/schools/${school.id}/enrollments`}
-                            className="rounded bg-transparent px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary"
+                            className="text-muted-foreground hover:text-primary rounded bg-transparent px-4 py-2 text-sm font-medium"
                         >
                             Back to Enrollments
                         </Link>
@@ -76,6 +97,8 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <FormErrors errors={errors} />
+
                         <FormSection>
                             <FormField
                                 label="Student"
@@ -83,13 +106,20 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                             >
                                 <Select
                                     value={data.student_id}
-                                    onValueChange={(value) => setData('student_id', value)}
+                                    onValueChange={(value) =>
+                                        setData('student_id', value)
+                                    }
                                     placeholder="Select student"
                                     required
                                 >
                                     {students.map((student) => (
-                                        <option key={student.id} value={student.id}>
-                                            {student.first_name} {student.last_name} ({student.student_number})
+                                        <option
+                                            key={student.id}
+                                            value={student.id}
+                                        >
+                                            {student.first_name}{' '}
+                                            {student.last_name} (
+                                            {student.student_number})
                                         </option>
                                     ))}
                                 </Select>
@@ -103,7 +133,9 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                             >
                                 <Select
                                     value={data.academic_year_id}
-                                    onValueChange={(value) => setData('academic_year_id', value)}
+                                    onValueChange={(value) =>
+                                        setData('academic_year_id', value)
+                                    }
                                     placeholder="Select academic year"
                                     required
                                 >
@@ -123,7 +155,9 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                             >
                                 <Select
                                     value={data.class_id}
-                                    onValueChange={(value) => setData('class_id', value)}
+                                    onValueChange={(value) =>
+                                        setData('class_id', value)
+                                    }
                                     placeholder="Select class"
                                     required
                                 >
@@ -143,7 +177,9 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                             >
                                 <Select
                                     value={data.section_id}
-                                    onValueChange={(value) => setData('section_id', value)}
+                                    onValueChange={(value) =>
+                                        setData('section_id', value)
+                                    }
                                     placeholder="Select section"
                                 >
                                     <option value="">None</option>
@@ -164,7 +200,9 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                                 <Input
                                     type="date"
                                     value={data.enrolled_on}
-                                    onChange={(e) => setData('enrolled_on', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('enrolled_on', e.target.value)
+                                    }
                                     required
                                 />
                             </FormField>
@@ -180,10 +218,7 @@ export default function EnrollmentCreate({ school, students, academicYears, acad
                         >
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            isLoading={processing}
-                        >
+                        <Button onClick={handleSubmit} isLoading={processing}>
                             Create Enrollment
                         </Button>
                     </CardFooter>

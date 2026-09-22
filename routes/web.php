@@ -1,17 +1,21 @@
 <?php
 
 use App\Http\Controllers\AcademicAdminController;
+use App\Http\Controllers\AcademicClassController;
+use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\AdmissionsController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeliveryMonitoringController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamPaperController;
 use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FinanceReconciliationController;
 use App\Http\Controllers\FinanceReportController;
+use App\Http\Controllers\GuardianController;
 use App\Http\Controllers\GuardianPortalController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\NoticeAdminController;
@@ -21,9 +25,11 @@ use App\Http\Controllers\PublicSchoolController;
 use App\Http\Controllers\ReceiptDownloadController;
 use App\Http\Controllers\ReportCardDownloadController;
 use App\Http\Controllers\ScheduleSetupController;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherAssignmentController;
 use App\Http\Controllers\TeacherPortalController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\UserController;
@@ -55,12 +61,22 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('admin/site-content', [SiteContentController::class, 'index'])->name('admin.site-content.index');
     Route::post('admin/site-content', [SiteContentController::class, 'upsert'])->name('admin.site-content.upsert');
+    // The roster is school-administration only; literal segments are declared
+    // before the {student} wildcard so `/portal/students/create` is not read as
+    // a student identifier.
+    Route::get('portal/students', [StudentController::class, 'index'])->name('students.index');
+    Route::get('portal/students/create', [StudentController::class, 'create'])->name('students.create');
+    Route::post('portal/students', [StudentController::class, 'store'])->name('students.store');
+    Route::get('portal/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
+    Route::put('portal/students/{student}', [StudentController::class, 'update'])->name('students.update');
+    Route::delete('portal/students/{student}', [StudentController::class, 'destroy'])->name('students.destroy');
     // Single canonical route: the student record page already contains the report card.
     Route::get('portal/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::post('portal/students/{student}/report-card/snapshots', [StudentController::class, 'issueSnapshot'])->name('students.report-card.issue');
     Route::get('portal/report-card-snapshots/{snapshot}/download', ReportCardDownloadController::class)->name('students.report-card.download');
     Route::get('portal/guardian', [GuardianPortalController::class, 'index'])->name('guardian.portal');
     Route::post('portal/installments/{installment}/payment-intents', [GuardianPortalController::class, 'createPaymentIntent'])->name('guardian.payment-intents.store');
+    Route::get('portal/receipts/{receipt}/download', ReceiptDownloadController::class)->name('guardian.receipts.download');
     Route::get('portal/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('portal/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
     Route::patch('portal/notifications/preferences/{category}', [NotificationController::class, 'updatePreference'])->name('notifications.preferences.update');
@@ -165,6 +181,7 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
         Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
         Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
         Route::post('teacher-assignments', [TeacherAssignmentController::class, 'store'])->name('teacher-assignments.store');
+        Route::post('student-accounts', [AcademicAdminController::class, 'linkStudentAccount'])->name('student-accounts.store');
     });
 
     Route::prefix('admin/schools/{school}/pages')->name('admin.pages.')->group(function () {

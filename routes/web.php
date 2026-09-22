@@ -13,6 +13,8 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ExamPaperController;
 use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\FeeStructureController;
+use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\FinanceReconciliationController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\GuardianController;
@@ -130,6 +132,27 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
     });
 
     // Enrollments - keeping existing route names for backward compatibility
+    // Fee structures
+    Route::prefix('admin/schools/{school}/fee-structures')->name('fee-structures.')->group(function () {
+        Route::get('/', [FeeStructureController::class, 'index'])->name('index');
+        Route::get('/create', [FeeStructureController::class, 'create'])->name('create');
+        Route::post('/', [FeeStructureController::class, 'store'])->name('store');
+        Route::get('/{feeStructure}/edit', [FeeStructureController::class, 'edit'])->name('edit');
+        Route::put('/{feeStructure}', [FeeStructureController::class, 'update'])->name('update');
+        Route::delete('/{feeStructure}', [FeeStructureController::class, 'destroy'])->name('destroy');
+        Route::get('/{feeStructure}', [FeeStructureController::class, 'show'])->name('show');
+    });
+
+    // Installments
+    Route::prefix("admin/schools/{school}/installments")->name("installments.")->group(function () {
+        Route::get("/", [InstallmentController::class, "index"])->name("index");
+        Route::get("/create", [InstallmentController::class, "create"])->name("create");
+        Route::post("/", [InstallmentController::class, "store"])->name("store");
+        Route::get("/{installment}/edit", [InstallmentController::class, "edit"])->name("edit");
+        Route::put("/{installment}", [InstallmentController::class, "update"])->name("update");
+        Route::delete("/{installment}", [InstallmentController::class, "destroy"])->name("destroy");
+        Route::get("/{installment}", [InstallmentController::class, "show"])->name("show");
+    });
     Route::prefix('admin/schools/{school}/enrollments')->name('enrollments.')->group(function () {
         Route::get('/', [EnrollmentController::class, 'index'])->name('index');
         Route::get('/create', [EnrollmentController::class, 'create'])->name('create');
@@ -246,3 +269,5 @@ Route::middleware(['auth', 'verified', 'tenant'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+test line
+// test comment

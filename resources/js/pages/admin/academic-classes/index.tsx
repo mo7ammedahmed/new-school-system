@@ -53,9 +53,8 @@ export default function AcademicClassIndex({
     academicClasses,
     filters = {},
 }: Props) {
-    const list = paginated<Props['academicClasses']['data'][number]>(
-        academicClasses,
-    );
+    const list =
+        paginated<Props['academicClasses']['data'][number]>(academicClasses);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
@@ -113,8 +112,11 @@ export default function AcademicClassIndex({
                                     }
                                 ).sections?.length ?? 0,
                             studentCount:
-                                (academicClass as { enrollments_count?: number })
-                                    .enrollments_count ?? 0,
+                                (
+                                    academicClass as {
+                                        enrollments_count?: number;
+                                    }
+                                ).enrollments_count ?? 0,
                             actions: (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>

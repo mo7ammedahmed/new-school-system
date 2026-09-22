@@ -38,15 +38,13 @@ export default function EnrollmentCreate({
     academicClasses,
     sections,
 }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            student_id: '',
-            academic_year_id: '',
-            class_id: '',
-            section_id: '',
-            enrolled_on: '',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        student_id: '',
+        academic_year_id: '',
+        class_id: '',
+        section_id: '',
+        enrolled_on: '',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

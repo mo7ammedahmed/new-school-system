@@ -61,7 +61,11 @@ export function useNavigation(): Navigation {
 
     if (base && abilities.manageEnrollment) {
         platform.push(
-            { title: t('shell.students'), href: '/portal/students', icon: Users },
+            {
+                title: t('shell.students'),
+                href: '/portal/students',
+                icon: Users,
+            },
             {
                 title: t('shell.guardians'),
                 href: `${base}/guardians`,

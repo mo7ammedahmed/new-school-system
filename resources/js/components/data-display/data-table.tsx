@@ -156,7 +156,9 @@ export function DataTable<T>({
                                 >
                                     {column.cell
                                         ? column.cell(
-                                              row[column.accessorKey as keyof T],
+                                              row[
+                                                  column.accessorKey as keyof T
+                                              ],
                                               row,
                                           )
                                         : renderValue(
@@ -177,35 +179,37 @@ export function DataTable<T>({
             </table>
 
             {totalPages > 1 && (
-            <div className="text-muted-foreground mt-4 flex items-center justify-between text-sm">
-                <p>
-                    Showing {paginatedData.length} of {sortedData.length}{' '}
-                    entries
-                </p>
-                <div className="flex items-center space-x-2">
-                    <button
-                        onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
-                        disabled={pageIndex === 0}
-                        className="discrete-button"
-                    >
-                        Previous
-                    </button>
-                    <span>
-                        Page {pageIndex + 1} of {totalPages}
-                    </span>
-                    <button
-                        onClick={() =>
-                            setPageIndex(
-                                Math.min(totalPages - 1, pageIndex + 1),
-                            )
-                        }
-                        disabled={pageIndex >= totalPages - 1}
-                        className="discrete-button"
-                    >
-                        Next
-                    </button>
+                <div className="text-muted-foreground mt-4 flex items-center justify-between text-sm">
+                    <p>
+                        Showing {paginatedData.length} of {sortedData.length}{' '}
+                        entries
+                    </p>
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={() =>
+                                setPageIndex(Math.max(0, pageIndex - 1))
+                            }
+                            disabled={pageIndex === 0}
+                            className="discrete-button"
+                        >
+                            Previous
+                        </button>
+                        <span>
+                            Page {pageIndex + 1} of {totalPages}
+                        </span>
+                        <button
+                            onClick={() =>
+                                setPageIndex(
+                                    Math.min(totalPages - 1, pageIndex + 1),
+                                )
+                            }
+                            disabled={pageIndex >= totalPages - 1}
+                            className="discrete-button"
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
-            </div>
             )}
         </div>
     );

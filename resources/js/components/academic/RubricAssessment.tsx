@@ -174,7 +174,7 @@ export default function RubricAssessment({
                                                         criterion.id
                                                     ] === point
                                                 }
-                                                onCheckedChange={() =>
+                                                onChange={() =>
                                                     handleCriterionScoreChange(
                                                         criterion.id,
                                                         point,

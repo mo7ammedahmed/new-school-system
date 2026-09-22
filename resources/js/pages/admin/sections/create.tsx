@@ -23,12 +23,10 @@ type Props = {
 };
 
 export default function SectionCreate({ school, academicClasses }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            name: '',
-            class_id: '',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        class_id: '',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

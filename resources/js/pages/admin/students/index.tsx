@@ -128,7 +128,9 @@ export default function StudentIndex({ filters, students }: Props) {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem asChild>
-                                        <Link href={`${LIST_URL}/${student.id}`}>
+                                        <Link
+                                            href={`${LIST_URL}/${student.id}`}
+                                        >
                                             {t('common.view')}
                                         </Link>
                                     </DropdownMenuItem>

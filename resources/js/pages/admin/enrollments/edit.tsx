@@ -47,15 +47,13 @@ export default function EnrollmentEdit({
     sections,
     students,
 }: Props) {
-    const { data, setData, post, put, processing, errors } = useForm(
-        {
-            student_id: enrollment.student_id,
-            academic_year_id: enrollment.academic_year_id,
-            class_id: enrollment.class_id,
-            section_id: enrollment.section_id ?? '',
-            enrolled_on: enrollment.enrolled_on,
-        },
-    );
+    const { data, setData, post, put, processing, errors } = useForm({
+        student_id: enrollment.student_id,
+        academic_year_id: enrollment.academic_year_id,
+        class_id: enrollment.class_id,
+        section_id: enrollment.section_id ?? '',
+        enrolled_on: enrollment.enrolled_on,
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -143,7 +141,10 @@ export default function EnrollmentEdit({
                                 <Select
                                     value={data.academic_year_id}
                                     onValueChange={(value) =>
-                                        setData('academic_year_id', Number(value))
+                                        setData(
+                                            'academic_year_id',
+                                            Number(value),
+                                        )
                                     }
                                     placeholder="Select academic year"
                                     required

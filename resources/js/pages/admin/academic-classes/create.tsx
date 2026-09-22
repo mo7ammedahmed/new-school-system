@@ -21,11 +21,9 @@ type Props = {
 };
 
 export default function AcademicClassCreate({ school }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            name: '',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

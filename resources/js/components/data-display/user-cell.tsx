@@ -8,10 +8,10 @@ type UserCellProps = {
     className?: string;
 };
 
-export function UserCell({ id, name, image, className }: UserCellProps) {
+export function UserCell({ name, image, className }: UserCellProps) {
     return (
         <div className={cn('flex items-center space-x-3', className)}>
-            <Avatar name={name} src={image} size={32} id={id} />
+            <Avatar src={image} size={32} />
             <span className="text-sm font-medium">{name}</span>
         </div>
     );

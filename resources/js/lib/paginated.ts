@@ -3,10 +3,7 @@
  * it. Controllers send full models, so relations are present at runtime even
  * when the page's own prop type is narrower.
  */
-export function related<T>(
-    row: unknown,
-    key: string,
-): T | undefined {
+export function related<T>(row: unknown, key: string): T | undefined {
     if (row === null || typeof row !== 'object') {
         return undefined;
     }

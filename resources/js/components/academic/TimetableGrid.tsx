@@ -1,5 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-clip';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 type TimetablePeriod = {
     id: number;
@@ -116,7 +120,7 @@ export default function TimetableGrid({
                         className="rounded-full border border-[#dbe8df] p-2 transition-colors hover:bg-[#f8fafc]"
                         disabled={currentDay === 0} // Assuming week starts on Sunday
                     >
-                        <svg size={16} aria-hidden="true">
+                        <svg width={16} height={16} aria-hidden={true}>
                             {isArabic ? (
                                 <path
                                     d="M12 4l-8 8 8 8"
@@ -146,7 +150,7 @@ export default function TimetableGrid({
                         className="rounded-full border border-[#dbe8df] p-2 transition-colors hover:bg-[#f8fafc]"
                         disabled={currentDay === 6} // Assuming week ends on Saturday
                     >
-                        <svg size={16} aria-hidden="true">
+                        <svg width={16} height={16} aria-hidden={true}>
                             {isArabic ? (
                                 <path
                                     d="M4 4l8-8-8-8"
@@ -266,11 +270,13 @@ export default function TimetableGrid({
                                                             )
                                                         }
                                                         draggable={canManage}
-                                                        className={`absolute left-[${leftPercent}%] top-0 w-[${widthPercent}%] h-full rounded-lg border ${
+                                                        className={cn(
+                                                            'absolute left-[${leftPercent}%] top-0 w-[${widthPercent}%] h-full rounded-lg border transition-all duration-200',
                                                             period.subject_color
-                                                                ? `border-[${period.subject_color}] bg-[${period.subject_color}]/20`
-                                                                : 'border-[#dbe8df] bg-white'
-                                                        } hover:border-[#0d5c4d] hover:bg-[${period.subject_color || '#0d5c4d'}]/10 transition-all duration-200`}
+                                                                ? `border-[${period.subject_color}] bg-[${period.subject_color}]/20 hover:bg-[${period.subject_color}]/10`
+                                                                : 'border-[#dbe8df] bg-white hover:bg-[#0d5c4d]/10',
+                                                            'hover:border-[#0d5c4d]'
+                                                        )}
                                                     >
                                                         <div className="p-2">
                                                             <div className="mb-1 flex items-center gap-2">
@@ -278,7 +284,8 @@ export default function TimetableGrid({
                                                                     className="h-2 w-2 rounded-full"
                                                                     style={{
                                                                         backgroundColor:
-                                                                            period.subject_color,
+                                                                            period.subject_color ??
+                                                                            '#0d5c4d',
                                                                     }}
                                                                 />
                                                                 <span className="text-xs font-medium text-[#17342f]">

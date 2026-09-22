@@ -105,8 +105,10 @@ export default function SectionIndex({
                         data={list.data.map((section) => ({
                             ...section,
                             academicClassName:
-                                related<{ name: string }>(section, 'academic_class')
-                                    ?.name ?? '—',
+                                related<{ name: string }>(
+                                    section,
+                                    'academic_class',
+                                )?.name ?? '—',
                             studentCount:
                                 (section as { enrollments_count?: number })
                                     .enrollments_count ?? 0,

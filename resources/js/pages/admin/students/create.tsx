@@ -19,19 +19,17 @@ import { useState } from 'react';
 type Props = {};
 
 export default function StudentCreate() {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            first_name: '',
-            last_name: '',
-            student_number: '',
-            date_of_birth: '',
-            gender: '',
-            phone: '',
-            email: '',
-            address: '',
-            status: 'active',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        first_name: '',
+        last_name: '',
+        student_number: '',
+        date_of_birth: '',
+        gender: '',
+        phone: '',
+        email: '',
+        address: '',
+        status: 'active',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -64,7 +62,9 @@ export default function StudentCreate() {
                     <h1 className="text-2xl font-semibold">New Student</h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
-                            <Link href="/portal/students">Back to Students</Link>
+                            <Link href="/portal/students">
+                                Back to Students
+                            </Link>
                         </Button>
                     </div>
                 </div>

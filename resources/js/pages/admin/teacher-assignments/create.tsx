@@ -31,12 +31,10 @@ export default function TeacherAssignmentCreate({
     teachers,
     sections,
 }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            teacher_id: '',
-            section_id: '',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        teacher_id: '',
+        section_id: '',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

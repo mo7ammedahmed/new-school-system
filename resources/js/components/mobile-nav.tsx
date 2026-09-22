@@ -45,8 +45,8 @@ export function MobileNav() {
 
     return (
         <nav
-            aria-label='Mobile navigation'
-            className='bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-14 border-t shadow-lg md:hidden'
+            aria-label="Mobile navigation"
+            className="bg-background border-border fixed inset-x-0 bottom-0 z-50 flex h-14 border-t shadow-lg md:hidden"
         >
             {items.map((item) => {
                 const isActive = isCurrentOrParentUrl(item.href);
@@ -63,8 +63,8 @@ export function MobileNav() {
                                 : 'text-muted-foreground hover:text-foreground',
                         )}
                     >
-                        {item.icon && <item.icon className='size-4 shrink-0' />}
-                        <span className='max-w-full truncate'>
+                        {item.icon && <item.icon className="size-4 shrink-0" />}
+                        <span className="max-w-full truncate">
                             {item.title}
                         </span>
                     </Link>

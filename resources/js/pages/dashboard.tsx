@@ -196,7 +196,7 @@ function Card({
         <section className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-6">
             <div className="flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2 text-lg font-black text-[#17342f]">
-                    <Icon size={18} aria-hidden="true" />
+                    <Icon size={18} aria-hidden={true} />
                     {title}
                 </h2>
                 {href ? (
@@ -234,7 +234,7 @@ function StatCard({
     const body = (
         <div className="flex items-start gap-3">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#eaf3ee] text-[#0d5c4d]">
-                <Icon size={18} aria-hidden="true" />
+                <Icon size={18} aria-hidden={true} />
             </span>
             <span className="min-w-0">
                 <span className="block text-sm font-bold text-[#6c837c]">
@@ -461,7 +461,7 @@ export default function Dashboard() {
                                         href={action.href}
                                         className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-[#28544a] shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#28544a] focus-visible:outline-none"
                                     >
-                                        <Icon size={17} aria-hidden="true" />
+                                        <Icon size={17} aria-hidden={true} />
                                         {t(meta?.key ?? action.key)}
                                     </Link>
                                 );

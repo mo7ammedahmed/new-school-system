@@ -51,11 +51,7 @@ type Props = {
     school: { id: number; name: string };
 };
 
-export default function UserIndex({
-    filters = {},
-    users,
-    school,
-}: Props) {
+export default function UserIndex({ filters = {}, users, school }: Props) {
     const { t } = useT();
     const list = paginated<Props['users']['data'][number]>(users);
     const [showToast, setShowToast] = useState(false);

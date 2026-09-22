@@ -32,12 +32,10 @@ export default function SectionEdit({
     section,
     academicClasses,
 }: Props) {
-    const { data, setData, post, put, processing, errors } = useForm(
-        {
-            name: section.name,
-            class_id: section.class_id,
-        },
-    );
+    const { data, setData, post, put, processing, errors } = useForm({
+        name: section.name,
+        class_id: section.class_id,
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

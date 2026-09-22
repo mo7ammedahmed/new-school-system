@@ -231,8 +231,8 @@ export default function FinanceIndex({
                                                     part.amount_minor,
                                                     item.currency,
                                                 )}{' '}
-                                                <DateCell value={part.due_on} /> ·{' '}
-                                                {part.status}
+                                                <DateCell value={part.due_on} />{' '}
+                                                · {part.status}
                                             </span>
                                         ))}
                                     </div>

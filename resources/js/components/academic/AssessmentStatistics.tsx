@@ -66,6 +66,7 @@ export default function AssessmentStatistics({
                     maintainAspectRatio: false,
                     scales: {
                         y: {
+                            type: 'linear' as const,
                             beginAtZero: true,
                             ticks: {
                                 stepSize: 1,

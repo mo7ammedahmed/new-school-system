@@ -22,15 +22,13 @@ type Props = {
 };
 
 export default function UserCreate({ school }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            name: '',
-            email: '',
-            role: '',
-            phone: '',
-            status: '',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        email: '',
+        role: '',
+        phone: '',
+        status: '',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

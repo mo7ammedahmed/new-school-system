@@ -153,13 +153,20 @@ export default function EnrollmentIndex({
                         ]}
                         data={list.data.map((enrollment) => ({
                             ...enrollment,
-                            studentNumber: related<{ student_number: string }>(enrollment, 'student')
-                                ?.student_number ?? '',
+                            studentNumber:
+                                related<{ student_number: string }>(
+                                    enrollment,
+                                    'student',
+                                )?.student_number ?? '',
                             studentName: [
-                                related<{ first_name?: string }>(enrollment, 'student')
-                                    ?.first_name,
-                                related<{ last_name?: string }>(enrollment, 'student')
-                                    ?.last_name,
+                                related<{ first_name?: string }>(
+                                    enrollment,
+                                    'student',
+                                )?.first_name,
+                                related<{ last_name?: string }>(
+                                    enrollment,
+                                    'student',
+                                )?.last_name,
                             ]
                                 .filter(Boolean)
                                 .join(' '),

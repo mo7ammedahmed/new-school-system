@@ -25,11 +25,9 @@ type Props = {
 };
 
 export default function AcademicClassEdit({ school, academicClass }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            name: academicClass.name,
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        name: academicClass.name,
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

@@ -53,7 +53,8 @@ export default function AcademicYearIndex({
     academicYears,
     filters = {},
 }: Props) {
-    const list = paginated<Props['academicYears']['data'][number]>(academicYears);
+    const list =
+        paginated<Props['academicYears']['data'][number]>(academicYears);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');

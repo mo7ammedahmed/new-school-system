@@ -22,16 +22,14 @@ type Props = {
 };
 
 export default function GuardianCreate({ school }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            name: '',
-            email: '',
-            phone: '',
-            address: '',
-            occupation: '',
-            relationship: '',
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        occupation: '',
+        relationship: '',
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

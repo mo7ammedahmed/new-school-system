@@ -4,24 +4,26 @@ import {
     Calendar,
     ChevronDown,
     Globe,
-    GlobeAlt,
     LogOut,
     MessageCircle,
     Settings,
+    Sun,
+    Moon,
     User,
     Users,
 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { LocaleSwitcher } from '@/components/locale-switcher';
+import LocaleSwitcher from '@/components/locale-switcher';
 import { usePageContext } from '@/hooks/use-page-context';
 import { cn } from '@/lib/utils';
+import type { BreadcrumbItem } from '@/types';
 
 export function AppTopbar({
     breadcrumbs = [],
 }: {
-    breadcrumbs?: Array<{ title: string; href: string }>;
+    breadcrumbs?: BreadcrumbItem[];
 }) {
     const {
         locale = 'ar',
@@ -97,9 +99,9 @@ export function AppTopbar({
                         className="hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {document.documentElement.classList.contains('dark') ? (
-                            <GlobeAlt className="h-4 w-4" />
+                            <Sun className="h-4 w-4" />
                         ) : (
-                            <Globe className="h-4 w-4" />
+                            <Moon className="h-4 w-4" />
                         )}
                     </button>
                 </div>

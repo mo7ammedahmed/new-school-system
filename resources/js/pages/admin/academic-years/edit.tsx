@@ -28,14 +28,12 @@ type Props = {
 };
 
 export default function AcademicYearEdit({ school, academicYear }: Props) {
-    const { data, setData, post, put, processing, errors } = useForm(
-        {
-            name: academicYear.name,
-            starts_on: academicYear.starts_on,
-            ends_on: academicYear.ends_on,
-            is_current: academicYear.is_current,
-        },
-    );
+    const { data, setData, post, put, processing, errors } = useForm({
+        name: academicYear.name,
+        starts_on: academicYear.starts_on,
+        ends_on: academicYear.ends_on,
+        is_current: academicYear.is_current,
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

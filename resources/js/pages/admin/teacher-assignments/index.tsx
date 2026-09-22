@@ -134,7 +134,8 @@ export default function TeacherAssignmentIndex({
                             className:
                                 related<{
                                     academic_class?: { name: string } | null;
-                                }>(assignment, 'section')?.academic_class?.name ?? '',
+                                }>(assignment, 'section')?.academic_class
+                                    ?.name ?? '',
                             actions: (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>

@@ -33,19 +33,17 @@ type Props = {
 };
 
 export default function StudentEdit({ student }: Props) {
-    const { data, setData, post, put, processing, errors } = useForm(
-        {
-            first_name: student.first_name,
-            last_name: student.last_name,
-            student_number: student.student_number,
-            date_of_birth: student.date_of_birth ?? '',
-            gender: student.gender ?? '',
-            phone: student.phone ?? '',
-            email: student.email ?? '',
-            address: student.address ?? '',
-            status: student.status,
-        },
-    );
+    const { data, setData, post, put, processing, errors } = useForm({
+        first_name: student.first_name,
+        last_name: student.last_name,
+        student_number: student.student_number,
+        date_of_birth: student.date_of_birth ?? '',
+        gender: student.gender ?? '',
+        phone: student.phone ?? '',
+        email: student.email ?? '',
+        address: student.address ?? '',
+        status: student.status,
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

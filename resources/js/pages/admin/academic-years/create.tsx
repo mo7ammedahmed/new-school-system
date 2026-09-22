@@ -21,14 +21,12 @@ type Props = {
 };
 
 export default function AcademicYearCreate({ school }: Props) {
-    const { data, setData, post, processing, errors } = useForm(
-        {
-            name: '',
-            starts_on: '',
-            ends_on: '',
-            is_current: false,
-        },
-    );
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        starts_on: '',
+        ends_on: '',
+        is_current: false,
+    });
 
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

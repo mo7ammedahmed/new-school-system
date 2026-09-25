@@ -24,48 +24,40 @@ The current project phase is **Phase 3: V1 implementation**, with the public CMS
 - [Delivery roadmap](docs/ROADMAP.md) — Phase 0 through Phase 4, dependencies, and exit criteria.
 - [Decision register](docs/DECISIONS.md) — confirmed assumptions, deferred choices, and links to their source decisions.
 - [Validation strategy](docs/VALIDATION.md) — traceability and phase-level acceptance scenarios.
+- [Repository audit](docs/AUDIT.md) — current evidence, launch risks, and native verification exit criteria.
+- [Native verification prompt](docs/VERIFY-NATIVE-RELEASE-PROMPT.md) — executable instructions for a local release-verification agent.
+- [Release checklist](docs/RELEASE_CHECKLIST.md) — pre-deploy gates, expected local failures, and the go/no-go decision.
+- [Migration inspection](docs/MIGRATION_INSPECTION.md) — pre-deploy `migrations` table export, comparison, and duplicate-migration handling.
 - [Phase 1 acceptance gate](docs/PHASE-1-ACCEPTANCE.md) — executable foundation checks and Phase 2 entry criteria.
 - [Domain language](CONTEXT.md) — canonical vocabulary for product, engineering, and implementation work.
 - [Wayfinder map](.wayfinder/Universal%20School%20Management%20Platform%20%E2%80%94%20CMS%20%2B%20ERP.md) — the original decision map and its resolved tickets.
 
 ## Current baseline
 
-The first commercial release is Saudi-first, uses a hybrid-ready tenancy model, and is built with Laravel 13, Inertia.js 3, React 19, TypeScript, Tailwind CSS 4, and MySQL. V1 is responsive web only. Stripe is the first payment provider, and ZATCA integration is scheduled after core finance workflows are proven.
+- **Stack** — Laravel 13, Inertia.js 3, React 19, TypeScript, Tailwind CSS 4, MySQL, Pint, PHPStan level 7. Responsive web only for V1.
+- **Market** — Saudi-first launch, fully bilingual Arabic/English with RTL and LTR layouts, with a path to GCC and international organizations.
+- **Tenancy** — hybrid-ready Organization → School → Branch model; database-level tenant ownership for schools and branches, and an explicit current-organization scope on every tenant-owned model.
+- **Deployment modes** — shared SaaS with strict data isolation, or a dedicated isolated deployment per client, from one codebase.
+- **Delivered** — public bilingual CMS with draft/publish and audit, admissions pipeline, SIS identity slice (students, guardians, links), academic structure, enrollment, teacher assignments, attendance and reporting with CSV export, assessments and report cards, guardian/teacher/student portals, scheduling and exams, finance (invoices, installments, receipts, reports), and bilingual notifications.
+- **Finance baseline** — Stripe is the first payment provider, with signed webhooks, replay idempotency, and immutable receipts.
+- **Deferred** — ZATCA e-invoicing and additional Saudi payment gateways are Phase 4, after the Phase 3 finance workflows are proven.
+- **Quality gates** — `bash scripts/verify-native-release.sh` runs the full sequence: dependency install, disposable-database migration and rollback validation, Wayfinder generation, frontend lint/types/build, Pint, PHPStan, the test suite, and the strict release check. Per-step evidence lands in `.verification/<run-id>/`. CI runs it via `.github/workflows/native-release.yml`.
+- **Launch decision** — see [docs/FINAL_PRE_LAUNCH_REVIEW.md](docs/FINAL_PRE_LAUNCH_REVIEW.md). Code-level gates pass; the remaining blockers are deployment-time configuration and migration-table inspection, not implementation.
+- **Detail** — [docs/PRODUCT.md](docs/PRODUCT.md) for scope and workflows, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system shape, [docs/ROADMAP.md](docs/ROADMAP.md) for phase order and exit criteria.
 
-Phase 1 implementation has started with the Laravel application bootstrap and the Organization → School → Branch hierarchy. Tenant-owned models use an explicit current-organization scope, and the database enforces organization ownership for schools and branches. The authorization baseline now includes platform, organization, school, finance, and teacher roles with tenant-aware gates. Localization now resolves English and Arabic per request, exposes RTL/LTR metadata to Inertia, and restores the application locale after each request. Immutable, tenant-scoped audit logging now records actors, targets, before/after payloads, request metadata, and platform-level events. Tenant-aware queue middleware now restores organization context for background jobs and clears it after execution, with database and failed-job tables available for durable queue processing. The shared Inertia shell now exposes a typed user, organization, capability, locale, and direction contract for React layouts, applies document lang/dir, and includes a persistent locale switcher. Media metadata is organization-scoped, private files use the local private disk, and downloads require authenticated signed URLs. Operational readiness now checks database connectivity, private storage writability, and queue configuration through a safe /health/ready endpoint. Local and testing environments have idempotent demo fixtures plus a guarded oundation:smoke command for schema and hierarchy verification.
+### Saudi payment gateway roadmap
 
-Phase 2 has now started with the public CMS foundation: bilingual School pages, draft/published state, and tenant-safe public routes keyed by Organization and School slugs. Authorized School and Organization Admins can create, update, publish, and audit page content through the protected CMS administration routes. Public admissions applications now create tenant-owned pending records, while authorized school staff can review and transition application status with audit events. The SIS identity slice now includes tenant-scoped Students, Guardians, explicit relationship metadata, and linked-guardian student access checks. Academic Years, Classes, Sections, and Enrollments now provide school-safe academic placement and prevent duplicate yearly enrollment. Teacher assignments and attendance recording now enforce section assignment and active enrollment boundaries. Staff can manage academic structure, enrollments, and teacher assignments through protected Inertia operations pages. Accepting an application now creates the Student and Guardian relationship exactly once and records the conversion audit event; accepted applications can then be assigned to an Academic Year and Class without duplicate enrollment. Guardians now have a protected portal showing only linked students, current enrollment summaries, attendance summaries, and published whole-school or linked-student notices. Teachers now have a protected workspace showing only assigned sections and their active rosters, with attendance entry, recent history, and audited correction controls. Authorized staff now have a filtered attendance reporting page and CSV export, while teachers remain limited to assigned sections. Teachers can record section-scoped assessments, and Guardians can see progress summaries only for linked Students. Authorized staff and linked Guardians can now view a printable report card combining enrollment, attendance, and assessments. School administrators can issue term-scoped immutable report-ca... (line truncated to 2000 chars)
+Phase 3 finance is proven on Stripe first. The remaining Saudi gateways enter in
+Phase 4, in dependency order, after Stripe reconciliation and reporting are
+stable.
 
-See [the roadmap](docs/ROADMAP.md) for the order in which these commitments become deliverable software.
+| Gateway                     | Phase     | Prerequisite                                                  | Integration surface                                                             |
+| --------------------------- | --------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| ZATCA e-invoicing (Fatoora) | Phase 4   | Stable receipts and immutable invoice numbering               | QR generation, TLV encoding, invoice/credit-note submission, phase-2 compliance |
+| Moyasar                     | Phase 4.1 | Payment-provider abstraction behind the Stripe implementation | Redirect and Apple Pay gateway, same webhook reconciliation path                |
+| Tap                         | Phase 4.2 | Moyasar proven in production traffic                          | Redirect gateway, same webhook reconciliation path                              |
+| HyperPay                    | Phase 4.3 | Moyasar and Tap proven; acquirer agreement signed             | Hosted gateway, same webhook reconciliation path                                |
 
-Queue worker observability now includes worker heartbeats, queue backlog, recent failed jobs, stale-worker detection, configurable thresholds, and hourly bilingual administrator alerts.
-
-Automated Feature coverage now covers localized email delivery, disabled notification channels, delivery idempotency, organization isolation in monitoring, queue worker heartbeat upserts, and threshold-based administrator alerts.
-
-Finance workflow tests now cover rounding-safe invoice installments, Guardian access isolation, signed Stripe webhook reconciliation, and duplicate webhook idempotency.
-
-Authorization and tenant-isolation tests now cover cross-organization Finance reports, Guardian student links, notification ownership, and delivery resend boundaries.
-
-Negative Finance tests now cover invalid installment counts, invalid due dates, zero or over-limit manual payments, and idempotency-key reuse across installments.
-
-Notification and Queue failure tests now cover SMTP exceptions, failed delivery state transitions, queue retry propagation, in-app deduplication, and stale-worker alerts.
-
-Finance reporting regression tests now cover printable linked receipts, Guardian receipt isolation, partial-payment balances, and paid-installment exclusion from outstanding reports.
-
-Scheduler integration tests now cover daily installment reminders, hourly notification and queue health commands, threshold behavior, and stable unique IDs for repeated reminder jobs.
-
-Audit integrity tests now cover immutable audit records, explicit tenant attribution for queued notifications, and complete metadata for manual payment reconciliation.
-
-A static code-quality review cleaned unused test imports and bindings, verified route references, and reviewed the unique notification job and scheduler integrations against the current Laravel APIs.
-
-Production deployment guidance is available in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), covering migrations, config cache, persistent queue workers, scheduler setup, worker heartbeats, Stripe webhooks, smoke checks, and rollback safeguards.
-
-Before production launch, run php artisan app:release-check and review [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). The gate checks production configuration, required tables, asynchronous queues, database connectivity, Stripe secret pairing, and critical operational prerequisites.
-
-**Note:** A native/CI verification gate (fresh/refresh migrations, Wayfinder generation, frontend lint/typecheck/build, Pint, PHPStan, PHPUnit, and pp:release-check --strict) is documented in docs/DEPLOYMENT.md and docs/FINAL_PRE_LAUNCH_REVIEW.md. The single-file script scripts/verify-native-release.sh and GitHub Actions workflow .github/workflows/native-release.yml **do not yet exist**; the manual steps must be executed from a native checkout or CI runner. The mounted development workspace cannot complete Laravel bootstrap, so PHPUnit, Pint, PHPStan, migrations, Wayfinder generation, and live Stripe/mail tests remain unverified until the native gate completes successfully.
-
-Security hardening includes baseline security headers, IP-based Stripe webhook throttling, secure session-cookie settings, and regression tests for the protections.
-
-Database integrity findings and migration ownership are documented in [docs/DATABASE_INTEGRITY.md](docs/DATABASE_INTEGRITY.md). Duplicate generated hierarchy migrations were neutralized as no-ops so fresh installs retain one canonical schema owner.
-
-The consolidated launch decision and remaining Go/No-Go gates are documented in [docs/FINAL_PRE_LAUNCH_REVIEW.md](docs/FINAL_PRE_LAUNCH_REVIEW.md). Current status is **NO-GO until the project runtime executes migrations, tests, static analysis, and production-like release checks**.
+Every gateway must reuse the same payment-intent, webhook-signature, replay
+idempotency, and immutable-receipt behavior already proven on Stripe. Full
+detail is in [docs/ROADMAP.md](docs/ROADMAP.md).

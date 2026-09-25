@@ -87,8 +87,8 @@ class PaymentController
 
         // Ensure either installment_id or invoice_id is set, but not both
         if (
-            ($validated['installment_id'] !== null && $validated['invoice_id'] !== null) ||
-            ($validated['installment_id'] === null && $validated['invoice_id'] === null)
+            (($validated['installment_id'] ?? null) !== null && ($validated['invoice_id'] ?? null) !== null) ||
+            (($validated['installment_id'] ?? null) === null && ($validated['invoice_id'] ?? null) === null)
         ) {
             // This should be caught by validation, but double-check
             return back()->withErrors(['_method' => 'Either installment or invoice must be specified, but not both.'])
@@ -207,8 +207,8 @@ class PaymentController
 
         // Ensure either installment_id or invoice_id is set, but not both
         if (
-            ($validated['installment_id'] !== null && $validated['invoice_id'] !== null) ||
-            ($validated['installment_id'] === null && $validated['invoice_id'] === null)
+            (($validated['installment_id'] ?? null) !== null && ($validated['invoice_id'] ?? null) !== null) ||
+            (($validated['installment_id'] ?? null) === null && ($validated['invoice_id'] ?? null) === null)
         ) {
             // This should be caught by validation, but double-check
             return back()->withErrors(['_method' => 'Either installment or invoice must be specified, but not both.'])

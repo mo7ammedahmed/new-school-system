@@ -2,40 +2,44 @@
 
 ## Current decision
 
-**Status: NO-GO until environment validation is completed.** The application foundation and core MVP slices are implemented, including tenant isolation, RBAC, bilingual localization, admissions, SIS, teaching operations, notifications, finance, Stripe reconciliation, receipts, reporting, audit logging, queue health, and deployment documentation. PHP and Composer are available, but the Laravel runtime cannot complete bootstrap from the mounted FUSE filesystem, so the release cannot yet be approved from this sandbox.
+**Status: NO-GO for production deployment.** Native verification completed on 2026-09-25 with every code gate green. The strict release check still fails on local production configuration (`APP_ENV`, HTTPS `APP_URL`, and mail transport), and the deployment migration history still requires review.
 
 ## Completed review areas
 
-| Area                                    | Result                                                    | Evidence                                                                                                                                                                            |
-| --------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tenant isolation and authorization      | Implemented and covered by Feature tests                  | AuthorizationIsolationTest, existing foundation tests                                                                                                                               |
-| Finance workflows                       | Implemented and covered                                   | FinanceWorkflowTest, FinanceNegativeValidationTest                                                                                                                                  |
-| Finance reports and receipts            | Implemented and covered                                   | FinanceReportingRegressionTest                                                                                                                                                      |
-| Notifications and email delivery        | Implemented and covered                                   | NotificationDeliveryTest                                                                                                                                                            |
-| Queue health and scheduler commands     | Implemented and covered                                   | QueueWorkerHealthTest, SchedulerCommandIntegrationTest                                                                                                                              |
-| Audit immutability and attribution      | Implemented and covered                                   | AuditIntegrityRegressionTest, immutable model hooks                                                                                                                                 |
-| Security headers and webhook throttling | Implemented and covered                                   | SecurityHeaders, SecurityHardeningTest                                                                                                                                              |
-| Public website and admissions funnel    | Implemented                                               | Complete bilingual homepage with real links, public pages, school CTA, admissions form, privacy consent, SEO metadata, sitemap, and robots endpoint                                 |
-| Authenticated dashboard overview        | UI implemented; data wiring pending                       | Bilingual operational summary with safe school-context navigation; live metrics and task counts must be supplied by the authenticated dashboard response before production approval |
-| Release gate and operations             | Documented and implemented                                | pp:release-check, docs/DEPLOYMENT.md                                                                                                                                                |
-| Migration integrity                     | Duplicate generated migrations identified and neutralized | docs/DATABASE_INTEGRITY.md                                                                                                                                                          |
+| Area                                    | Result                                                                    | Evidence                                                                                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tenant isolation and authorization      | Implemented and covered by Feature tests                                  | AuthorizationIsolationTest, existing foundation tests                                                                                               |
+| Finance workflows                       | Implemented and covered                                                   | FinanceWorkflowTest, FinanceNegativeValidationTest                                                                                                  |
+| Finance reports and receipts            | Implemented and covered                                                   | FinanceReportingRegressionTest                                                                                                                      |
+| Notifications and email delivery        | Implemented and covered                                                   | NotificationDeliveryTest                                                                                                                            |
+| Queue health and scheduler commands     | Implemented and covered                                                   | QueueWorkerHealthTest, SchedulerCommandIntegrationTest                                                                                              |
+| Audit immutability and attribution      | Implemented and covered                                                   | AuditIntegrityRegressionTest, immutable model hooks                                                                                                 |
+| Security headers and webhook throttling | Implemented and covered                                                   | SecurityHeaders, SecurityHardeningTest                                                                                                              |
+| Public website and admissions funnel    | Implemented                                                               | Complete bilingual homepage with real links, public pages, school CTA, admissions form, privacy consent, SEO metadata, sitemap, and robots endpoint |
+| Authenticated dashboard overview        | Implemented with live-record data wiring                                  | DashboardController and DashboardPayloadService; production smoke validation remains required                                                       |
+| Release gate and operations             | Implemented and automated; native strict check has configuration failures | `php artisan app:release-check --strict`, `scripts/verify-native-release.sh`, docs/DEPLOYMENT.md                                                    |
+| Migration integrity                     | Duplicate generated migrations identified and neutralized                 | docs/DATABASE_INTEGRITY.md, docs/MIGRATION_INSPECTION.md                                                                                            |
 
 ## Mandatory go-live gates
 
-Before approving release, run the native verification gate from a native checkout or CI runner. This gate is **not yet scripted as a single file** (see Known Limitations); the equivalent manual steps are:
+The native verification gate is automated and was executed locally on 2026-09-25 with `bash scripts/verify-native-release.sh`. Evidence is recorded per step under `.verification/<run-id>/`. The completed results are:
 
-1. composer install (validates repository whitespace and Composer manifests)
-2. Fresh and refresh migration/seed validation against a disposable SQLite database
-3. Wayfinder generation (php artisan wayfinder:generate)
-4.
+1. Dependency install from lockfiles: PASS.
+2. Migration audit: PASS — 52 repository migrations, 52 applied, no drift, all seven documented duplicate no-ops recorded.
+3. Migration rollback (`migrate:reset`) and re-apply on a disposable SQLite database: PASS.
+4. Wayfinder generation (`wayfinder:generate --with-form`): PASS; generated actions and routes present.
+5. `npm run check`: PASS; 698 literal translation keys, none missing in `en` or `ar`.
+6. `npm run types:check`: PASS.
+7. `npm run build`: PASS.
+8. `composer lint:check`: PASS.
+9. `composer types:check`: PASS.
+10. `php artisan test`: PASS, 216 tests and 1,044 assertions.
+11. `php artisan schedule:list`: PASS; three scheduled commands registered.
+12. `php artisan app:release-check --strict`: FAIL; three local configuration failures (APP_ENV, APP_URL HTTPS, mail transport).
 
-pm ci (frontend dependency installation) 5. Frontend lint and type checks (
-pm run check) 6. Production build (
-pm run build) 7. composer lint:check (Pint) 8. composer types:check (PHPStan) 9. php artisan test (PHPUnit) 10. php artisan app:release-check --strict
+Any required failure is a no-go condition. The full gate is automated and re-runnable: `bash scripts/verify-native-release.sh` (routine local/CI validation) and `RELEASE_MODE=ci bash scripts/verify-native-release.sh` (full production-like release gate). Both fail on any required gate failure and write per-step evidence to `.verification/<run-id>/`. CI runs them through `.github/workflows/native-release.yml`. Only the three local-configuration items in item 7 are tolerated in local mode; they are hard failures in release mode.
 
-Any failure is a no-go condition. A single-file script (scripts/verify-native-release.sh) and GitHub Actions workflow (.github/workflows/native-release.yml) **do not yet exist**; they are tracked as future work. The manual gate above must pass before production approval.
-
-The deployment database must be inspected before promoting the no-op duplicate migration correction. If any duplicate migration has already been recorded in the database migration table, do not rewrite migration history; create a reviewed forward migration instead and take a backup first.
+The deployment database must be inspected before promoting the no-op duplicate migration correction. The exact export, comparison, and duplicate-handling procedure is in [docs/MIGRATION_INSPECTION.md](MIGRATION_INSPECTION.md), and the corresponding pre-deploy checklist items are in [docs/RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md). If any duplicate migration has already been recorded in the database migration table, do not rewrite migration history; create a reviewed forward migration instead and take a backup first.
 
 Production must use HTTPS, APP_DEBUG=false, a stable APP_KEY, persistent sessions and cache, a real mail transport, an asynchronous queue, and SESSION_SECURE_COOKIE=true. Stripe secret and webhook secret must both be present and the registered webhook must use POST /webhooks/stripe with signature verification enabled.
 
@@ -48,14 +52,14 @@ At least one persistent queue worker and one scheduler process must be running. 
 3. Deploy code and dependencies with the previous release retained for rollback.
 4. Run migrations, clear stale caches, and rebuild config, route, and view caches.
 5. Start or restart queue workers and scheduler processes.
-6. Run pp:release-check --strict.
+6. Run `php artisan app:release-check --strict`.
 7. Execute public, Guardian, Finance, receipt, webhook, notification, and monitoring smoke tests.
 8. Confirm audit events and worker heartbeats are visible.
 9. Approve traffic only after all gates pass.
 
 ## Known limitations before approval
 
-Frontend dependency installation and formatting/lint validation have passed in a native temporary workspace. The typed Inertia resolver, locale reload call, and teacher attendance FormData handling were corrected. Full TypeScript and production bundling remain dependent on Wayfinder generation, which requires the Laravel runtime. The mounted validation environment still cannot complete Laravel bootstrap: even php artisan --version and the focused PHPUnit run exceed the bounded timeout before producing output. PHPUnit, Pint, PHPStan, migrations, Wayfinder generation, and live Stripe/mail tests therefore remain unverified until the native gate (manual steps listed above) or a future CI workflow completes successfully. The no-op migration remediation also requires verification against the actual deployment database before release.
+Native verification now passes every code gate: dependency install, disposable-database migration and rollback validation, migration audit, Wayfinder generation, frontend check, TypeScript, the production build, Pint, PHPStan, the test suite (216 tests, 1,044 assertions), and scheduler registration. The local strict release check fails because production-like `APP_ENV`, HTTPS `APP_URL`, and a mail transport are not configured; those three are the only expected local failures and `RELEASE_MODE=local` tolerates them by design. The deployment database must still be inspected before release. Live Stripe and mail delivery, browser smoke tests, and production queue execution remain deployment checks. The GitHub Actions workflow has not yet executed on GitHub, so the CI release gate is unproven.
 
 ## Rollback posture
 

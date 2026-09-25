@@ -1,0 +1,153 @@
+name: Native Release Verification
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      release_mode:
+        description: 'local (routine CI validation) or ci (full production-like release gate)'
+        required: true
+        default: local
+        type: choice
+        options:
+          - local
+          - ci
+
+concurrency:
+  group: native-release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify (${{ matrix.mode }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [local]
+
+    env:
+      RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.release_mode || matrix.mode }}
+      COMPOSER_INSTALL_FLAGS: ${{ vars.COMPOSER_INSTALL_FLAGS }}
+      APP_NAME: Laravel
+      APP_ENV: local
+      APP_DEBUG: 'true'
+      APP_URL: http://localhost:8000
+      APP_KEY: base64:S0kzT1BwZXJhdGl2ZVJlbGVhc2VWZXJpZmljYXRpb25LTA=
+      DB_CONNECTION: sqlite
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      BROADCAST_CONNECTION: log
+      MAIL_MAILER: array
+      PAYMENTS_ENABLED: 'false'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, bcmath, intl, zip
+          ini-values: post_max_size=64M, upload_max_filesize=64M
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Run native release verification
+        run: bash scripts/verify-native-release.sh
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-evidence-${{ matrix.mode }}
+          path: .verification/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  release-gate:
+    name: release gate (production-like)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: verify
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+
+    env:
+      RELEASE_MODE: ci
+      APP_NAME: Laravel
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_URL: ${{ vars.RELEASE_APP_URL || 'https://example.invalid' }}
+      APP_KEY: ${{ secrets.RELEASE_APP_KEY || 'base64:S0kzT1BwZXJhdGl2ZVJlbGVhc2VWZXJpZmljYXRpb25LTA=' }}
+      DB_CONNECTION: sqlite
+      QUEUE_CONNECTION: database
+      BROADCAST_CONNECTION: log
+      MAIL_MAILER: ${{ vars.RELEASE_MAIL_MAILER || 'smtp' }}
+      MAIL_HOST: ${{ vars.RELEASE_MAIL_HOST || 'smtp.example.invalid' }}
+      MAIL_PORT: ${{ vars.RELEASE_MAIL_PORT || '587' }}
+      MAIL_USERNAME: ${{ secrets.RELEASE_MAIL_USERNAME || 'ci' }}
+      MAIL_PASSWORD: ${{ secrets.RELEASE_MAIL_PASSWORD || 'ci' }}
+      MAIL_FROM_ADDRESS: ${{ vars.RELEASE_MAIL_FROM_ADDRESS || 'ci@example.invalid' }}
+      MAIL_FROM_NAME: Laravel
+      STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      PAYMENTS_ENABLED: ${{ vars.PAYMENTS_ENABLED || 'false' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, bcmath, intl, zip
+          ini-values: post_max_size=64M, upload_max_filesize=64M
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Run release gate
+        run: bash scripts/verify-native-release.sh
+
+      - name: Upload release gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-evidence
+          path: .verification/
+          if-no-files-found: ignore
+          retention-days: 14

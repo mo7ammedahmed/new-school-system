@@ -8,6 +8,7 @@ use App\Models\Guardian;
 use App\Models\Installment;
 use App\Models\Invoice;
 use App\Models\Organization;
+use App\Models\Payment;
 use App\Models\School;
 use App\Models\Student;
 use App\Models\User;
@@ -53,6 +54,47 @@ class FinanceNegativeValidationTest extends TestCase
         $second = Installment::create(['organization_id' => $organization->id, 'school_id' => $school->id, 'invoice_id' => $invoice->id, 'sequence' => 2, 'due_on' => '2026-10-16', 'amount_minor' => 1000, 'paid_minor' => 0, 'status' => 'pending']);
         $this->actingAs($guardianUser)->post(route('guardian.payment-intents.store', $first), ['idempotency_key' => 'reused-key'])->assertRedirect();
         $this->actingAs($guardianUser)->post(route('guardian.payment-intents.store', $second), ['idempotency_key' => 'reused-key'])->assertStatus(409);
+    }
+
+    public function test_manual_payment_rejects_a_foreign_invoice(): void
+    {
+        [$organization, $school, $staff, $student] = $this->paymentFixture();
+        $foreignOrganization = Organization::create(['name' => 'Foreign Org', 'slug' => 'foreign-org']);
+        $foreignSchool = School::create(['organization_id' => $foreignOrganization->id, 'name' => 'Foreign School', 'slug' => 'foreign-school']);
+        $foreignStaff = User::factory()->create(['organization_id' => $foreignOrganization->id, 'role' => UserRole::FinanceStaff]);
+        $foreignStudent = Student::create(['organization_id' => $foreignOrganization->id, 'school_id' => $foreignSchool->id, 'student_number' => 'F-1', 'first_name' => 'Foreign', 'last_name' => 'Student', 'status' => 'active']);
+        $foreignInvoice = Invoice::create(['organization_id' => $foreignOrganization->id, 'school_id' => $foreignSchool->id, 'student_id' => $foreignStudent->id, 'issued_by' => $foreignStaff->id, 'number' => 'INV-F', 'issued_on' => '2026-09-16', 'due_on' => '2026-09-16', 'status' => 'issued', 'currency' => 'SAR', 'subtotal_minor' => 1000, 'total_minor' => 1000, 'items' => []]);
+
+        $this->actingAs($staff)->post(route('payments.store', $school), [
+            'invoice_id' => $foreignInvoice->id,
+            'received_by' => $staff->id,
+            'payment_date' => '2026-09-16',
+            'amount_minor' => 1000,
+            'status' => 'completed',
+        ])->assertSessionHasErrors('invoice_id');
+
+        $this->assertDatabaseCount('payments', 0);
+    }
+
+    public function test_manual_payment_update_cannot_change_its_school_or_organization(): void
+    {
+        [$organization, $school, $staff, $student] = $this->paymentFixture();
+        $invoice = Invoice::create(['organization_id' => $organization->id, 'school_id' => $school->id, 'student_id' => $student->id, 'issued_by' => $staff->id, 'number' => 'INV-P', 'issued_on' => '2026-09-16', 'due_on' => '2026-09-16', 'status' => 'issued', 'currency' => 'SAR', 'subtotal_minor' => 1000, 'total_minor' => 1000, 'items' => []]);
+        $payment = Payment::create(['organization_id' => $organization->id, 'school_id' => $school->id, 'invoice_id' => $invoice->id, 'received_by' => $staff->id, 'payment_date' => '2026-09-16', 'amount_minor' => 1000, 'status' => 'completed']);
+        $foreignOrganization = Organization::create(['name' => 'Foreign Org', 'slug' => 'foreign-org']);
+        $foreignSchool = School::create(['organization_id' => $foreignOrganization->id, 'name' => 'Foreign School', 'slug' => 'foreign-school']);
+
+        $this->actingAs($staff)->put(route('payments.update', [$school, $payment]), [
+            'organization_id' => $foreignOrganization->id,
+            'school_id' => $foreignSchool->id,
+            'invoice_id' => $invoice->id,
+            'received_by' => $staff->id,
+            'payment_date' => '2026-09-17',
+            'amount_minor' => 900,
+            'status' => 'completed',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('payments', ['id' => $payment->id, 'organization_id' => $organization->id, 'school_id' => $school->id, 'amount_minor' => 900]);
     }
 
     private function invoiceFixture(): array

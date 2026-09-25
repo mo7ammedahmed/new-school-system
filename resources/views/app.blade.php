@@ -53,7 +53,7 @@
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
-        <a href="#main-content" class="skip-link">{{ app()->getLocale() === 'ar' ? 'تجاوز إلى المحتوى' : 'Skip to main content' }}</a>
+        
         <x-inertia::app />
     </body>
 </html>

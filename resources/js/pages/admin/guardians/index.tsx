@@ -26,7 +26,7 @@ type GuardianData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     guardians: {
         data: GuardianData[];
         meta: {
@@ -62,7 +62,7 @@ export default function GuardianIndex({
     const { t } = useT();
     const list = paginated<GuardianData>(guardians);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [relationship, setRelationship] = useState(
+    const [relationship, _setRelationship] = useState(
         filters.relationship ?? '',
     );
 
@@ -118,7 +118,7 @@ export default function GuardianIndex({
                         </option>
                         {RELATIONSHIPS.map((rel) => (
                             <option key={rel.value} value={rel.value}>
-                                {t(`guardians.relationship.${rel.value}`)}
+                                {t(`guardians.relationshipTypes.${rel.value}`)}
                             </option>
                         ))}
                     </Select>

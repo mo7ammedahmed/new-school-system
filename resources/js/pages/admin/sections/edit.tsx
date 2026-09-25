@@ -95,14 +95,18 @@ export default function SectionEdit({
                         <FormSection>
                             <FormField
                                 label={t('sections.academicClass')}
-                                description={t('sections.academicClassDescription')}
+                                description={t(
+                                    'sections.academicClassDescription',
+                                )}
                             >
                                 <Select
                                     value={data.class_id}
                                     onValueChange={(value) =>
                                         setData('class_id', Number(value))
                                     }
-                                    placeholder={t('sections.academicClassPlaceholder')}
+                                    placeholder={t(
+                                        'sections.academicClassPlaceholder',
+                                    )}
                                     required
                                 >
                                     {academicClasses.map((academicClass) => (

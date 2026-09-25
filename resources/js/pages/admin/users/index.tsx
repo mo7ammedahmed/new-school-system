@@ -25,7 +25,7 @@ type UserData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     users: {
         data: UserData[];
         meta: {
@@ -46,19 +46,23 @@ type Props = {
 
 const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/users`;
 
+/**
+ * Mirrors UserController::MANAGED_ROLES. Teachers, guardians and students are
+ * not managed here, so offering them as filters would only ever produce an
+ * empty list with no explanation.
+ */
 const ROLES = [
-    { value: 'organization_admin', label: 'Organization Admin' },
-    { value: 'school_admin', label: 'School Admin' },
-    { value: 'teacher', label: 'Teacher' },
-    { value: 'staff', label: 'Staff' },
-    { value: 'guardian', label: 'Guardian' },
+    { value: 'school_admin' },
+    { value: 'academic_coordinator' },
+    { value: 'teacher' },
+    { value: 'finance_staff' },
 ];
 
 export default function UserIndex({ filters = {}, users, school }: Props) {
     const { t } = useT();
     const list = paginated<UserData>(users);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [role, setRole] = useState(filters.role ?? '');
+    const [role, _setRole] = useState(filters.role ?? '');
 
     const applyFilters = (next: { search?: string; role?: string }) => {
         router.get(

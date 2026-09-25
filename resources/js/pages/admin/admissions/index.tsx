@@ -31,11 +31,11 @@ const statusLabels: Record<string, string> = {
     withdrawn: 'Withdrawn',
 };
 const statusStyles: Record<string, string> = {
-    pending: 'bg-amber-50 text-amber-800',
-    reviewing: 'bg-blue-50 text-blue-800',
-    accepted: 'bg-emerald-50 text-emerald-800',
-    rejected: 'bg-red-50 text-red-800',
-    withdrawn: 'bg-slate-100 text-slate-700',
+    pending: 'bg-warning-container text-warning-foreground',
+    reviewing: 'bg-info/10 text-info',
+    accepted: 'bg-success-container text-success-foreground',
+    rejected: 'bg-danger-container text-danger-foreground',
+    withdrawn: 'bg-surface-container-low text-on-surface-variant',
 };
 
 export default function AdmissionsIndex({
@@ -69,7 +69,7 @@ export default function AdmissionsIndex({
                         <p className="text-muted-foreground text-sm font-bold">
                             Admissions workspace
                         </p>
-                        <h1 className="mt-1 text-3xl font-black">
+                        <h1 className="mt-1 text-3xl font-semibold">
                             {school.name}
                         </h1>
                         <p className="text-muted-foreground mt-2 text-sm">
@@ -105,7 +105,7 @@ export default function AdmissionsIndex({
                         </select>
                     </div>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
                     <Metric
                         icon={ClipboardCheck}
                         label="Total applications"
@@ -131,7 +131,7 @@ export default function AdmissionsIndex({
                     />
                 </div>
                 {visible.length === 0 ? (
-                    <div className="text-muted-foreground rounded-2xl border border-dashed p-12 text-center">
+                    <div className="text-muted-foreground rounded-lg border border-dashed p-12 text-center">
                         No applications match this filter.
                     </div>
                 ) : (
@@ -139,12 +139,12 @@ export default function AdmissionsIndex({
                         {visible.map((application) => (
                             <article
                                 key={application.id}
-                                className="bg-card rounded-2xl border p-5 shadow-sm"
+                                className="bg-card rounded-lg border p-5"
                             >
                                 <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
                                     <div>
                                         <div className="flex flex-wrap items-center gap-3">
-                                            <h2 className="font-black">
+                                            <h2 className="font-semibold">
                                                 {application.student_name}
                                             </h2>
                                             <span
@@ -282,12 +282,12 @@ function Metric({
     value: number;
 }) {
     return (
-        <div className="bg-card flex items-center gap-4 rounded-2xl border p-5">
+        <div className="bg-card flex items-center gap-4 rounded-lg border p-5">
             <div className="bg-muted grid size-10 place-items-center rounded-xl">
                 <Icon size={19} />
             </div>
             <div>
-                <p className="text-2xl font-black">{value}</p>
+                <p className="text-2xl font-semibold">{value}</p>
                 <p className="text-muted-foreground text-xs font-bold">
                     {label}
                 </p>

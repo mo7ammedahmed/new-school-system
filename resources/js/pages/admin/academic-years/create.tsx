@@ -19,7 +19,8 @@ type Props = {
     school: { id: number; name: string };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-years`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-years`;
 
 export default function AcademicYearCreate({ school }: Props) {
     const { t } = useT();
@@ -72,7 +73,9 @@ export default function AcademicYearCreate({ school }: Props) {
                                 description={t('academicYears.nameDescription')}
                             >
                                 <Input
-                                    placeholder={t('academicYears.namePlaceholder')}
+                                    placeholder={t(
+                                        'academicYears.namePlaceholder',
+                                    )}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -85,7 +88,9 @@ export default function AcademicYearCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicYears.startsOn')}
-                                description={t('academicYears.startsOnDescription')}
+                                description={t(
+                                    'academicYears.startsOnDescription',
+                                )}
                             >
                                 <Input
                                     type="date"
@@ -101,7 +106,9 @@ export default function AcademicYearCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicYears.endsOn')}
-                                description={t('academicYears.endsOnDescription')}
+                                description={t(
+                                    'academicYears.endsOnDescription',
+                                )}
                             >
                                 <Input
                                     type="date"
@@ -117,12 +124,14 @@ export default function AcademicYearCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicYears.isCurrent')}
-                                description={t('academicYears.isCurrentDescription')}
+                                description={t(
+                                    'academicYears.isCurrentDescription',
+                                )}
                             >
                                 <Checkbox
                                     checked={data.is_current}
                                     onCheckedChange={(checked) =>
-                                        setData('is_current', checked)
+                                        setData('is_current', checked === true)
                                     }
                                 />
                             </FormField>

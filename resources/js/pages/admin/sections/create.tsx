@@ -44,7 +44,9 @@ export default function SectionCreate({ school, academicClasses }: Props) {
             <Head title={t('sections.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">{t('sections.create')}</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t('sections.create')}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
                             <Link href={LIST_URL(school.id)}>
@@ -83,14 +85,18 @@ export default function SectionCreate({ school, academicClasses }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('sections.academicClass')}
-                                description={t('sections.academicClassDescription')}
+                                description={t(
+                                    'sections.academicClassDescription',
+                                )}
                             >
                                 <Select
                                     value={data.class_id}
                                     onValueChange={(value) =>
                                         setData('class_id', value)
                                     }
-                                    placeholder={t('sections.academicClassPlaceholder')}
+                                    placeholder={t(
+                                        'sections.academicClassPlaceholder',
+                                    )}
                                     required
                                 >
                                     {academicClasses.map((academicClass) => (

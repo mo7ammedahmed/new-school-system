@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\Receipt;
 use App\Services\AuditLogger;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class ReceiptDownloadController
     public function __invoke(Request $request, int $receipt, AuditLogger $audit): StreamedResponse
     {
         $record = Receipt::query()->with(['invoice.student.school', 'installment'])->findOrFail($receipt);
-        if ($request->user()->hasRole('guardian')) {
+        if ($request->user()->hasRole(UserRole::Guardian)) {
             Gate::authorize('view-student', $record->invoice->student);
         } else {
             Gate::authorize('manage-finance', $record->invoice->school);

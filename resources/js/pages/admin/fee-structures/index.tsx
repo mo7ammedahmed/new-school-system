@@ -26,7 +26,7 @@ type FeeStructureData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     feeStructures: {
         data: FeeStructureData[];
         meta: {
@@ -45,7 +45,8 @@ type Props = {
     school: { id: number; name: string };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/fee-structures`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/fee-structures`;
 
 const CURRENCIES = [
     { value: 'SAR', label: 'Saudi Riyal' },
@@ -69,11 +70,16 @@ export default function FeeStructureIndex({
     const { t } = useT();
     const list = paginated<FeeStructureData>(feeStructures);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [currency, setCurrency] = useState(filters.currency ?? '');
-    const [frequency, setFrequency] = useState(filters.frequency ?? '');
-    const [isActive, setIsActive] = useState(filters.is_active ?? '');
+    const [currency, _setCurrency] = useState(filters.currency ?? '');
+    const [frequency, _setFrequency] = useState(filters.frequency ?? '');
+    const [isActive, _setIsActive] = useState(filters.is_active ?? '');
 
-    const applyFilters = (next: { search?: string; currency?: string; frequency?: string; is_active?: string }) => {
+    const applyFilters = (next: {
+        search?: string;
+        currency?: string;
+        frequency?: string;
+        is_active?: string;
+    }) => {
         router.get(
             LIST_URL(school.id),
             {
@@ -123,7 +129,9 @@ export default function FeeStructureIndex({
                             }
                             placeholder={t('feeStructures.filterByCurrency')}
                         >
-                            <option value="">{t('feeStructures.allCurrencies')}</option>
+                            <option value="">
+                                {t('feeStructures.allCurrencies')}
+                            </option>
                             {CURRENCIES.map((c) => (
                                 <option key={c.value} value={c.value}>
                                     {t(`currencies.${c.value}`)}
@@ -137,7 +145,9 @@ export default function FeeStructureIndex({
                             }
                             placeholder={t('feeStructures.filterByFrequency')}
                         >
-                            <option value="">{t('feeStructures.allFrequencies')}</option>
+                            <option value="">
+                                {t('feeStructures.allFrequencies')}
+                            </option>
                             {FREQUENCIES.map((f) => (
                                 <option key={f.value} value={f.value}>
                                     {t(`frequencies.${f.value}`)}
@@ -151,25 +161,41 @@ export default function FeeStructureIndex({
                             }
                             placeholder={t('feeStructures.filterByStatus')}
                         >
-                            <option value="">{t('feeStructures.allStatuses')}</option>
+                            <option value="">
+                                {t('feeStructures.allStatuses')}
+                            </option>
                             <option value="true">{t('common.active')}</option>
-                            <option value="false">{t('common.inactive')}</option>
+                            <option value="false">
+                                {t('common.inactive')}
+                            </option>
                         </Select>
                     </div>
                 </div>
 
                 <DataTable
                     columns={[
-                        { accessorKey: 'name', header: t('feeStructures.name') },
-                        { accessorKey: 'description', header: t('feeStructures.description') },
+                        {
+                            accessorKey: 'name',
+                            header: t('feeStructures.name'),
+                        },
+                        {
+                            accessorKey: 'description',
+                            header: t('feeStructures.description'),
+                        },
                         {
                             accessorKey: 'amount',
                             header: t('feeStructures.amount'),
                             cell: (value: number) =>
                                 `${(value / 100).toFixed(2)} ${value > 0 ? 'SAR' : ''}`,
                         },
-                        { accessorKey: 'currency', header: t('feeStructures.currency') },
-                        { accessorKey: 'frequency', header: t('feeStructures.frequency') },
+                        {
+                            accessorKey: 'currency',
+                            header: t('feeStructures.currency'),
+                        },
+                        {
+                            accessorKey: 'frequency',
+                            header: t('feeStructures.frequency'),
+                        },
                         {
                             accessorKey: 'is_active',
                             header: t('feeStructures.isActive'),

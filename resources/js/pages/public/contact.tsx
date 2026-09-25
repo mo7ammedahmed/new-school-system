@@ -58,15 +58,15 @@ export default function Contact() {
             <Head title={isArabic ? 'تواصل مع مدرستي' : 'Contact Madrasati'} />
             <section className="mx-auto max-w-7xl px-5 pt-20 pb-24 sm:px-8">
                 <div className="max-w-2xl">
-                    <p className="text-sm font-black text-[#c56a3b]">
+                    <p className="text-warning text-sm font-semibold">
                         {isArabic ? 'نحن قريبون' : 'We are close'}
                     </p>
-                    <h1 className="mt-4 text-5xl leading-tight font-black tracking-tight sm:text-6xl">
+                    <h1 className="mt-4 text-5xl leading-tight font-semibold tracking-tight sm:text-6xl">
                         {isArabic
                             ? 'لنبدأ من سؤال واحد: ما الذي تحتاجه مدرستك؟'
                             : 'Let’s start with one question: what does your school need?'}
                     </h1>
-                    <p className="mt-6 text-lg leading-8 text-[#5d746c]">
+                    <p className="text-on-surface-variant mt-6 text-lg leading-8">
                         {isArabic
                             ? 'سواء كنتم في مرحلة الاستكشاف أو جاهزين للانطلاق، نساعدكم على اختيار الطريق الأنسب.'
                             : 'Whether you are exploring or ready to launch, we will help you choose the right path.'}
@@ -77,20 +77,20 @@ export default function Contact() {
                         ({ icon: Icon, title, text, action, href }) => (
                             <article
                                 key={title}
-                                className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-7"
+                                className="border-outline-variant bg-card rounded-lg border p-7"
                             >
-                                <div className="grid size-12 place-items-center rounded-2xl bg-[#0d5c4d] text-white">
+                                <div className="bg-primary text-primary-foreground grid size-12 place-items-center rounded-lg">
                                     <Icon size={21} />
                                 </div>
-                                <h2 className="mt-6 text-xl font-black">
+                                <h2 className="mt-6 text-xl font-semibold">
                                     {title}
                                 </h2>
-                                <p className="mt-3 min-h-14 leading-7 text-[#6c837c]">
+                                <p className="text-on-surface-variant mt-3 min-h-14 leading-7">
                                     {text}
                                 </p>
                                 <a
                                     href={href}
-                                    className="mt-6 inline-flex items-center gap-2 text-sm font-black text-[#0d5c4d]"
+                                    className="text-primary mt-6 inline-flex items-center gap-2 text-sm font-semibold"
                                 >
                                     {action} <ArrowLeft size={15} />
                                 </a>
@@ -98,7 +98,7 @@ export default function Contact() {
                         ),
                     )}
                 </div>
-                <div className="mt-10 flex items-center gap-3 rounded-2xl bg-[#e1efe2] px-6 py-4 text-sm font-bold text-[#28544a]">
+                <div className="bg-surface-container-low text-on-surface mt-10 flex items-center gap-3 rounded-lg px-6 py-4 text-sm font-bold">
                     <Clock3 size={18} />
                     {isArabic
                         ? 'الأحد — الخميس، 9:00 ص — 5:00 م بتوقيت الرياض'

@@ -18,7 +18,8 @@ type Props = {
     school: { id: number; name: string };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-classes`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-classes`;
 
 export default function AcademicClassCreate({ school }: Props) {
     const { t } = useT();
@@ -65,10 +66,14 @@ export default function AcademicClassCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicClasses.name')}
-                                description={t('academicClasses.nameDescription')}
+                                description={t(
+                                    'academicClasses.nameDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('academicClasses.namePlaceholder')}
+                                    placeholder={t(
+                                        'academicClasses.namePlaceholder',
+                                    )}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)

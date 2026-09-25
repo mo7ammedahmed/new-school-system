@@ -2,6 +2,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { cloneElement, isValidElement } from 'react';
 
 type FormFieldProps = {
     label: string;
@@ -12,12 +13,6 @@ type FormFieldProps = {
     disabled?: boolean;
     // The actual input component can be passed as children
     children: React.ReactNode;
-    // Optional: specify input type to render appropriate component
-    asChild?: 'input' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'switch';
-    // For select options
-    options?: Array<{ label: string; value: string | number }>;
-    // For radio group
-    radioOptions?: Array<{ label: string; value: string | number }>;
 };
 
 export function FormField({
@@ -28,14 +23,12 @@ export function FormField({
     required,
     disabled,
     children,
-    asChild,
-    options,
-    radioOptions,
 }: FormFieldProps) {
     const finalId =
         id ||
         htmlFor ||
         `form-field-${Math.random().toString(36).substr(2, 9)}`;
+    const descriptionId = description ? `${finalId}-description` : undefined;
 
     return (
         <div className="space-y-2">
@@ -49,11 +42,28 @@ export function FormField({
                 {required && <span className="text-destructive ml-1">*</span>}
             </Label>
             {description && (
-                <p className="text-muted-foreground text-sm">{description}</p>
+                <p id={descriptionId} className="text-muted-foreground text-sm">
+                    {description}
+                </p>
             )}
             <div className="flex items-start space-x-3">
                 {/* We'll render the children directly; they should be an input component */}
-                <div className="flex min-w-0 flex-1">{children}</div>
+                <div className="flex min-w-0 flex-1">
+                    {isValidElement(children) &&
+                        cloneElement(
+                            children as React.ReactElement<
+                                Record<string, unknown>
+                            >,
+                            {
+                                id: finalId,
+                                'aria-required': required,
+                                'aria-describedby': descriptionId,
+                                'aria-invalid': undefined, // Will be set by parent form if there's an error
+                                disabled,
+                            },
+                        )}
+                    {!isValidElement(children) && children}
+                </div>
             </div>
         </div>
     );
@@ -96,7 +106,7 @@ export function FormTextareaField(
     },
 ) {
     return (
-        <FormField {...props} asChild="textarea">
+        <FormField {...props}>
             <textarea
                 value={props.value ?? ''}
                 onChange={props.onChange}
@@ -120,7 +130,7 @@ export function FormSelectField(
     },
 ) {
     return (
-        <FormField {...props} asChild="select">
+        <FormField {...props}>
             <Select
                 value={props.value ?? ''}
                 onValueChange={props.onChange}

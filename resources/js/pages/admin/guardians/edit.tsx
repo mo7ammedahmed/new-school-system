@@ -109,7 +109,9 @@ export default function GuardianEdit({ school, guardian }: Props) {
                                 description={t('guardians.emailDescription')}
                             >
                                 <Input
-                                    placeholder={t('guardians.emailPlaceholder')}
+                                    placeholder={t(
+                                        'guardians.emailPlaceholder',
+                                    )}
                                     value={data.email}
                                     onChange={(e) =>
                                         setData('email', e.target.value)
@@ -127,7 +129,9 @@ export default function GuardianEdit({ school, guardian }: Props) {
                                 description={t('guardians.phoneDescription')}
                             >
                                 <Input
-                                    placeholder={t('guardians.phonePlaceholder')}
+                                    placeholder={t(
+                                        'guardians.phonePlaceholder',
+                                    )}
                                     value={data.phone}
                                     onChange={(e) =>
                                         setData('phone', e.target.value)
@@ -143,7 +147,9 @@ export default function GuardianEdit({ school, guardian }: Props) {
                                 description={t('guardians.addressDescription')}
                             >
                                 <Input
-                                    placeholder={t('guardians.addressPlaceholder')}
+                                    placeholder={t(
+                                        'guardians.addressPlaceholder',
+                                    )}
                                     value={data.address}
                                     onChange={(e) =>
                                         setData('address', e.target.value)
@@ -155,10 +161,14 @@ export default function GuardianEdit({ school, guardian }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('guardians.occupation')}
-                                description={t('guardians.occupationDescription')}
+                                description={t(
+                                    'guardians.occupationDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('guardians.occupationPlaceholder')}
+                                    placeholder={t(
+                                        'guardians.occupationPlaceholder',
+                                    )}
                                     value={data.occupation}
                                     onChange={(e) =>
                                         setData('occupation', e.target.value)
@@ -171,18 +181,27 @@ export default function GuardianEdit({ school, guardian }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('guardians.relationship')}
-                                description={t('guardians.relationshipDescription')}
+                                description={t(
+                                    'guardians.relationshipDescription',
+                                )}
                             >
                                 <Select
                                     value={data.relationship}
                                     onValueChange={(value) =>
                                         setData('relationship', value)
                                     }
-                                    placeholder={t('guardians.relationshipPlaceholder')}
+                                    placeholder={t(
+                                        'guardians.relationshipPlaceholder',
+                                    )}
                                 >
-                                    <option value="">{t('guardians.relationshipPlaceholder')}</option>
+                                    <option value="">
+                                        {t('guardians.relationshipPlaceholder')}
+                                    </option>
                                     {RELATIONSHIPS.map((rel) => (
-                                        <option key={rel.value} value={rel.value}>
+                                        <option
+                                            key={rel.value}
+                                            value={rel.value}
+                                        >
                                             {rel.label}
                                         </option>
                                     ))}

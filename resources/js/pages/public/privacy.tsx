@@ -50,14 +50,14 @@ export default function Privacy() {
             />
             <section className="mx-auto max-w-4xl px-5 pt-20 pb-24 sm:px-8">
                 <div className="flex items-center gap-4">
-                    <div className="grid size-14 place-items-center rounded-2xl bg-[#e1efe2] text-[#0d5c4d]">
+                    <div className="bg-surface-container-low text-primary grid size-14 place-items-center rounded-lg">
                         <LockKeyhole size={27} />
                     </div>
                     <div>
-                        <p className="text-sm font-black text-[#c56a3b]">
+                        <p className="text-warning text-sm font-semibold">
                             {isArabic ? 'الخصوصية' : 'Privacy'}
                         </p>
-                        <h1 className="mt-1 text-4xl font-black tracking-tight">
+                        <h1 className="mt-1 text-4xl font-semibold tracking-tight">
                             {isArabic
                                 ? 'بياناتكم أمانة.'
                                 : 'Your data is entrusted to us.'}
@@ -68,16 +68,16 @@ export default function Privacy() {
                     {sections[locale].map(([title, body]) => (
                         <article
                             key={title}
-                            className="rounded-2xl border border-[#dbe8df] bg-white p-7"
+                            className="border-outline-variant bg-card rounded-lg border p-7"
                         >
-                            <h2 className="text-xl font-black">{title}</h2>
-                            <p className="mt-3 leading-8 text-[#5d746c]">
+                            <h2 className="text-xl font-semibold">{title}</h2>
+                            <p className="text-on-surface-variant mt-3 leading-8">
                                 {body}
                             </p>
                         </article>
                     ))}
                 </div>
-                <p className="mt-8 flex items-center gap-2 text-xs text-[#789087]">
+                <p className="text-on-surface-variant mt-8 flex items-center gap-2 text-xs">
                     <FileText size={15} />{' '}
                     {isArabic
                         ? 'آخر تحديث: سبتمبر 2026'

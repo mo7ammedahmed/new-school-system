@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('school_id')->constrained();
             $table->foreignId('installment_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('invoice_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('received_by')->constrained('users')->nullable(); // User who recorded the payment
+            $table->foreignId('received_by')->nullable()->constrained('users'); // User who recorded the payment
             $table->string('payment_method')->nullable(); // cash, bank_transfer, credit_card, etc.
             $table->string('reference_number')->nullable(); // Check number, transaction ID, etc.
             $table->date('payment_date');
@@ -26,11 +26,9 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Ensure either installment_id or invoice_id is set, but not both
-            $table->checkConstraint(
-                "(installment_id IS NULL) + (invoice_id IS NULL) = 1",
-                'payment_must_have_either_installment_or_invoice'
-            );
+            // A payment settles either an installment or a whole invoice, never
+            // both. That rule lives in PaymentRequest: a DB-level CHECK is not
+            // portable across the drivers this app runs on.
         });
     }
 

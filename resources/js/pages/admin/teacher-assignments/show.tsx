@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { useT } from '@/hooks/useT';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
     school: { id: number; name: string };
@@ -30,7 +31,8 @@ type Props = {
     };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/teacher-assignments`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/teacher-assignments`;
 const EDIT_URL = (schoolId: number, assignmentId: number) =>
     `/admin/schools/${schoolId}/teacher-assignments/${assignmentId}`;
 
@@ -39,11 +41,17 @@ export default function TeacherAssignmentShow({ school, assignment }: Props) {
 
     return (
         <>
-            <Head title={t('teacherAssignments.show', { name: assignment.teacher.name })} />
+            <Head
+                title={t('teacherAssignments.show', {
+                    name: assignment.teacher.name,
+                })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        {t('teacherAssignments.show', { name: assignment.teacher.name })}
+                        {t('teacherAssignments.show', {
+                            name: assignment.teacher.name,
+                        })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild>
@@ -53,16 +61,16 @@ export default function TeacherAssignmentShow({ school, assignment }: Props) {
                         </Button>
                         <Button
                             variant="destructive"
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        t('teacherAssignments.deleteConfirm'),
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    alert(t('teacherAssignments.deleted'));
-                                }
-                            }}
+                            onClick={() =>
+                                confirmDelete(
+                                    `/admin/schools/${school.id}/teacher-assignments/${assignment.id}`,
+                                    {
+                                        message: t(
+                                            'teacherAssignments.deleteConfirm',
+                                        ),
+                                    },
+                                )
+                            }
                         >
                             {t('actions.delete')}
                         </Button>

@@ -28,7 +28,7 @@ type PaymentData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     payments: {
         data: PaymentData[];
         meta: {
@@ -71,16 +71,25 @@ export default function PaymentIndex({
     const { t } = useT();
     const list = paginated<PaymentData>(payments);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [status, setStatus] = useState(filters.status ?? '');
-    const [paymentMethod, setPaymentMethod] = useState(filters.payment_method ?? '');
+    const [status, _setStatus] = useState(filters.status ?? '');
+    const [paymentMethod, _setPaymentMethod] = useState(
+        filters.payment_method ?? '',
+    );
 
-    const applyFilters = (next: { search?: string; status?: string; payment_method?: string }) => {
+    const applyFilters = (next: {
+        search?: string;
+        status?: string;
+        payment_method?: string;
+    }) => {
         router.get(
             LIST_URL(school.id),
             {
                 search: next.search || undefined,
                 status: next.status === '' ? undefined : next.status,
-                payment_method: next.payment_method === '' ? undefined : next.payment_method,
+                payment_method:
+                    next.payment_method === ''
+                        ? undefined
+                        : next.payment_method,
             },
             { preserveState: true, preserveScroll: true, replace: true },
         );
@@ -123,7 +132,9 @@ export default function PaymentIndex({
                             }
                             placeholder={t('payments.filterByStatus')}
                         >
-                            <option value="">{t('payments.allStatuses')}</option>
+                            <option value="">
+                                {t('payments.allStatuses')}
+                            </option>
                             {STATUSES.map((status) => (
                                 <option key={status.value} value={status.value}>
                                     {t(`payments.statuses.${status.value}`)}
@@ -133,7 +144,10 @@ export default function PaymentIndex({
                         <Select
                             value={paymentMethod}
                             onValueChange={(value) =>
-                                applyFilters({ ...filters, payment_method: value })
+                                applyFilters({
+                                    ...filters,
+                                    payment_method: value,
+                                })
                             }
                             placeholder={t('payments.filterByPaymentMethod')}
                         >
@@ -149,26 +163,44 @@ export default function PaymentIndex({
 
                 <DataTable
                     columns={[
-                        { accessorKey: 'payment_date', header: t('payments.date') },
-                        { accessorKey: 'reference', header: t('payments.reference') },
-                        { accessorKey: 'student_name', header: t('payments.student') },
-                        { accessorKey: 'amount_minor', header: t('payments.amount'),
+                        {
+                            accessorKey: 'payment_date',
+                            header: t('payments.date'),
+                        },
+                        {
+                            accessorKey: 'reference',
+                            header: t('payments.reference'),
+                        },
+                        {
+                            accessorKey: 'student_name',
+                            header: t('payments.student'),
+                        },
+                        {
+                            accessorKey: 'amount_minor',
+                            header: t('payments.amount'),
                             cell: (value: number) =>
                                 `${(value / 100).toFixed(2)} SAR`,
                         },
-                        { accessorKey: 'status', header: t('payments.status'),
+                        {
+                            accessorKey: 'status',
+                            header: t('payments.status'),
                             cell: (value: string) =>
                                 value
                                     ? t(`payments.statuses.${value}`)
                                     : t('common.notAvailable'),
                         },
-                        { accessorKey: 'payment_method', header: t('payments.method'),
+                        {
+                            accessorKey: 'payment_method',
+                            header: t('payments.method'),
                             cell: (value: string | null) =>
                                 value
                                     ? t(`payments.methods.${value}`)
                                     : t('common.notAvailable'),
                         },
-                        { accessorKey: 'received_by', header: t('payments.receivedBy') },
+                        {
+                            accessorKey: 'received_by',
+                            header: t('payments.receivedBy'),
+                        },
                         { accessorKey: 'actions', header: t('common.actions') },
                     ]}
                     data={list.data.map((payment) => ({

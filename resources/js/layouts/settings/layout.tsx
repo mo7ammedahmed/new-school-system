@@ -1,51 +1,37 @@
 import { Link } from '@inertiajs/react';
-import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useT } from '@/hooks/useT';
 import { cn, toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
 import type { LayoutProps } from '@/types/shared';
-import type { BreadcrumbItem } from '@/types/navigation';
-
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: 'Security',
-        href: editSecurity(),
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-        icon: null,
-    },
-];
 
 export default function SettingsLayout({
     children,
-    title = 'Settings',
-    description = 'Manage your profile and account settings',
     className,
-    breadcrumbs = [],
-    active,
-    ...props
+    _breadcrumbs = [],
+    _active,
+    ..._props
 }: LayoutProps) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
+    const { t } = useT();
+
+    const sidebarNavItems: NavItem[] = [
+        { title: t('settings.profile'), href: edit(), icon: null },
+        { title: t('settings.security'), href: editSecurity(), icon: null },
+        { title: t('settings.appearance'), href: editAppearance(), icon: null },
+    ];
 
     return (
         <div className={cn('px-4 py-6', className)}>
             <Heading
-                title={title}
-                description={description}
+                title={t('settings.title')}
+                description={t('settings.description')}
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

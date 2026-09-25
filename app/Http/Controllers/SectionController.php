@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\SectionRequest;
 use App\Models\AcademicClass;
 use App\Models\School;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class SectionController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of sections.
      */
@@ -183,11 +186,6 @@ class SectionController
 
         return redirect()->route('sections.index', $schoolModel->id)
             ->with('success', 'Section deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 
     /**

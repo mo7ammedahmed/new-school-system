@@ -32,6 +32,8 @@ export type SharedAbilities = {
     manageEnrollment: boolean;
     manageUsers: boolean;
     manageContent: boolean;
+    manageTheme: boolean;
+    managePlatformTheme: boolean;
     viewAttendanceReports: boolean;
 };
 
@@ -53,6 +55,19 @@ export type SharedPageProps = {
         abilities: SharedAbilities;
         schools: SharedSchool[];
     };
+    /** One-shot messages flashed by the request that produced this page. */
+    flash: {
+        success?: string | null;
+        error?: string | null;
+        /** Schedule conflicts the client translates from their codes. */
+        conflicts?: SharedConflict[] | null;
+    };
+};
+
+export type SharedConflict = {
+    code: string;
+    severity: string;
+    params: Record<string, unknown>;
 };
 
 export type LayoutProps = {

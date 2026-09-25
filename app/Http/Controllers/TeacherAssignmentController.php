@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Enums\UserRole;
 use App\Http\Requests\TeacherAssignmentRequest;
-use App\Models\School;
 use App\Models\Section;
 use App\Models\TeacherAssignment;
 use App\Models\User;
@@ -16,6 +16,8 @@ use Inertia\Response;
 
 class TeacherAssignmentController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of teacher assignments.
      */
@@ -239,10 +241,5 @@ class TeacherAssignmentController
         $audit->record('teacher.assigned_section.deleted', null, before: $recordValues);
 
         return back()->with('success', 'Teacher assignment removed successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

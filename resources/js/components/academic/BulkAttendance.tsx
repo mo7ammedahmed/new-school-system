@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 type Student = {
     id: number;
@@ -35,9 +33,11 @@ export default function BulkAttendance({
     });
 
     const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [_showToast, _setShowToast] = useState(false);
+    const [_toastMessage, _setToastMessage] = useState('');
+    const [_toastType, _setToastType] = useState<'success' | 'error'>(
+        'success',
+    );
 
     const isArabic = false; // Would come from context in real implementation
 
@@ -50,7 +50,7 @@ export default function BulkAttendance({
         });
     };
 
-    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const _handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setFormData((prev) => ({ ...prev, status: e.target.value }));
     };
 
@@ -58,7 +58,7 @@ export default function BulkAttendance({
         setFormData((prev) => ({ ...prev, notes: e.target.value }));
     };
 
-    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
             setSelectedStudentIds(students.map((student) => student.id));
         } else {
@@ -203,7 +203,7 @@ export default function BulkAttendance({
                                             checked={selectedStudentIds.includes(
                                                 student.id,
                                             )}
-                                            onCheckedChange={(checked) =>
+                                            onCheckedChange={(_checked) =>
                                                 handleStudentToggle(student.id)
                                             }
                                         />

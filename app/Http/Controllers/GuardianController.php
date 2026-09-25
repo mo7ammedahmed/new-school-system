@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\GuardianRequest;
 use App\Models\Guardian;
-use App\Models\School;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +13,8 @@ use Inertia\Response;
 
 class GuardianController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of guardians.
      */
@@ -181,10 +183,5 @@ class GuardianController
 
         return redirect()->route('guardians.index', $schoolModel->id)
             ->with('success', 'Guardian deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

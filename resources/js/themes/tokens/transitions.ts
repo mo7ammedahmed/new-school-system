@@ -60,4 +60,4 @@ export const transitions = {
 // Type definitions
 export type DurationKey = keyof typeof transitions.duration;
 export type EasingKey = keyof typeof transitions.easing;
-export type TransitionValue = `${DurationKey} ${EasingKey}` | string;
+export type TransitionValue = string;

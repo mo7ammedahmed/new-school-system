@@ -79,9 +79,9 @@ export default function SiteContentIndex({ pages, contents }: Props) {
         <>
             <Head title="Public site content" />
             <div className="space-y-8 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-[#143e36] p-6 text-white md:p-8">
+                <header className="bg-primary-container rounded-lg p-6 text-white md:p-8">
                     <p className="text-sm font-bold text-[#b7d7c5]">CMS</p>
-                    <h1 className="mt-2 text-3xl font-black">
+                    <h1 className="mt-2 text-3xl font-semibold">
                         Manage the public website
                     </h1>
                     <p className="mt-3 max-w-3xl leading-7 text-[#d2e6d8]">
@@ -92,8 +92,8 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                 </header>
 
                 <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
-                    <aside className="rounded-[1.5rem] border border-[#dbe8df] bg-white p-4">
-                        <p className="mb-3 text-xs font-black tracking-widest text-[#789087] uppercase">
+                    <aside className="border-outline-variant bg-card rounded-lg border p-4">
+                        <p className="text-on-surface-variant mb-3 text-xs font-semibold tracking-widest uppercase">
                             Pages
                         </p>
                         <div className="space-y-2">
@@ -104,7 +104,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                     onClick={() =>
                                         select(page.key, selectedLocale)
                                     }
-                                    className={`w-full rounded-xl px-4 py-3 text-left font-bold transition ${selectedPage === page.key ? 'bg-[#dcecdf] text-[#0d5c4d]' : 'text-[#48635b] hover:bg-[#f7f8f4]'}`}
+                                    className={`w-full rounded-xl px-4 py-3 text-left font-bold transition ${selectedPage === page.key ? 'bg-surface-container-low text-primary' : 'text-on-surface-variant hover:bg-surface-container-low'}`}
                                 >
                                     {page.label}
                                 </button>
@@ -113,15 +113,15 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                     </aside>
 
                     <form
-                        className="space-y-6 rounded-[1.5rem] border border-[#dbe8df] bg-white p-5 md:p-7"
+                        className="border-outline-variant bg-card space-y-6 rounded-lg border p-5 md:p-6"
                         onSubmit={(event) => submit(event, form.data.status)}
                     >
-                        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edf2ed] pb-5">
+                        <div className="border-outline-variant flex flex-wrap items-center justify-between gap-3 border-b pb-5">
                             <div>
-                                <p className="text-sm font-bold text-[#789087]">
+                                <p className="text-on-surface-variant text-sm font-bold">
                                     Selected page
                                 </p>
-                                <h2 className="text-2xl font-black text-[#17342f]">
+                                <h2 className="text-on-surface text-2xl font-semibold">
                                     {
                                         pages.find(
                                             (page) => page.key === selectedPage,
@@ -129,7 +129,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                     }
                                 </h2>
                             </div>
-                            <div className="flex rounded-full border border-[#cbded2] p-1">
+                            <div className="border-outline-variant flex rounded-full border p-1">
                                 {(['ar', 'en'] as const).map((locale) => (
                                     <button
                                         key={locale}
@@ -137,7 +137,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                         onClick={() =>
                                             select(selectedPage, locale)
                                         }
-                                        className={`rounded-full px-4 py-2 text-sm font-black ${selectedLocale === locale ? 'bg-[#0d5c4d] text-white' : 'text-[#48635b]'}`}
+                                        className={`rounded-full px-4 py-2 text-sm font-semibold ${selectedLocale === locale ? 'bg-primary text-primary-foreground' : 'text-on-surface-variant'}`}
                                     >
                                         <Globe2
                                             className="mr-1 inline"
@@ -156,7 +156,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                 ([key, value]) => (
                                     <label
                                         key={key}
-                                        className="space-y-2 text-sm font-bold text-[#48635b]"
+                                        className="text-on-surface-variant space-y-2 text-sm font-bold"
                                     >
                                         <span>{key}</span>
                                         <textarea
@@ -165,7 +165,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                                     ? 'rtl'
                                                     : 'ltr'
                                             }
-                                            className="min-h-24 w-full rounded-xl border border-[#dbe8df] bg-[#fbfdf9] p-3 font-normal outline-none focus:border-[#0d5c4d]"
+                                            className="field bg-surface-container-low min-h-24"
                                             value={value}
                                             onChange={(event) =>
                                                 form.setData('content', {
@@ -179,11 +179,11 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                             )}
                         </div>
 
-                        <div className="grid gap-4 border-t border-[#edf2ed] pt-5 md:grid-cols-2">
-                            <label className="space-y-2 text-sm font-bold text-[#48635b]">
+                        <div className="border-outline-variant grid gap-4 border-t pt-5 md:grid-cols-2">
+                            <label className="text-on-surface-variant space-y-2 text-sm font-bold">
                                 <span>SEO title</span>
                                 <input
-                                    className="w-full rounded-xl border border-[#dbe8df] p-3 font-normal"
+                                    className="field"
                                     value={form.data.seo_title}
                                     onChange={(event) =>
                                         form.setData(
@@ -193,10 +193,10 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                     }
                                 />
                             </label>
-                            <label className="space-y-2 text-sm font-bold text-[#48635b]">
+                            <label className="text-on-surface-variant space-y-2 text-sm font-bold">
                                 <span>SEO description</span>
                                 <textarea
-                                    className="min-h-24 w-full rounded-xl border border-[#dbe8df] p-3 font-normal"
+                                    className="field min-h-24"
                                     value={form.data.seo_description}
                                     onChange={(event) =>
                                         form.setData(
@@ -213,7 +213,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                 type="button"
                                 disabled={form.processing}
                                 onClick={(event) => submit(event, 'draft')}
-                                className="inline-flex items-center gap-2 rounded-full border border-[#cbded2] px-5 py-3 font-black text-[#28544a]"
+                                className="border-outline-variant text-on-surface inline-flex items-center gap-2 rounded-full border px-5 py-3 font-semibold"
                             >
                                 <Save size={16} /> Save draft
                             </button>
@@ -221,7 +221,7 @@ export default function SiteContentIndex({ pages, contents }: Props) {
                                 type="submit"
                                 disabled={form.processing}
                                 onClick={(event) => submit(event, 'published')}
-                                className="inline-flex items-center gap-2 rounded-full bg-[#0d5c4d] px-5 py-3 font-black text-white disabled:opacity-50"
+                                className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold disabled:opacity-50"
                             >
                                 <Send size={16} /> Publish
                             </button>

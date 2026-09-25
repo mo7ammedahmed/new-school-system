@@ -11,5 +11,10 @@ export function usePageContext() {
         window.location.reload();
     }, []);
 
-    return { ...usePage<SharedPageProps>().props, locale, direction, switchLocale };
+    return {
+        ...usePage<SharedPageProps>().props,
+        locale,
+        direction,
+        switchLocale,
+    };
 }

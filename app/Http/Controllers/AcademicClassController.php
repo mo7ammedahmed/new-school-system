@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\AcademicClassRequest;
 use App\Models\AcademicClass;
-use App\Models\School;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +13,8 @@ use Inertia\Response;
 
 class AcademicClassController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of academic classes.
      */
@@ -164,10 +166,5 @@ class AcademicClassController
 
         return redirect()->route('academic-classes.index', $schoolModel->id)
             ->with('success', 'Academic class deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

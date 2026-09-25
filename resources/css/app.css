@@ -1,49 +1,174 @@
 @import 'tailwindcss';
-
 @import 'tw-animate-css';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/inter';
+@import '@fontsource/ibm-plex-sans-arabic';
+
+@config '../../tailwind.config.js';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Tokens follow the "Nexus Academic Command" design system shipped with the
+ * Stitch redesign bundle. This file is the single owner of every colour, font
+ * and radius: `tailwind.config.js` deliberately declares no palette of its own.
+ *
+ * `:root` holds the bundle's Material-3 vocabulary verbatim
+ * (`surface-container-lowest`, `on-surface-variant`, …); the short semantic
+ * names (`background`, `card`, `foreground`, …) are aliases onto it so the
+ * existing screens keep working unchanged.
+ */
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+        'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display:
+        'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-arabic:
+        'IBM Plex Sans Arabic', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+    /* Bundle type scale (Geist for headlines/metrics, Inter for dense text). */
+    --text-headline-xl: 2.5rem;
+    --text-headline-xl--line-height: 3rem;
+    --text-headline-xl--letter-spacing: -0.03em;
+    --text-headline-xl--font-weight: 700;
+    --text-headline-lg: 2rem;
+    --text-headline-lg--line-height: 2.5rem;
+    --text-headline-lg--letter-spacing: -0.025em;
+    --text-headline-lg--font-weight: 600;
+    --text-headline-md: 1.375rem;
+    --text-headline-md--line-height: 1.75rem;
+    --text-headline-md--letter-spacing: -0.02em;
+    --text-headline-md--font-weight: 600;
+    --text-headline-sm: 1.125rem;
+    --text-headline-sm--line-height: 1.5rem;
+    --text-headline-sm--letter-spacing: -0.015em;
+    --text-headline-sm--font-weight: 600;
+    --text-title-md: 0.9375rem;
+    --text-title-md--line-height: 1.375rem;
+    --text-title-md--letter-spacing: -0.01em;
+    --text-title-md--font-weight: 600;
+    --text-body-lg: 1rem;
+    --text-body-lg--line-height: 1.5rem;
+    --text-body-md: 0.875rem;
+    --text-body-md--line-height: 1.25rem;
+    --text-body-sm: 0.8125rem;
+    --text-body-sm--line-height: 1.125rem;
+    --text-label-md: 0.75rem;
+    --text-label-md--line-height: 1rem;
+    --text-label-md--letter-spacing: 0.02em;
+    --text-label-md--font-weight: 500;
+    --text-label-caps: 0.6875rem;
+    --text-label-caps--line-height: 0.875rem;
+    --text-label-caps--letter-spacing: 0.05em;
+    --text-label-caps--font-weight: 600;
+    --text-metric-display: 1.75rem;
+    --text-metric-display--line-height: 2rem;
+    --text-metric-display--letter-spacing: -0.025em;
+    --text-metric-display--font-weight: 700;
 
+    /* Bundle spacing scale (4px base, 12-column admin grid gutters). */
+    --spacing-gutter: 1rem;
+    --spacing-gutter-md: 1.5rem;
+    --spacing-gutter-lg: 2rem;
+    --spacing-margin: 1rem;
+    --spacing-margin-md: 1.5rem;
+    --spacing-margin-lg: 2rem;
+    --spacing-space-xs: 0.25rem;
+    --spacing-space-sm: 0.5rem;
+    --spacing-space-md: 1rem;
+    --spacing-space-lg: 1.5rem;
+    --spacing-space-xl: 2rem;
+
+    /* Bundle radii: 4px micro controls, 8px form controls, 12-16px envelopes. */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    /* Surfaces and state colours, straight from the bundle. */
+    --color-surface: var(--surface);
+    --color-surface-dim: var(--surface-dim);
+    --color-surface-bright: var(--surface-bright);
+    --color-surface-variant: var(--surface-variant);
+    --color-surface-container-lowest: var(--surface-container-lowest);
+    --color-surface-container-low: var(--surface-container-low);
+    --color-surface-container: var(--surface-container);
+    --color-surface-container-high: var(--surface-container-high);
+    --color-surface-container-highest: var(--surface-container-highest);
+    --color-surface-tint: var(--surface-tint);
+    --color-on-surface: var(--on-surface);
+    --color-on-surface-variant: var(--on-surface-variant);
+    --color-inverse-surface: var(--inverse-surface);
+    --color-inverse-on-surface: var(--inverse-on-surface);
+    --color-outline: var(--outline);
+    --color-outline-variant: var(--outline-variant);
+
+    --color-primary-container: var(--primary-container);
+    --color-on-primary: var(--on-primary);
+    --color-on-primary-container: var(--on-primary-container);
+    --color-primary-fixed: var(--primary-fixed);
+    --color-primary-fixed-dim: var(--primary-fixed-dim);
+    --color-secondary: var(--secondary);
+    --color-on-secondary: var(--on-secondary);
+    --color-secondary-container: var(--secondary-container);
+    --color-on-secondary-container: var(--on-secondary-container);
+    --color-secondary-fixed: var(--secondary-fixed);
+    --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+    --color-tertiary: var(--tertiary);
+    --color-on-tertiary: var(--on-tertiary);
+    --color-tertiary-container: var(--tertiary-container);
+    --color-on-tertiary-container: var(--on-tertiary-container);
+    --color-tertiary-fixed: var(--tertiary-fixed);
+    --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+    --color-on-tertiary: var(--on-tertiary);
+    --color-error: var(--error);
+    --color-on-error: var(--on-error);
+    --color-error-container: var(--error-container);
+    --color-on-error-container: var(--on-error-container);
+
+    /* Semantic aliases used across the application shell and pages. */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
-
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
-
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
-
-    --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
-
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
-
     --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
-
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
-
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+
+    --color-success: var(--success);
+    --color-success-container: var(--success-container);
+    --color-success-foreground: var(--success-foreground);
+    --color-success-border: var(--success-border);
+    --color-warning: var(--warning);
+    --color-warning-container: var(--warning-container);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-warning-border: var(--warning-border);
+    --color-danger: var(--danger);
+    --color-danger-container: var(--danger-container);
+    --color-danger-foreground: var(--danger-foreground);
+    --color-danger-border: var(--danger-border);
+    --color-academic: var(--academic);
+    --color-academic-container: var(--academic-container);
+    --color-academic-foreground: var(--academic-foreground);
+    --color-academic-border: var(--academic-border);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
 
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
@@ -60,6 +185,7 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
+    /* Secondary ramp: the 600 step is the bundle's action blue. */
     --color-brand-50: var(--brand-50);
     --color-brand-100: var(--brand-100);
     --color-brand-200: var(--brand-200);
@@ -76,96 +202,206 @@
 }
 
 :root {
-    --background: #ffffff;
-    --foreground: #17342f;
-    --card: #ffffff;
-    --card-foreground: #17342f;
-    --popover: #ffffff;
-    --popover-foreground: #17342f;
-    --primary: #3d8548;
-    --primary-foreground: #ffffff;
-    --secondary: #9f836e;
-    --secondary-foreground: #ffffff;
-    --muted: #f1f5f2;
-    --muted-foreground: #789087;
-    --accent: #e9f7f0;
-    --accent-foreground: #0d5c4d;
-    --border: #d1e0d7;
-    --input: #d1e0d7;
-    --ring: #3d8548;
-    --radius: 0.75rem;
-    --chart-1: #3d8548;
-    --chart-2: #2f6b3a;
-    --chart-3: #4a9d6e;
-    --chart-4: #0d5c4d;
-    --chart-5: #9f836e;
-    --sidebar: #ffffff;
-    --sidebar-foreground: #17342f;
-    --sidebar-primary: #3d8548;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #e9f7f0;
-    --sidebar-accent-foreground: #0d5c4d;
-    --sidebar-border: #d1e0d7;
-    --sidebar-ring: #3d8548;
-    --brand-900: #17342f;
-    --brand-800: #2f6b3a;
-    --brand-700: #275430;
-    --brand-600: #0d5c4d;
-    --brand-500: #3d8548;
-    --brand-400: #5fa368;
-    --brand-300: #8fc194;
-    --brand-200: #bcd9c0;
-    --brand-100: #e9f7f0;
-    --brand-50: #f0faf7;
-    --hero-bg: #143e36;
-    --hero-muted: #b7d7c5;
-    --hero-accent: #d2e6d8;
+    /* Material-3 vocabulary, verbatim from the bundle. */
+    --surface: #f8f9ff;
+    --surface-dim: #cbdbf5;
+    --surface-bright: #f8f9ff;
+    --surface-variant: #d3e4fe;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #eff4ff;
+    --surface-container: #e5eeff;
+    --surface-container-high: #dce9ff;
+    --surface-container-highest: #d3e4fe;
+    --surface-tint: #565e74;
+    --on-surface: #0b1c30;
+    --on-surface-variant: #45464d;
+    --inverse-surface: #213145;
+    --inverse-on-surface: #eaf1ff;
+    --outline: #76777d;
+    --outline-variant: #c6c6cd;
+    --primary: #000000;
+    --on-primary: #ffffff;
+    --primary-container: #131b2e;
+    --on-primary-container: #7c839b;
+    --primary-fixed: #dae2fd;
+    --primary-fixed-dim: #bec6e0;
+    --secondary: #0051d5;
+    --on-secondary: #ffffff;
+    --secondary-container: #316bf3;
+    --on-secondary-container: #fefcff;
+    --secondary-fixed: #dbe1ff;
+    --secondary-fixed-dim: #b4c5ff;
+    --tertiary: #000000;
+    --on-tertiary: #ffffff;
+    --tertiary-container: #002113;
+    --on-tertiary-container: #009668;
+    --tertiary-fixed: #6ffbbe;
+    --tertiary-fixed-dim: #4edea3;
+    --error: #ba1a1a;
+    --on-error: #ffffff;
+    --error-container: #ffdad6;
+    --on-error-container: #93000a;
+
+    /* Aliases: the short names every existing screen already uses. */
+    --background: var(--surface);
+    --foreground: var(--on-surface);
+    --card: var(--surface-container-lowest);
+    --card-foreground: var(--on-surface);
+    --popover: var(--surface-container-lowest);
+    --popover-foreground: var(--on-surface);
+    --primary-foreground: var(--on-primary);
+    --secondary-foreground: var(--on-secondary);
+    --muted: var(--surface-container-low);
+    --muted-foreground: var(--on-surface-variant);
+    --accent: var(--surface-container-high);
+    --accent-foreground: var(--on-surface);
+    --destructive: var(--error);
+    --destructive-foreground: var(--on-error);
+    --border: var(--outline-variant);
+    --input: var(--outline-variant);
+    /* Focus ring stays the bundle's action blue, not the black primary. */
+    --ring: #2563eb;
+    --radius: 0.5rem;
+
+    /* Academic domain semantics (bundle prose: state pairs, not flat colours). */
+    --success: #10b981;
+    --success-container: #ecfdf5;
+    --success-foreground: #065f46;
+    --success-border: #a7f3d0;
+    --warning: #f59e0b;
+    --warning-container: #fffbeb;
+    --warning-foreground: #92400e;
+    --warning-border: #fde68a;
+    --danger: #ef4444;
+    --danger-container: #fef2f2;
+    --danger-foreground: #991b1b;
+    --danger-border: #fecaca;
+    --academic: #8b5cf6;
+    --academic-container: #f5f3ff;
+    --academic-foreground: #5b21b6;
+    --academic-border: #ddd6fe;
+    --info: #0051d5;
+    --info-foreground: #ffffff;
+
+    --chart-1: #0051d5;
+    --chart-2: #10b981;
+    --chart-3: #8b5cf6;
+    --chart-4: #f59e0b;
+    --chart-5: #76777d;
+
+    --sidebar: var(--surface-container-lowest);
+    --sidebar-foreground: var(--on-surface);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--on-primary);
+    --sidebar-accent: var(--surface-container);
+    --sidebar-accent-foreground: var(--on-surface);
+    --sidebar-border: var(--outline-variant);
+    --sidebar-ring: var(--ring);
+
+    --brand-50: #eff4ff;
+    --brand-100: #dbe1ff;
+    --brand-200: #b4c5ff;
+    --brand-300: #7f9fff;
+    --brand-400: #4a7bff;
+    --brand-500: #316bf3;
+    --brand-600: #0051d5;
+    --brand-700: #003ea8;
+    --brand-800: #00174b;
+    --brand-900: #131b2e;
+
+    --hero-bg: var(--primary-container);
+    --hero-muted: var(--primary-fixed-dim);
+    --hero-accent: var(--tertiary-fixed-dim);
 }
 
 .dark {
-    --background: #0d1411;
-    --foreground: #d7ebe1;
-    --card: #143e36;
-    --card-foreground: #e4f0e9;
-    --popover: #143e36;
-    --popover-foreground: #e4f0e9;
-    --primary: #4a9d6e;
-    --primary-foreground: #0a0f0d;
-    --secondary: #b7d7c5;
-    --secondary-foreground: #0a1410;
-    --muted: #1a3b30;
-    --muted-foreground: #789087;
-    --accent: #1a3b30;
-    --accent-foreground: #b7d7c5;
-    --border: #21432a;
-    --input: #21432a;
-    --ring: #4a9d6e;
-    --chart-1: #4a9d6e;
-    --chart-2: #3d8548;
-    --chart-3: #2f6b3a;
-    --chart-4: #b7d7c5;
-    --chart-5: #b7d7c5;
-    --sidebar: #0d1411;
-    --sidebar-foreground: #d7ebe1;
-    --sidebar-primary: #4a9d6e;
-    --sidebar-primary-foreground: #0a0f0d;
-    --sidebar-accent: #1a3b30;
-    --sidebar-accent-foreground: #b7d7c5;
-    --sidebar-border: #21432a;
-    --sidebar-ring: #4a9d6e;
-    --brand-900: #0a1410;
-    --brand-800: #2a5a44;
-    --brand-700: #224626;
-    --brand-600: #0e6b5e;
-    --brand-500: #4a9d6e;
-    --brand-400: #5fa368;
-    --brand-300: #8fc194;
-    --brand-200: #bcd9c0;
-    --brand-100: #1a3b30;
-    --brand-50: #0d1411;
-    --hero-bg: #1a3b30;
-    --hero-muted: #8ec1a9;
-    --hero-accent: #a3c9b4;
+    /* Bundle prose: canvas #090D16, cards #0F172A, borders #1E293B, text #F8FAFC. */
+    --surface: #090d16;
+    --surface-dim: #060910;
+    --surface-bright: #1b253c;
+    --surface-variant: #1e293b;
+    --surface-container-lowest: #0f172a;
+    --surface-container-low: #131c2e;
+    --surface-container: #172036;
+    --surface-container-high: #1e293b;
+    --surface-container-highest: #263149;
+    --surface-tint: #bec6e0;
+    --on-surface: #f8fafc;
+    --on-surface-variant: #94a3b8;
+    --inverse-surface: #eaf1ff;
+    --inverse-on-surface: #0b1c30;
+    --outline: #475569;
+    --outline-variant: #1e293b;
+    --primary: #f8fafc;
+    --on-primary: #090d16;
+    --primary-container: #1e293b;
+    --on-primary-container: #bec6e0;
+    --primary-fixed: #131b2e;
+    --primary-fixed-dim: #bec6e0;
+    --secondary: #b4c5ff;
+    --on-secondary: #00174b;
+    --secondary-container: #316bf3;
+    --on-secondary-container: #fefcff;
+    --secondary-fixed: #dbe1ff;
+    --secondary-fixed-dim: #b4c5ff;
+    --tertiary: #4edea3;
+    --on-tertiary: #002113;
+    --tertiary-container: #002113;
+    --on-tertiary-container: #6ffbbe;
+    --tertiary-fixed: #6ffbbe;
+    --tertiary-fixed-dim: #4edea3;
+    --error: #f87171;
+    --on-error: #450a0a;
+    --error-container: #450a0a;
+    --on-error-container: #fecaca;
+
+    --ring: #b4c5ff;
+
+    --success-container: #052e26;
+    --success-foreground: #a7f3d0;
+    --success-border: #065f46;
+    --warning-container: #3b2503;
+    --warning-foreground: #fde68a;
+    --warning-border: #92400e;
+    --danger-container: #400d0d;
+    --danger-foreground: #fecaca;
+    --danger-border: #7f1d1d;
+    --academic-container: #241447;
+    --academic-foreground: #ddd6fe;
+    --academic-border: #4c1d95;
+    --info: #b4c5ff;
+    --info-foreground: #00174b;
+
+    --chart-1: #b4c5ff;
+    --chart-2: #4edea3;
+    --chart-3: #c4b5fd;
+    --chart-4: #fde68a;
+    --chart-5: #94a3b8;
+
+    --sidebar: var(--surface-container-lowest);
+    --sidebar-accent: var(--surface-container-high);
+    --sidebar-border: var(--outline-variant);
+
+    --brand-50: #00174b;
+    --brand-100: #002868;
+    --brand-200: #003ea8;
+    --brand-300: #0051d5;
+    --brand-400: #316bf3;
+    --brand-500: #7f9fff;
+    --brand-600: #b4c5ff;
+    --brand-700: #dbe1ff;
+    --brand-800: #eff4ff;
+    --brand-900: #f8fafc;
+
+    --hero-bg: var(--surface-container);
+    --hero-muted: var(--on-surface-variant);
+    --hero-accent: var(--tertiary-fixed-dim);
+}
+
+/* Arabic keeps its own face on both the sans and the display stack. */
+[dir='rtl'] {
+    --font-sans: var(--font-arabic);
+    --font-display: var(--font-arabic);
 }
 
 @layer base {
@@ -174,17 +410,62 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground font-sans antialiased;
     }
 
+    :is(h1, h2, h3, h4) {
+        @apply font-display;
+    }
+
+    /* Arabic diacritics need the taller 1.4x baseline the bundle specifies. */
+    [dir='rtl'] :is(h1, h2, h3, h4, h5, h6) {
+        line-height: 1.4;
+    }
+
+    /* Focus ring: 2px action blue with a 2px offset, per the bundle. */
     :where(a, button, summary, input, select, textarea):focus-visible {
-        outline: 3px solid var(--ring);
-        outline-offset: 3px;
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
     }
 }
 
 @layer components {
+    /* Visually hidden until focused, then a real control above the shell. */
+    .skip-link {
+        @apply focus:bg-primary focus:text-primary-foreground focus:text-body-sm sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-100 focus:rounded-md focus:px-3 focus:py-2 focus:font-semibold;
+    }
+
     .field {
-        @apply w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground transition outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30;
+        @apply border-input bg-card text-foreground placeholder:text-on-surface-variant focus:border-secondary focus:ring-secondary/15 text-body-md w-full rounded-md border px-3 py-2 transition outline-none focus:ring-[3px];
+    }
+}
+
+@layer utilities {
+    .label-caps {
+        @apply text-label-caps font-display tracking-[0.05em] uppercase;
+    }
+
+    .metric-display {
+        @apply text-metric-display font-display text-on-surface tabular-nums;
+    }
+
+    .font-display {
+        font-family: var(--font-display);
+    }
+
+    /* Tabular figures for ledgers, ID numbers and rubrics. */
+    .tabular {
+        @apply tabular-nums;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

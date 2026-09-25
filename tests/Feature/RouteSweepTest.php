@@ -13,12 +13,14 @@ use App\Models\BellSchedule;
 use App\Models\Enrollment;
 use App\Models\ExamPaper;
 use App\Models\ExamSchedule;
+use App\Models\FeeStructure;
 use App\Models\Guardian;
 use App\Models\Installment;
 use App\Models\Invoice;
 use App\Models\Notice;
 use App\Models\Organization;
 use App\Models\Page;
+use App\Models\Payment;
 use App\Models\PaymentIntent;
 use App\Models\Receipt;
 use App\Models\ReportCardSnapshot;
@@ -52,6 +54,9 @@ class RouteSweepTest extends TestCase
 
     /** @var array<string, User> */
     private array $users = [];
+
+    /** Surfaces only a platform operator reaches. */
+    private const PLATFORM_ONLY_URLS = ['/admin/site-content', '/admin/theme'];
 
     /** @var list<string> */
     private array $missingComponents = [];
@@ -175,6 +180,17 @@ class RouteSweepTest extends TestCase
             'provider_reference' => 'pi_sweep', 'issued_at' => now(),
         ]);
 
+        $feeStructure = FeeStructure::create([
+            'organization_id' => $org->id, 'school_id' => $school->id, 'name' => 'Annual Tuition',
+            'amount_minor' => 500000, 'currency' => 'SAR', 'frequency' => 'annual', 'is_active' => true,
+        ]);
+
+        $payment = Payment::create([
+            'organization_id' => $org->id, 'school_id' => $school->id, 'installment_id' => $installment->id,
+            'received_by' => $admin->id, 'payment_method' => 'cash', 'reference_number' => 'RCP-1',
+            'payment_date' => '2026-09-20', 'amount_minor' => 20000, 'status' => 'completed',
+        ]);
+
         $notice = Notice::create([
             'organization_id' => $org->id, 'school_id' => $school->id, 'title' => 'Notice',
             'body' => 'Body', 'status' => 'published', 'published_at' => now(), 'created_by' => $admin->id,
@@ -211,6 +227,8 @@ class RouteSweepTest extends TestCase
             'page' => 'about-us',
             'application' => $application->id,
             'installment' => $installment->id,
+            'feeStructure' => $feeStructure->id,
+            'payment' => $payment->id,
             'paymentIntent' => $intent->id,
             'receipt' => $receipt->id,
             'section' => $section->id,
@@ -333,8 +351,10 @@ class RouteSweepTest extends TestCase
             }
 
             // Platform-operator surfaces are not part of a school admin's reach.
-            if (str_starts_with($url, '/admin/site-content')) {
-                continue;
+            foreach (self::PLATFORM_ONLY_URLS as $platformUrl) {
+                if (str_starts_with($url, $platformUrl)) {
+                    continue 2;
+                }
             }
 
             if ($status !== 200) {

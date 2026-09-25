@@ -52,14 +52,14 @@ export default function About() {
             <section className="mx-auto max-w-7xl px-5 pt-20 pb-24 sm:px-8">
                 <div className="grid gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
                     <div>
-                        <p className="text-sm font-black text-[#c56a3b]">
+                        <p className="text-warning text-sm font-semibold">
                             {copy.eyebrow}
                         </p>
-                        <h1 className="mt-4 text-5xl leading-tight font-black tracking-tight sm:text-6xl">
+                        <h1 className="mt-4 text-5xl leading-tight font-semibold tracking-tight sm:text-6xl">
                             {copy.title}
                         </h1>
                     </div>
-                    <p className="max-w-xl text-lg leading-9 text-[#5d746c]">
+                    <p className="text-on-surface-variant max-w-xl text-lg leading-9">
                         {copy.text}
                     </p>
                 </div>
@@ -67,22 +67,24 @@ export default function About() {
                     {values[locale].map(({ icon: Icon, title, text }) => (
                         <article
                             key={title}
-                            className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-7"
+                            className="border-outline-variant bg-card rounded-lg border p-7"
                         >
-                            <div className="grid size-12 place-items-center rounded-2xl bg-[#e1efe2] text-[#0d5c4d]">
+                            <div className="bg-surface-container-low text-primary grid size-12 place-items-center rounded-lg">
                                 <Icon size={22} />
                             </div>
-                            <h2 className="mt-6 text-xl font-black">{title}</h2>
-                            <p className="mt-3 leading-7 text-[#6c837c]">
+                            <h2 className="mt-6 text-xl font-semibold">
+                                {title}
+                            </h2>
+                            <p className="text-on-surface-variant mt-3 leading-7">
                                 {text}
                             </p>
                         </article>
                     ))}
                 </div>
-                <div className="mt-16 grid gap-8 rounded-[2rem] bg-[#0d5c4d] p-8 text-white sm:p-12 md:grid-cols-2">
+                <div className="bg-primary text-primary-foreground mt-16 grid gap-8 rounded-lg p-8 sm:p-12 md:grid-cols-2">
                     <div>
-                        <MapPinned className="text-[#f4c765]" size={28} />
-                        <h2 className="mt-6 text-3xl font-black">
+                        <MapPinned className="text-warning-border" size={28} />
+                        <h2 className="mt-6 text-3xl font-semibold">
                             {isArabic
                                 ? 'من السعودية، لكل مدرسة تريد أن تتقدم.'
                                 : 'From Saudi Arabia, for every school ready to move forward.'}

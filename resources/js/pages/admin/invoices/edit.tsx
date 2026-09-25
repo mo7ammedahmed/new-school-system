@@ -14,7 +14,6 @@ import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { useT } from '@/hooks/useT';
 
 type Props = {
@@ -55,15 +54,15 @@ const CURRENCIES = [
 export default function InvoiceEdit({ school, invoice }: Props) {
     const { t } = useT();
     const { data, setData, put, processing, errors } = useForm({
-        student_id: invoice.student_id,
-        issued_by: invoice.issued_by,
+        student_id: String(invoice.student_id ?? ''),
+        issued_by: String(invoice.issued_by ?? ''),
         number: invoice.number,
         issued_on: invoice.issued_on ?? '',
         due_on: invoice.due_on ?? '',
         status: invoice.status,
         currency: invoice.currency,
-        subtotal_minor: invoice.subtotal_minor,
-        total_minor: invoice.total_minor,
+        subtotal_minor: String(invoice.subtotal_minor ?? ''),
+        total_minor: String(invoice.total_minor ?? ''),
         items: JSON.stringify(invoice.items),
     });
 
@@ -109,7 +108,9 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                 description={t('invoices.studentDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.studentPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.studentPlaceholder',
+                                    )}
                                     value={data.student_id}
                                     onChange={(e) =>
                                         setData('student_id', e.target.value)
@@ -127,7 +128,9 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                 description={t('invoices.issuedByDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.issuedByPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.issuedByPlaceholder',
+                                    )}
                                     value={data.issued_by}
                                     onChange={(e) =>
                                         setData('issued_by', e.target.value)
@@ -145,7 +148,9 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                 description={t('invoices.numberDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.numberPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.numberPlaceholder',
+                                    )}
                                     value={data.number}
                                     onChange={(e) =>
                                         setData('number', e.target.value)
@@ -159,10 +164,14 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('invoices.issuedDate')}
-                                description={t('invoices.issuedDateDescription')}
+                                description={t(
+                                    'invoices.issuedDateDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('invoices.issuedDatePlaceholder')}
+                                    placeholder={t(
+                                        'invoices.issuedDatePlaceholder',
+                                    )}
                                     value={data.issued_on}
                                     onChange={(e) =>
                                         setData('issued_on', e.target.value)
@@ -179,7 +188,9 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                 description={t('invoices.dueDateDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.dueDatePlaceholder')}
+                                    placeholder={t(
+                                        'invoices.dueDatePlaceholder',
+                                    )}
                                     value={data.due_on}
                                     onChange={(e) =>
                                         setData('due_on', e.target.value)
@@ -199,13 +210,22 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                     onValueChange={(value) =>
                                         setData('status', value)
                                     }
-                                    placeholder={t('invoices.statusPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.statusPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('invoices.statusPlaceholder')}</option>
+                                    <option value="">
+                                        {t('invoices.statusPlaceholder')}
+                                    </option>
                                     {STATUSES.map((status) => (
-                                        <option key={status.value} value={status.value}>
-                                            {t(`invoices.statuses.${status.value}`)}
+                                        <option
+                                            key={status.value}
+                                            value={status.value}
+                                        >
+                                            {t(
+                                                `invoices.statuses.${status.value}`,
+                                            )}
                                         </option>
                                     ))}
                                 </Select>
@@ -222,12 +242,19 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                     onValueChange={(value) =>
                                         setData('currency', value)
                                     }
-                                    placeholder={t('invoices.currencyPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.currencyPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('invoices.currencyPlaceholder')}</option>
+                                    <option value="">
+                                        {t('invoices.currencyPlaceholder')}
+                                    </option>
                                     {CURRENCIES.map((currency) => (
-                                        <option key={currency.value} value={currency.value}>
+                                        <option
+                                            key={currency.value}
+                                            value={currency.value}
+                                        >
                                             {t(`currencies.${currency.value}`)}
                                         </option>
                                     ))}
@@ -241,10 +268,15 @@ export default function InvoiceEdit({ school, invoice }: Props) {
                                 description={t('invoices.subtotalDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.subtotalPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.subtotalPlaceholder',
+                                    )}
                                     value={data.subtotal_minor}
                                     onChange={(e) =>
-                                        setData('subtotal_minor', e.target.value)
+                                        setData(
+                                            'subtotal_minor',
+                                            e.target.value,
+                                        )
                                     }
                                     type="number"
                                     min="0"

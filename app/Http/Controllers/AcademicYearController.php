@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\AcademicYearRequest;
 use App\Models\AcademicYear;
-use App\Models\School;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +13,8 @@ use Inertia\Response;
 
 class AcademicYearController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of academic years.
      */
@@ -168,10 +170,5 @@ class AcademicYearController
 
         return redirect()->route('academic-years.index', $schoolModel->id)
             ->with('success', 'Academic year deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

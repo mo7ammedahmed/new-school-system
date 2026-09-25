@@ -30,7 +30,8 @@ type Props = {
     };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-years`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-years`;
 const EDIT_URL = (schoolId: number, yearId: number) =>
     `/admin/schools/${schoolId}/academic-years/${yearId}`;
 
@@ -47,7 +48,9 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
 
     return (
         <>
-            <Head title={t('academicYears.show', { name: academicYear.name })} />
+            <Head
+                title={t('academicYears.show', { name: academicYear.name })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
@@ -80,25 +83,33 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                 title={t('academicYears.studentCount')}
                                 value={academicYear.student_count ?? 0}
                                 trend="up"
-                                description={t('academicYears.studentCountDescription')}
+                                description={t(
+                                    'academicYears.studentCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('academicYears.classCount')}
                                 value={academicYear.class_count ?? 0}
                                 trend="up"
-                                description={t('academicYears.classCountDescription')}
+                                description={t(
+                                    'academicYears.classCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('academicYears.sectionCount')}
                                 value={academicYear.section_count ?? 0}
                                 trend="up"
-                                description={t('academicYears.sectionCountDescription')}
+                                description={t(
+                                    'academicYears.sectionCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('academicYears.enrollmentCount')}
                                 value={academicYear.enrollment_count ?? 0}
                                 trend="up"
-                                description={t('academicYears.enrollmentCountDescription')}
+                                description={t(
+                                    'academicYears.enrollmentCountDescription',
+                                )}
                             />
                         </div>
 
@@ -110,9 +121,6 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                     </TabsTrigger>
                                     <TabsTrigger value="details">
                                         {t('common.details')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="timeline">
-                                        {t('common.timeline')}
                                     </TabsTrigger>
                                 </TabsList>
 
@@ -139,8 +147,12 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                                 }
                                             >
                                                 {academicYear.is_current
-                                                    ? t('academicYears.status.current')
-                                                    : t('academicYears.status.inactive')}
+                                                    ? t(
+                                                          'academicYears.statuses.current',
+                                                      )
+                                                    : t(
+                                                          'academicYears.statuses.inactive',
+                                                      )}
                                             </Badge>
                                         </div>
 
@@ -148,14 +160,18 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                             <p className="font-medium">
                                                 {t('academicYears.startsOn')}
                                             </p>
-                                            <DateCell value={academicYear.starts_on} />
+                                            <DateCell
+                                                value={academicYear.starts_on}
+                                            />
                                         </div>
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
                                                 {t('academicYears.endsOn')}
                                             </p>
-                                            <DateCell value={academicYear.ends_on} />
+                                            <DateCell
+                                                value={academicYear.ends_on}
+                                            />
                                         </div>
 
                                         <div className="space-y-2">
@@ -163,7 +179,10 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                                 {t('academicYears.duration')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {t('academicYears.durationValue', { years: durationYears })}
+                                                {t(
+                                                    'academicYears.durationValue',
+                                                    { years: durationYears },
+                                                )}
                                             </p>
                                         </div>
                                     </div>
@@ -176,7 +195,9 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                                 {t('common.createdAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {formatDate(academicYear.created_at)}
+                                                {formatDate(
+                                                    academicYear.created_at,
+                                                )}
                                             </p>
                                         </div>
 
@@ -185,17 +206,11 @@ export default function AcademicYearShow({ school, academicYear }: Props) {
                                                 {t('common.updatedAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {formatDate(academicYear.updated_at)}
+                                                {formatDate(
+                                                    academicYear.updated_at,
+                                                )}
                                             </p>
                                         </div>
-                                    </div>
-                                </TabsContent>
-
-                                <TabsContent value="timeline">
-                                    <div className="space-y-4">
-                                        <p className="text-muted-foreground">
-                                            {t('academicYears.timelineComingSoon')}
-                                        </p>
                                     </div>
                                 </TabsContent>
                             </Tabs>

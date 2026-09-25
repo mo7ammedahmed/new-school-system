@@ -37,7 +37,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                             {passkey.name}
                         </p>
                         {passkey.authenticator && (
-                            <span className="bg-muted text-muted-foreground ring-border inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium tracking-wide uppercase ring-1 ring-inset">
+                            <span className="bg-muted text-muted-foreground ring-border text-label-caps inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-medium tracking-wide uppercase ring-1 ring-inset">
                                 {passkey.authenticator}
                             </span>
                         )}

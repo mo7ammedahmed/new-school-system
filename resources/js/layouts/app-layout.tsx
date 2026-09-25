@@ -24,37 +24,66 @@ export default function AppLayout({
     className?: string;
     children: React.ReactNode;
 } & LayoutProps) {
-    let LayoutComponent;
-    
     switch (variant) {
         case 'header':
-            LayoutComponent = AppHeaderLayout;
-            break;
+            return (
+                <AppHeaderLayout
+                    breadcrumbs={breadcrumbs}
+                    title={title}
+                    description={description}
+                    className={className}
+                    {...props}
+                >
+                    {children}
+                </AppHeaderLayout>
+            );
         case 'public':
-            LayoutComponent = PublicLayout;
-            break;
+            return (
+                <PublicLayout
+                    active={active}
+                    title={title}
+                    description={description}
+                    className={className}
+                    {...props}
+                >
+                    {children}
+                </PublicLayout>
+            );
         case 'auth':
-            LayoutComponent = AuthLayout;
-            break;
+            return (
+                <AuthLayout
+                    title={title}
+                    description={description}
+                    className={className}
+                    {...props}
+                >
+                    {children}
+                </AuthLayout>
+            );
         case 'settings':
-            LayoutComponent = SettingsLayout;
-            break;
+            return (
+                <SettingsLayout
+                    title={title}
+                    description={description}
+                    className={className}
+                    {...props}
+                >
+                    {children}
+                </SettingsLayout>
+            );
         case 'sidebar':
         default:
-            LayoutComponent = AppSidebarLayout;
-            break;
+            return (
+                <AppSidebarLayout
+                    breadcrumbs={breadcrumbs}
+                    title={title}
+                    description={description}
+                    active={active}
+                    className={className}
+                    {...props}
+                >
+                    {children}
+                </AppSidebarLayout>
+            );
     }
-    
-    return (
-        <LayoutComponent
-            breadcrumbs={breadcrumbs}
-            title={title}
-            description={description}
-            active={active}
-            className={className}
-            {...props}
-        >
-            {children}
-        </LayoutComponent>
-    );
 }

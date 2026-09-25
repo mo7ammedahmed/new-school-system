@@ -1,8 +1,7 @@
 import { Bell, Menu, Search } from 'lucide-react';
-import { Link, usePage, useRouter } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import type { HTMLAttributes } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import LocaleSwitcher from '@/components/locale-switcher';
 import {
@@ -15,8 +14,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useT } from '@/hooks/useT';
+import { useInitials } from '@/hooks/use-initials';
 import { dashboard } from '@/routes';
 import { SearchField } from '@/components/forms/search-field';
+import { useSidebar } from '@/components/ui/sidebar';
 import { useState } from 'react';
 
 export function AppTopbar({
@@ -28,86 +30,100 @@ export function AppTopbar({
             user: { name: string; email: string } | null;
         };
     };
-    const router = useRouter();
     const [search, setSearch] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const { toggleSidebar } = useSidebar();
+    const { t } = useT();
+    const getInitials = useInitials();
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Navigate to search results page - this would need a search route/page implemented
-        // For demonstration, we're logging the search term
-        console.log('Global search for:', search);
-        // In a real implementation, this would navigate to a search page:
-        // router.get('/search', { search }, { preserveState: true, replace: true });
+    // The roster is the one list that answers a name, a number or a class, so
+    // the shell search submits there rather than to a route that does nothing.
+    const handleSearch = (event: React.FormEvent) => {
+        event.preventDefault();
+
+        const term = search.trim();
+
+        if (term === '') {
+            return;
+        }
+
+        router.get(
+            '/portal/students',
+            { search: term },
+            { preserveState: true },
+        );
+        setIsSearchOpen(false);
     };
 
+    // Bundle shell: a 56px control bar on the lowest surface step.
     return (
         <header
             className={cn(
-                'sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/90 backdrop-blur-xl',
+                'bg-surface-container-lowest/90 border-outline-variant sm:gap-gutter-md sm:px-gutter-md sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b px-3 backdrop-blur-xl',
                 className,
             )}
             {...props}
         >
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
                 <Button
                     variant="ghost"
                     size="icon"
                     className="md:hidden"
-                    aria-label="Open navigation"
+                    aria-label={t('shell.openNavigation')}
+                    onClick={toggleSidebar}
                 >
                     <Menu size={20} />
                 </Button>
 
                 <Link
                     href={dashboard()}
-                    className="text-sm font-black text-foreground hover:text-primary"
+                    className="text-foreground hover:text-primary truncate text-sm font-semibold"
                 >
                     Madrasati
                 </Link>
             </div>
 
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex min-w-0 flex-1 items-center justify-center">
                 {/* Search Field - Visible on lg and up */}
-                <div className="hidden lg:flex lg:items-center lg:w-1/2">
+                <div className="hidden lg:flex lg:w-1/2 lg:items-center">
                     <form onSubmit={handleSearch} className="w-full">
                         <SearchField
-                            placeholder="Search students, teachers, classes..."
+                            placeholder={t('shell.searchPlaceholder')}
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={setSearch}
                             className="w-full"
                         />
                     </form>
                 </div>
 
                 {/* Mobile search button */}
-                <div className="lg:hidden flex items-center">
+                <div className="flex items-center lg:hidden">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => setIsSearchOpen(!isSearchOpen)}
-                        aria-label="Toggle search"
+                        aria-label={t('shell.toggleSearch')}
                     >
                         <Search size={18} />
                     </Button>
 
                     {/* Mobile search dropdown */}
                     {isSearchOpen && (
-                        <div className="absolute top-16 right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                        <div className="border-outline-variant bg-card absolute end-0 top-16 z-20 mt-2 w-56 rounded-md border shadow-lg">
                             <form onSubmit={handleSearch} className="p-4">
                                 <SearchField
-                                    placeholder="Search..."
+                                    placeholder={t('shell.searchPlaceholder')}
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full mb-2"
+                                    onChange={setSearch}
+                                    className="mb-2 w-full"
                                 />
                                 <Button
                                     type="submit"
                                     variant="default"
                                     size="sm"
-                                    width="full"
+                                    className="w-full"
                                 >
-                                    Search
+                                    {t('shell.search')}
                                 </Button>
                             </form>
                         </div>
@@ -115,29 +131,17 @@ export function AppTopbar({
                 </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-1.5">
                 <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hidden sm:flex"
-                    aria-label="Search"
-                >
-                    <Search size={18} />
-                </Button>
-
-                <Button
+                    asChild
                     variant="ghost"
                     size="icon"
                     className="relative"
-                    aria-label="Notifications"
+                    aria-label={t('shell.notifications')}
                 >
-                    <Bell size={18} />
-                    <Badge
-                        variant="secondary"
-                        className="absolute -top-1 -right-1 h-5 w-5 min-w-[1.25rem] rounded-full p-0 text-xs"
-                    >
-                        0
-                    </Badge>
+                    <Link href="/portal/notifications">
+                        <Bell size={18} />
+                    </Link>
                 </Button>
 
                 <LocaleSwitcher />
@@ -147,20 +151,13 @@ export function AppTopbar({
                         <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
-                                className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                                className="text-muted-foreground hover:text-foreground hover:bg-accent focus:ring-ring flex shrink-0 items-center gap-2 rounded-xl px-2 py-1.5 text-sm font-bold focus:ring-2 focus:outline-none"
                             >
+                                {/* Initials only: no external avatar service is
+                                    called for a name we already have. */}
                                 <Avatar className="h-8 w-8">
-                                    <AvatarImage
-                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(auth.user.name)}`}
-                                        alt={auth.user.name}
-                                    />
-                                    <AvatarFallback className="bg-primary text-xs font-black text-primary-foreground">
-                                        {auth.user.name
-                                            .split(' ')
-                                            .map((n) => n[0])
-                                            .join('')
-                                            .toUpperCase()
-                                            .slice(0, 2)}
+                                    <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                                        {getInitials(auth.user.name)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <span className="hidden sm:inline">
@@ -168,13 +165,16 @@ export function AppTopbar({
                                 </span>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 space-y-1">
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-56 space-y-1"
+                        >
                             <DropdownMenuLabel className="px-4 py-3">
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium">
                                         {auth.user.name}
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         {auth.user.email}
                                     </p>
                                 </div>
@@ -183,38 +183,38 @@ export function AppTopbar({
                             <DropdownMenuGroup>
                                 <DropdownMenuItem asChild>
                                     <Link
-                                        href="/profile/edit"
+                                        href="/settings/profile"
                                         className="flex w-full items-center gap-2 text-sm"
                                     >
-                                        Settings
+                                        {t('shell.accountSettings')}
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
                                     <Link
-                                        href="/appearance/edit"
+                                        href="/settings/appearance"
                                         className="flex w-full items-center gap-2 text-sm"
                                     >
-                                        Appearance
+                                        {t('shell.appearance')}
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
                                     <Link
-                                        href="/notifications"
+                                        href="/portal/notifications"
                                         className="flex w-full items-center gap-2 text-sm"
                                     >
-                                        Notifications
+                                        {t('shell.notifications')}
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
                                     <Link
-                                        href="/help"
+                                        href="/faq"
                                         className="flex w-full items-center gap-2 text-sm"
                                     >
-                                        Help & Support
+                                        {t('shell.help')}
                                     </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
-                            <DropdownMenuSeparator className="my-1"/>
+                            <DropdownMenuSeparator className="my-1" />
                             <DropdownMenuItem
                                 onSelect={() => {
                                     const form = document.createElement('form');
@@ -225,7 +225,7 @@ export function AppTopbar({
                                 }}
                             >
                                 <span className="flex w-full items-center gap-2 text-sm">
-                                    Log out
+                                    {t('shell.logOut')}
                                 </span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>

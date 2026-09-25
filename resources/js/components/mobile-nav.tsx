@@ -2,7 +2,9 @@ import { Link } from '@inertiajs/react';
 import { PanelLeftOpenIcon } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useT } from '@/hooks/useT';
 import { useNavigation } from '@/lib/navigation';
+import { useSidebar } from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -13,12 +15,20 @@ import { cn } from '@/lib/utils';
  */
 const PRIORITY = ['/portal/students', '/finance', '/notices'];
 
-const MAX_ITEMS = 5;
+/**
+ * Destinations that fit beside the "More" slot at a 320px phone width. A
+ * sixth slot squeezes every label past the point where it truncates. Its
+ * Arabic label is short on purpose: "الرئيسية" and "الإشعارات" are the
+ * longest strings the bar has to hold.
+ */
+const MAX_ITEMS = 4;
 
 export function MobileNav() {
     const isMobile = useIsMobile();
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const { flat } = useNavigation();
+    const { setOpenMobile } = useSidebar();
+    const { t } = useT();
 
     if (!isMobile) {
         return null;
@@ -28,11 +38,13 @@ export function MobileNav() {
     const notifications = flat.find(
         (item) => item.href === '/portal/notifications',
     );
+    // Nav hrefs are school-scoped (`/admin/schools/3/finance`), so a priority
+    // entry matches on the tail of the path rather than on equality.
     const prioritised = PRIORITY.map((fragment) =>
-        flat.find((item) =>
-            item.href === fragment ||
-            item.href.startsWith(`${fragment}/`) ||
-            item.href === `${fragment}`
+        flat.find(
+            (item) =>
+                typeof item.href === 'string' &&
+                (item.href === fragment || item.href.endsWith(fragment)),
         ),
     ).filter((item): item is NavItem => item !== undefined);
 
@@ -45,8 +57,20 @@ export function MobileNav() {
                 all.findIndex((other) => other.href === item.href) === index,
         ); // Remove duplicates
 
-    // Add notifications if it exists and isn't already in our list
-    if (notifications && !items.some(item => item.href === notifications.href)) {
+    // The school notices surface and the personal notifications list read as
+    // almost the same word in Arabic, so the bar keeps only the school-scoped
+    // one. Notifications stays one tap away in the topbar bell and in the
+    // drawer, which is a better trade than two identical-looking thumbs.
+    const hasNotices = items.some(
+        (item) =>
+            typeof item.href === 'string' && item.href.endsWith('/notices'),
+    );
+
+    if (
+        notifications &&
+        !hasNotices &&
+        !items.some((item) => item.href === notifications.href)
+    ) {
         items = [...items, notifications];
     }
 
@@ -67,34 +91,40 @@ export function MobileNav() {
 
                 return (
                     <Link
-                        key={String(item.href)}
+                        key={typeof item.href === 'string' ? item.href : ''}
                         href={item.href}
                         prefetch
                         className={cn(
-                            'flex flex-1 flex-col items-center justify-center gap-0.5 px-1 text-[0.6875rem] font-medium transition-colors',
+                            'text-label-caps flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 font-medium transition-colors',
                             isActive
                                 ? 'text-primary'
                                 : 'text-muted-foreground hover:text-foreground',
                         )}
                     >
                         {item.icon && <item.icon className="size-4 shrink-0" />}
-                        <span className="max-w-full truncate">
-                            {item.title}
+                        <span className="w-full truncate text-center">
+                            {item.shortTitle ?? item.title}
                         </span>
                     </Link>
                 );
             })}
 
-            {/* Visual indicator when there are more items available via sidebar */}
-            {flat.length > MAX_ITEMS && (
-                <Link
-                    href="/admin/schools" // Link to sidebar-accessible area
-                    prefetch
-                    className="flex flex-1 flex-col items-center justify-center gap-0.5 px-1 text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground"
+            {/* Opens the full sidebar rather than navigating to a dead route. */}
+            {items.length < flat.length && (
+                <button
+                    type="button"
+                    onClick={() => setOpenMobile(true)}
+                    aria-label={t('shell.openNavigation')}
+                    className="text-muted-foreground hover:text-foreground text-label-caps flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 font-medium"
                 >
-                    <PanelLeftOpenIcon className="size-3 shrink-0" opacity="75" />
-                    <span className="max-w-full truncate text-xs">More</span>
-                </Link>
+                    <PanelLeftOpenIcon
+                        className="size-3 shrink-0"
+                        opacity="75"
+                    />
+                    <span className="text-label-caps max-w-full truncate">
+                        {t('shell.more')}
+                    </span>
+                </button>
             )}
         </nav>
     );

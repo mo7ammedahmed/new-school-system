@@ -86,11 +86,11 @@ export default function TimetableIndex() {
                                         <span
                                             className={`inline-block rounded px-2 py-1 text-xs ${
                                                 version.status === 'published'
-                                                    ? 'bg-green-100 text-green-800'
+                                                    ? 'bg-success-container text-success-foreground'
                                                     : version.status ===
                                                         'archived'
-                                                      ? 'bg-gray-100 text-gray-800'
-                                                      : 'bg-blue-100 text-blue-800'
+                                                      ? 'bg-surface-container-low text-on-surface'
+                                                      : 'bg-info/15 text-info'
                                             }`}
                                         >
                                             {t(`status.${version.status}`)}

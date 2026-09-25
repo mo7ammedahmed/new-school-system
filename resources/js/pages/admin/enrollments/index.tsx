@@ -57,7 +57,7 @@ type Props = {
             next: string | null;
         };
     };
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
 };
 
 const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/enrollments`;
@@ -76,7 +76,7 @@ export default function EnrollmentIndex({
     const { t } = useT();
     const list = paginated<EnrollmentData>(enrollments);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [status, setStatus] = useState(filters.status ?? '');
+    const [status, _setStatus] = useState(filters.status ?? '');
 
     const applyFilters = (next: { search?: string; status?: string }) => {
         router.get(
@@ -128,7 +128,7 @@ export default function EnrollmentIndex({
                         <option value="">{t('enrollments.allStatuses')}</option>
                         {STATUSES.map((s) => (
                             <option key={s.value} value={s.value}>
-                                {t(`enrollments.status.${s.value}`)}
+                                {t(`enrollments.statuses.${s.value}`)}
                             </option>
                         ))}
                     </Select>
@@ -165,7 +165,7 @@ export default function EnrollmentIndex({
                             accessorKey: 'status',
                             header: t('enrollments.status'),
                             cell: (value: string) =>
-                                t(`enrollments.status.${value}`),
+                                t(`enrollments.statuses.${value}`),
                         },
                         {
                             accessorKey: 'actions',

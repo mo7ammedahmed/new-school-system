@@ -310,12 +310,12 @@ export default function AcademicIndex({
                         </button>
                     </form>
                     {linkForm.errors.user_id && (
-                        <p className="mt-2 text-sm text-red-600">
+                        <p className="text-danger-foreground mt-2 text-sm">
                             {linkForm.errors.user_id}
                         </p>
                     )}
                     {linkForm.errors.student_id && (
-                        <p className="mt-2 text-sm text-red-600">
+                        <p className="text-danger-foreground mt-2 text-sm">
                             {linkForm.errors.student_id}
                         </p>
                     )}

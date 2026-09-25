@@ -1,82 +1,33 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useT } from '@/hooks/useT';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
     school: { id: number; name: string };
     payment: {
         id: number;
-        organization_id: number;
-        school_id: number;
-        installment_id: number | null;
-        invoice_id: number | null;
-        received_by: number;
-        payment_method: string | null;
-        reference_number: string | null;
         payment_date: string | null;
         amount_minor: number;
         status: string;
-        installment: {
-            id: number;
-            sequence: number;
-            invoice: {
-                id: number;
-                number: string;
-                student: {
-                    id: number;
-                    first_name: string;
-                    last_name: string;
-                };
-            };
-        } | null;
-        invoice: {
-            id: number;
-            number: string;
-            student: {
-                id: number;
-                first_name: string;
-                last_name: string;
-            };
-        } | null;
-        receivedBy: {
-            id: number;
-            name: string;
-        } | null;
+        payment_method: string | null;
+        reference_number: string | null;
+        reference: string;
+        student_name: string | null;
+        due_on: string | null;
+        amount_due_minor: number;
+        amount_paid_minor: number;
+        received_by: string | null;
     };
 };
 
 export default function PaymentShow({ school, payment }: Props) {
     const { t } = useT();
 
-    // Determine reference info
-    let reference = '';
-    let studentName = '';
-    let dueOn = null;
-    let amountDueMinor = 0;
-    let amountPaidMinor = 0;
-
-    if (payment.installment) {
-        reference = `Installment #${payment.installment.sequence}`;
-        studentName = `${payment.installment.invoice.student.first_name} ${payment.installment.invoice.student.last_name}`.trim();
-        dueOn = payment.installment.due_on;
-        amountDueMinor = payment.installment.amount_minor;
-        amountPaidMinor = payment.installment.paid_minor;
-    } else if (payment.invoice) {
-        reference = `Invoice #${payment.invoice.number}`;
-        studentName = `${payment.invoice.student.first_name} ${payment.invoice.student.last_name}`.trim();
-        // For invoices, show total amount
-        amountDueMinor = payment.invoice.total_minor;
-        amountPaidMinor = payment.invoice.installments.reduce((sum, installment) => sum + installment.paid_minor, 0);
-    }
+    // The server derives the reference and student name; this page renders them.
+    const reference = payment.reference ?? '';
+    const studentName = payment.student_name ?? '';
 
     return (
         <>
@@ -94,21 +45,19 @@ export default function PaymentShow({ school, payment }: Props) {
                             {t('actions.edit')}
                         </Link>
                         <Button
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        t('common.deleteConfirmation', {
-                                            name: t('payments.title'),
-                                        })
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert('Payment deleted successfully!');
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/payments`;
-                                }
-                            }}
+                            onClick={() =>
+                                confirmDelete(
+                                    `/admin/schools/${school.id}/payments/${payment.id}`,
+                                    {
+                                        message: t(
+                                            'common.deleteConfirmation',
+                                            {
+                                                name: t('payments.title'),
+                                            },
+                                        ),
+                                    },
+                                )
+                            }
                             variant="destructive"
                         >
                             {t('actions.delete')}
@@ -134,7 +83,8 @@ export default function PaymentShow({ school, payment }: Props) {
                                         {t('payments.date')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {payment.payment_date ?? t('common.notAvailable')}
+                                        {payment.payment_date ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                                 <div>
@@ -158,7 +108,11 @@ export default function PaymentShow({ school, payment }: Props) {
                                         {t('payments.amount')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        ${(payment.amount_minor / 100).toFixed(2)} SAR
+                                        $
+                                        {(payment.amount_minor / 100).toFixed(
+                                            2,
+                                        )}{' '}
+                                        SAR
                                     </p>
                                 </div>
                                 <div>
@@ -166,7 +120,9 @@ export default function PaymentShow({ school, payment }: Props) {
                                         {t('payments.status')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {t(`payments.statuses.${payment.status}`)}
+                                        {t(
+                                            `payments.statuses.${payment.status}`,
+                                        )}
                                     </p>
                                 </div>
                                 <div>
@@ -175,7 +131,9 @@ export default function PaymentShow({ school, payment }: Props) {
                                     </h3>
                                     <p className="mt-1 block truncate">
                                         {payment.payment_method
-                                            ? t(`payments.methods.${payment.payment_method}`)
+                                            ? t(
+                                                  `payments.methods.${payment.payment_method}`,
+                                              )
                                             : t('common.notAvailable')}
                                     </p>
                                 </div>
@@ -184,7 +142,8 @@ export default function PaymentShow({ school, payment }: Props) {
                                         {t('payments.referenceNumber')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {payment.reference_number ?? t('common.notAvailable')}
+                                        {payment.reference_number ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                                 <div>
@@ -192,12 +151,13 @@ export default function PaymentShow({ school, payment }: Props) {
                                         {t('payments.receivedBy')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {payment.receivedBy?.name ?? t('common.notAvailable')}
+                                        {payment.received_by ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                    </Content>
+                    </CardContent>
                 </Card>
             </div>
         </>

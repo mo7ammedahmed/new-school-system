@@ -1,4 +1,5 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import type { SharedPageProps } from '@/types/shared';
 import { dashboard } from '@/routes';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -21,9 +22,15 @@ import { LayoutGrid, Users, Bell } from 'lucide-react';
 
 export function AppSidebar() {
     const { sections } = useNavigation();
+    const { direction } = usePage<SharedPageProps>().props;
 
+    // Arabic reads right to left: the rail belongs on the right edge.
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar
+            side={direction === 'rtl' ? 'right' : 'left'}
+            collapsible="icon"
+            variant="sidebar"
+        >
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -38,30 +45,32 @@ export function AppSidebar() {
 
             <SidebarContent>
                 {sections.map((section, index) => (
-                    <>
-                        <SidebarGroup key={`group-${section.key}`}>
-                            <SidebarGroupLabel>
-                                <div className="flex items-center gap-2">
-                                    {/* Section icon based on key */}
-                                    {section.key === 'platform' && <LayoutGrid className="h-4 w-4 text-muted-foreground" />}
-                                    {section.key === 'administration' && <Users className="h-4 w-4 text-muted-foreground" />}
-                                    {section.key === 'mySpace' && <Bell className="h-4 w-4 text-muted-foreground" />}
-                                    <span className="text-xs font-medium text-sidebar-foreground/80">{section.label}</span>
-                                </div>
-                            </SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <NavMain
-                                    items={section.items}
-                                    label={section.label}
-                                />
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                        
-                        {/* Add separator between sections (except after last section) */}
+                    <SidebarGroup key={`group-${section.key}`}>
+                        <SidebarGroupLabel>
+                            <div className="flex items-center gap-2">
+                                {/* Section icon based on key */}
+                                {section.key === 'platform' && (
+                                    <LayoutGrid className="text-muted-foreground h-4 w-4" />
+                                )}
+                                {section.key === 'administration' && (
+                                    <Users className="text-muted-foreground h-4 w-4" />
+                                )}
+                                {section.key === 'mySpace' && (
+                                    <Bell className="text-muted-foreground h-4 w-4" />
+                                )}
+                                <span className="text-sidebar-foreground/80 text-xs font-medium">
+                                    {section.label}
+                                </span>
+                            </div>
+                        </SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <NavMain items={section.items} />
+                        </SidebarGroupContent>
+                        {/* Separator between sections, never after the last one. */}
                         {index < sections.length - 1 && (
                             <SidebarSeparator className="my-2" />
                         )}
-                    </>
+                    </SidebarGroup>
                 ))}
             </SidebarContent>
 

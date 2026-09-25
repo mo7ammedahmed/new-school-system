@@ -32,7 +32,7 @@ export default function Deliveries({ deliveries, metrics }: Props) {
     const queueAlert = metrics.queued >= metrics.queueThreshold;
     const card = (label: string, value: string | number, alert = false) => (
         <article
-            className={`rounded-xl border p-4 ${alert ? 'border-red-500 bg-red-50' : ''}`}
+            className={`rounded-xl border p-4 ${alert ? 'border-danger bg-danger-container' : ''}`}
         >
             <p className="text-muted-foreground text-sm">{label}</p>
             <p className="text-2xl font-semibold">{value}</p>
@@ -51,7 +51,7 @@ export default function Deliveries({ deliveries, metrics }: Props) {
                         current backlog and last hour of failures.
                     </p>
                 </header>
-                <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     {card('Email queued, 24h', metrics.queued, queueAlert)}
                     {card('Email failed, 24h', metrics.failed, failureAlert)}
                     {card('Email sent, 24h', metrics.sent)}
@@ -60,7 +60,7 @@ export default function Deliveries({ deliveries, metrics }: Props) {
                         `${metrics.averageSeconds}s`,
                     )}
                 </section>
-                <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <section className="grid grid-cols-2 gap-3 lg:grid-cols-3">
                     {card(
                         'Queue backlog',
                         metrics.queueBacklog,
@@ -74,7 +74,7 @@ export default function Deliveries({ deliveries, metrics }: Props) {
                     {card('Worker heartbeats', metrics.workerHeartbeats.length)}
                 </section>
                 {(failureAlert || queueAlert) && (
-                    <aside className="rounded-xl border border-red-500 bg-red-50 p-4 text-sm">
+                    <aside className="border-danger bg-danger-container rounded-xl border p-4 text-sm">
                         Email delivery alert:{' '}
                         {failureAlert
                             ? `failed deliveries reached ${metrics.failed}/${metrics.failureThreshold}. `

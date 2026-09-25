@@ -26,7 +26,8 @@ type Props = {
     };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-years`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-years`;
 const EDIT_URL = (schoolId: number, yearId: number) =>
     `/admin/schools/${schoolId}/academic-years/${yearId}`;
 
@@ -50,7 +51,9 @@ export default function AcademicYearEdit({ school, academicYear }: Props) {
 
     return (
         <>
-            <Head title={t('academicYears.edit', { name: academicYear.name })} />
+            <Head
+                title={t('academicYears.edit', { name: academicYear.name })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
@@ -81,7 +84,9 @@ export default function AcademicYearEdit({ school, academicYear }: Props) {
                                 description={t('academicYears.nameDescription')}
                             >
                                 <Input
-                                    placeholder={t('academicYears.namePlaceholder')}
+                                    placeholder={t(
+                                        'academicYears.namePlaceholder',
+                                    )}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -94,7 +99,9 @@ export default function AcademicYearEdit({ school, academicYear }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicYears.startsOn')}
-                                description={t('academicYears.startsOnDescription')}
+                                description={t(
+                                    'academicYears.startsOnDescription',
+                                )}
                             >
                                 <Input
                                     type="date"
@@ -110,7 +117,9 @@ export default function AcademicYearEdit({ school, academicYear }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicYears.endsOn')}
-                                description={t('academicYears.endsOnDescription')}
+                                description={t(
+                                    'academicYears.endsOnDescription',
+                                )}
                             >
                                 <Input
                                     type="date"
@@ -126,12 +135,14 @@ export default function AcademicYearEdit({ school, academicYear }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicYears.isCurrent')}
-                                description={t('academicYears.isCurrentDescription')}
+                                description={t(
+                                    'academicYears.isCurrentDescription',
+                                )}
                             >
                                 <Checkbox
                                     checked={data.is_current}
                                     onCheckedChange={(checked) =>
-                                        setData('is_current', checked)
+                                        setData('is_current', checked === true)
                                     }
                                 />
                             </FormField>

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\PaymentRequest;
-use App\Models\Invoice;
-use App\Models\Installment;
 use App\Models\Payment;
 use App\Models\School;
 use App\Services\AuditLogger;
@@ -15,6 +14,8 @@ use Inertia\Response;
 
 class PaymentController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of payments for the school.
      */
@@ -33,29 +34,29 @@ class PaymentController
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'payments' => $payments->map(function ($payment) {
                 $related = $payment->installment ?? $payment->invoice;
-                $studentName = '';
+                $studentName = null;
                 $reference = '';
 
                 if ($related) {
                     if ($payment->installment) {
-                        $reference = 'Installment #' . $payment->installment->sequence;
-                        $studentName = trim($payment->installment->invoice->student->first_name . ' ' . $payment->installment->invoice->student->last_name ?? '');
+                        $reference = 'Installment #'.$payment->installment->sequence;
+                        $studentName = $payment->installment->invoice?->student?->full_name;
                     } elseif ($payment->invoice) {
-                        $reference = 'Invoice #' . $payment->invoice->number;
-                        $studentName = trim($payment->invoice->student->first_name . ' ' . $payment->invoice->student->last_name ?? '');
+                        $reference = 'Invoice #'.$payment->invoice->number;
+                        $studentName = $payment->invoice->student?->full_name;
                     }
                 }
 
                 return [
                     'id' => $payment->id,
-                    'payment_date' => $payment->payment_date?->toDateString(),
+                    'payment_date' => $payment->payment_date->toDateString(),
                     'amount_minor' => $payment->amount_minor,
                     'status' => $payment->status,
                     'payment_method' => $payment->payment_method,
                     'reference_number' => $payment->reference_number,
                     'reference' => $reference,
                     'student_name' => $studentName,
-                    'received_by' => $payment->receivedBy?->name ?? '',
+                    'received_by' => $payment->receivedBy?->name,
                 ];
             }),
         ]);
@@ -120,21 +121,21 @@ class PaymentController
 
         $related = $paymentModel->installment ?? $paymentModel->invoice;
         $reference = '';
-        $studentName = '';
+        $studentName = null;
         $dueOn = null;
         $amountDueMinor = 0;
         $amountPaidMinor = 0;
 
         if ($related) {
             if ($paymentModel->installment) {
-                $reference = 'Installment #' . $paymentModel->installment->sequence;
-                $studentName = trim($paymentModel->installment->invoice->student->first_name . ' ' . $paymentModel->installment->invoice->student->last_name ?? '');
+                $reference = 'Installment #'.$paymentModel->installment->sequence;
+                $studentName = $paymentModel->installment->invoice?->student?->full_name;
                 $dueOn = $paymentModel->installment->due_on?->toDateString();
                 $amountDueMinor = $paymentModel->installment->amount_minor;
                 $amountPaidMinor = $paymentModel->installment->paid_minor;
             } elseif ($paymentModel->invoice) {
-                $reference = 'Invoice #' . $paymentModel->invoice->number;
-                $studentName = trim($paymentModel->invoice->student->first_name . ' ' . $paymentModel->invoice->student->last_name ?? '');
+                $reference = 'Invoice #'.$paymentModel->invoice->number;
+                $studentName = $paymentModel->invoice->student?->full_name;
                 // For invoices, we might want to show total amount due
                 $amountDueMinor = $paymentModel->invoice->total_minor;
                 $amountPaidMinor = $paymentModel->invoice->installments->sum('paid_minor');
@@ -145,7 +146,7 @@ class PaymentController
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
             'payment' => [
                 'id' => $paymentModel->id,
-                'payment_date' => $paymentModel->payment_date?->toDateString(),
+                'payment_date' => $paymentModel->payment_date->toDateString(),
                 'amount_minor' => $paymentModel->amount_minor,
                 'status' => $paymentModel->status,
                 'payment_method' => $paymentModel->payment_method,
@@ -155,7 +156,7 @@ class PaymentController
                 'due_on' => $dueOn,
                 'amount_due_minor' => $amountDueMinor,
                 'amount_paid_minor' => $amountPaidMinor,
-                'received_by' => $paymentModel->receivedBy?->name ?? '',
+                'received_by' => $paymentModel->receivedBy?->name,
             ],
         ]);
     }
@@ -182,7 +183,7 @@ class PaymentController
                 'received_by' => $paymentModel->received_by,
                 'payment_method' => $paymentModel->payment_method,
                 'reference_number' => $paymentModel->reference_number,
-                'payment_date' => $paymentModel->payment_date?->toDateString(),
+                'payment_date' => $paymentModel->payment_date->toDateString(),
                 'amount_minor' => $paymentModel->amount_minor,
                 'status' => $paymentModel->status,
             ],
@@ -196,6 +197,11 @@ class PaymentController
     {
         $schoolModel = $this->school($school);
         Gate::authorize('manage-finance', $schoolModel);
+
+        $paymentModel = Payment::query()
+            ->where('school_id', $schoolModel->id)
+            ->where('id', $payment)
+            ->firstOrFail();
 
         $validated = $request->validated();
 
@@ -231,6 +237,11 @@ class PaymentController
         $schoolModel = $this->school($school);
         Gate::authorize('manage-finance', $schoolModel);
 
+        $paymentModel = Payment::query()
+            ->where('school_id', $schoolModel->id)
+            ->where('id', $payment)
+            ->firstOrFail();
+
         // Store values for audit before deletion
         $recordValues = $paymentModel->only([
             'installment_id', 'invoice_id', 'payment_date', 'amount_minor', 'status', 'payment_method',
@@ -242,10 +253,5 @@ class PaymentController
 
         return redirect()->route('payments.index', $schoolModel->id)
             ->with('success', 'Payment deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

@@ -4,21 +4,28 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Compact status chip: 22px tall, 4px radius, 12px at weight 600.
+ *
+ * The semantic variants carry the exact container/text/border triples from the
+ * design system, so attendance, billing and grading states read the same on
+ * every screen.
+ */
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "inline-flex h-[22px] w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-sm border px-2 text-xs font-semibold [&>svg]:pointer-events-none [&>svg]:size-3",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive:
-          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        default: "border-transparent bg-primary text-primary-foreground",
+        secondary: "border-border bg-muted text-muted-foreground",
+        outline: "border-border text-foreground",
         success:
-          "border-transparent bg-success text-white [a&]:hover:bg-success/90 focus-visible:ring-success/20 dark:focus-visible:ring-success/40 dark:bg-success/60",
+          "border-success-border bg-success-container text-success-foreground",
+        warning:
+          "border-warning-border bg-warning-container text-warning-foreground",
+        destructive: "border-danger-border bg-danger-container text-danger-foreground",
+        academic:
+          "border-academic-border bg-academic-container text-academic-foreground",
       },
     },
     defaultVariants: {

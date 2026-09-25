@@ -40,7 +40,7 @@ class NoticeAdminController
         $notice->students()->sync($students->mapWithKeys(fn (Student $student) => [$student->id => ['organization_id' => $schoolModel->organization_id]])->all());
         $audit->record('notice.created', $notice, after: ['school_id' => $schoolModel->id, 'target_count' => $students->count()]);
 
-        return back();
+        return back()->with('success', 'Notice saved as a draft.');
     }
 
     public function publish(int $school, int $notice, AuditLogger $audit): RedirectResponse
@@ -57,6 +57,6 @@ class NoticeAdminController
         });
         User::query()->where('organization_id', $schoolModel->organization_id)->whereIn('role', ['organization_admin', 'school_admin'])->get()->each(fn ($user) => DeliverInAppNotification::dispatch($record->organization_id, $user->id, 'notice.published', $record->title, $record->body, ['notice_id' => $record->id], 'notice:'.$record->id));
 
-        return back();
+        return back()->with('success', 'Notice published.');
     }
 }

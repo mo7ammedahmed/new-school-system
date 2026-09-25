@@ -3,6 +3,7 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import type { HTMLAttributes } from 'react';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useAppearance } from '@/hooks/use-appearance';
+import { useT } from '@/hooks/useT';
 import { cn } from '@/lib/utils';
 
 export default function AppearanceToggleTab({
@@ -10,17 +11,18 @@ export default function AppearanceToggleTab({
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
+    const { t } = useT();
 
     const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
-        { value: 'light', icon: Sun, label: 'Light' },
-        { value: 'dark', icon: Moon, label: 'Dark' },
-        { value: 'system', icon: Monitor, label: 'System' },
+        { value: 'light', icon: Sun, label: t('settings.light') },
+        { value: 'dark', icon: Moon, label: t('settings.dark') },
+        { value: 'system', icon: Monitor, label: t('settings.system') },
     ];
 
     return (
         <div
             className={cn(
-                'inline-flex gap-1 rounded-lg bg-neutral-100 p-1 dark:bg-neutral-800',
+                'bg-surface-container-low dark:bg-inverse-surface inline-flex gap-1 rounded-lg p-1',
                 className,
             )}
             {...props}
@@ -32,8 +34,8 @@ export default function AppearanceToggleTab({
                     className={cn(
                         'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
                         appearance === value
-                            ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
-                            : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                            ? 'bg-card dark:bg-inverse-surface dark:text-inverse-on-surface shadow-xs'
+                            : 'text-on-surface-variant hover:bg-surface-container-high/60 hover:text-on-surface dark:text-on-surface-variant dark:hover:bg-inverse-surface/60',
                     )}
                 >
                     <Icon className="-ml-1 h-4 w-4" />

@@ -107,13 +107,13 @@ export default function Features() {
             />
             <section className="mx-auto max-w-7xl px-5 pt-20 pb-24 sm:px-8">
                 <div className="max-w-3xl">
-                    <p className="text-sm font-black text-[#c56a3b]">
+                    <p className="text-warning text-sm font-semibold">
                         {copy.eyebrow}
                     </p>
-                    <h1 className="mt-4 text-5xl leading-tight font-black tracking-tight sm:text-6xl">
+                    <h1 className="mt-4 text-5xl leading-tight font-semibold tracking-tight sm:text-6xl">
                         {copy.title}
                     </h1>
-                    <p className="mt-6 max-w-2xl text-lg leading-8 text-[#5d746c]">
+                    <p className="text-on-surface-variant mt-6 max-w-2xl text-lg leading-8">
                         {copy.text}
                     </p>
                 </div>
@@ -123,24 +123,24 @@ export default function Features() {
                         return (
                             <article
                                 key={title}
-                                className="group rounded-[2rem] border border-[#dbe8df] bg-white p-8 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#dcecdf]/60"
+                                className="group border-outline-variant bg-card hover:shadow-outline-variant/60 rounded-lg border p-8 transition hover:-translate-y-1 hover:shadow-xl"
                             >
                                 <div className="flex items-start justify-between">
-                                    <div className="grid size-12 place-items-center rounded-2xl bg-[#e1efe2] text-[#0d5c4d]">
+                                    <div className="bg-surface-container-low text-primary grid size-12 place-items-center rounded-lg">
                                         <Icon size={23} />
                                     </div>
-                                    <ShieldCheck className="text-[#cde5d3] transition group-hover:text-[#0d5c4d]" />
+                                    <ShieldCheck className="group-hover:text-primary text-[#cde5d3] transition" />
                                 </div>
-                                <h2 className="mt-7 text-2xl font-black">
+                                <h2 className="mt-7 text-2xl font-semibold">
                                     {title}
                                 </h2>
                                 <ul className="mt-5 space-y-3">
                                     {points.map((point) => (
                                         <li
                                             key={point}
-                                            className="flex items-center gap-3 text-[#5d746c]"
+                                            className="text-on-surface-variant flex items-center gap-3"
                                         >
-                                            <span className="grid size-5 place-items-center rounded-full bg-[#e1efe2] text-[#0d5c4d]">
+                                            <span className="bg-surface-container-low text-primary grid size-5 place-items-center rounded-full">
                                                 <Check size={12} />
                                             </span>
                                             {point}
@@ -154,7 +154,7 @@ export default function Features() {
                 <div className="mt-12 text-center">
                     <Link
                         href={canRegister ? '/register' : '/contact'}
-                        className="inline-flex items-center gap-3 rounded-full bg-[#0d5c4d] px-7 py-4 font-black text-white"
+                        className="bg-primary text-primary-foreground inline-flex items-center gap-3 rounded-full px-7 py-4 font-semibold"
                     >
                         {copy.cta} <ArrowLeft size={18} />
                     </Link>

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\EnrollmentRequest;
 use App\Models\AcademicClass;
 use App\Models\AcademicYear;
+use App\Models\Assessment;
+use App\Models\AttendanceRecord;
 use App\Models\Enrollment;
-use App\Models\School;
 use App\Models\Section;
 use App\Models\Student;
 use App\Services\AuditLogger;
@@ -17,6 +19,8 @@ use Inertia\Response;
 
 class EnrollmentController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of enrollments.
      */
@@ -121,15 +125,51 @@ class EnrollmentController
 
         Gate::authorize('manage-enrollment', $schoolModel);
 
+        $counts = AttendanceRecord::query()
+            ->where('student_id', $enrollmentModel->student_id)
+            ->whereHas('session', fn ($query) => $query->where('school_id', $schoolModel->id))
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $attendanceTotals = [
+            'present' => (int) $counts->get('present', 0),
+            'absent' => (int) $counts->get('absent', 0),
+            'late' => (int) $counts->get('late', 0),
+            'excused' => (int) $counts->get('excused', 0),
+            'total' => (int) $counts->sum(),
+        ];
+
+        $assessments = Assessment::query()
+            ->where('school_id', $schoolModel->id)
+            ->where('student_id', $enrollmentModel->student_id)
+            ->orderByDesc('assessed_on')
+            ->get()
+            ->map(fn (Assessment $assessment) => [
+                'title' => $assessment->title,
+                'score' => (float) $assessment->score,
+                'maxScore' => (float) $assessment->max_score,
+                'date' => $assessment->assessed_on?->toDateString(),
+                'comment' => $assessment->comment,
+            ])
+            ->all();
+
         return Inertia::render('admin/enrollments/show', [
             'school' => ['id' => $schoolModel->id, 'name' => $schoolModel->name],
+            'canEdit' => Gate::allows('manage-enrollment', $schoolModel),
+            'canDelete' => Gate::allows('manage-enrollment', $schoolModel),
             'enrollment' => [
                 'id' => $enrollmentModel->id,
                 'student' => [
                     'id' => $enrollmentModel->student->id,
-                    'name' => trim($enrollmentModel->student->first_name.' '.$enrollmentModel->student->last_name),
+                    'name' => $enrollmentModel->student->full_name,
+                    'first_name' => $enrollmentModel->student->first_name,
+                    'last_name' => $enrollmentModel->student->last_name,
                     'student_number' => $enrollmentModel->student->student_number,
+                    'date_of_birth' => $enrollmentModel->student->date_of_birth?->toDateString(),
                 ],
+                'attendance' => $attendanceTotals,
+                'assessments' => $assessments,
                 'academicYear' => [
                     'id' => $enrollmentModel->academicYear->id,
                     'name' => $enrollmentModel->academicYear->name,
@@ -253,10 +293,5 @@ class EnrollmentController
 
         return redirect()->route('enrollments.index', $schoolModel->id)
             ->with('success', 'Enrollment deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

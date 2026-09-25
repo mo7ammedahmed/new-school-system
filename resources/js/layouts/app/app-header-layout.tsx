@@ -7,11 +7,11 @@ import type { LayoutProps } from '@/types/shared';
 
 export default function AppHeaderLayout({
     children,
-    breadcrumbs = [],
+    _breadcrumbs = [],
     title,
     description,
     className,
-    ...props
+    ..._props
 }: {
     children: React.ReactNode;
     breadcrumbs?: BreadcrumbItem[];
@@ -23,23 +23,26 @@ export default function AppHeaderLayout({
         <AppShell variant="header">
             <AppContent
                 variant="header"
-                className={cn('mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl', className)}
+                className={cn(
+                    'mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl',
+                    className,
+                )}
             >
                 {title || description ? (
                     <div className="border-b px-6 pb-4">
                         {title && (
-                            <h1 className="text-xl font-bold text-foreground mb-2">
+                            <h1 className="text-foreground mb-2 text-xl font-bold">
                                 {title}
                             </h1>
                         )}
                         {description && (
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                                 {description}
                             </p>
                         )}
                     </div>
                 ) : null}
-                <AppTopbar breadcrumbs={breadcrumbs} />
+                <AppTopbar />
                 {children}
             </AppContent>
         </AppShell>

@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/data-display/data-table';
 import {
@@ -37,7 +37,7 @@ type Props = {
             next: string | null;
         };
     };
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
 };
 
 const LIST_URL = (schoolId: number) =>
@@ -52,7 +52,7 @@ export default function AcademicYearIndex({
     const list =
         paginated<Props['academicYears']['data'][number]>(academicYears);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [status, setStatus] = useState(filters.status ?? '');
+    const [status, _setStatus] = useState(filters.status ?? '');
 
     const applyFilters = (next: { search?: string; status?: string }) => {
         router.get(
@@ -110,13 +110,13 @@ export default function AcademicYearIndex({
                             {t('academicYears.allStatuses')}
                         </option>
                         <option value="current">
-                            {t('academicYears.status.current')}
+                            {t('academicYears.statuses.current')}
                         </option>
                         <option value="past">
-                            {t('academicYears.status.past')}
+                            {t('academicYears.statuses.past')}
                         </option>
                         <option value="future">
-                            {t('academicYears.status.future')}
+                            {t('academicYears.statuses.future')}
                         </option>
                     </select>
                 </div>

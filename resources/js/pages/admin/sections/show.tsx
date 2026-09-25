@@ -68,19 +68,25 @@ export default function SectionShow({ school, section }: Props) {
                                 title={t('sections.studentCount')}
                                 value={section.student_count ?? 0}
                                 trend="up"
-                                description={t('sections.studentCountDescription')}
+                                description={t(
+                                    'sections.studentCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('sections.academicClass')}
                                 value={section.academic_class_name ?? 'N/A'}
                                 trend="up"
-                                description={t('sections.academicClassDescription')}
+                                description={t(
+                                    'sections.academicClassDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('sections.homeroomTeacher')}
                                 value={section.teacher_name ?? 'Unassigned'}
                                 trend="up"
-                                description={t('sections.homeroomTeacherDescription')}
+                                description={t(
+                                    'sections.homeroomTeacherDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('sections.capacity')}
@@ -95,12 +101,6 @@ export default function SectionShow({ school, section }: Props) {
                                 <TabsList className="grid w-[200px] grid-cols-1">
                                     <TabsTrigger value="info">
                                         {t('common.information')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="details">
-                                        {t('common.details')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="timeline">
-                                        {t('common.timeline')}
                                     </TabsTrigger>
                                 </TabsList>
 
@@ -152,22 +152,6 @@ export default function SectionShow({ school, section }: Props) {
                                                 {formatDate(section.updated_at)}
                                             </p>
                                         </div>
-                                    </div>
-                                </TabsContent>
-
-                                <TabsContent value="details">
-                                    <div className="space-y-4">
-                                        <p className="text-muted-foreground">
-                                            {t('sections.detailsComingSoon')}
-                                        </p>
-                                    </div>
-                                </TabsContent>
-
-                                <TabsContent value="timeline">
-                                    <div className="space-y-4">
-                                        <p className="text-muted-foreground">
-                                            {t('sections.timelineComingSoon')}
-                                        </p>
                                     </div>
                                 </TabsContent>
                             </Tabs>

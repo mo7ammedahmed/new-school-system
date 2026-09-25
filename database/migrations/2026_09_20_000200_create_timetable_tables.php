@@ -27,7 +27,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['organization_id', 'school_id', 'academic_year_id', 'name']);
+            $table->unique(['organization_id', 'school_id', 'academic_year_id', 'name'], 'timetable_versions_school_ay_name_unique');
         });
 
         Schema::create('timetable_entries', function (Blueprint $table): void {
@@ -48,7 +48,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['timetable_version_id', 'section_id', 'day_of_week', 'period_number']);
+            $table->unique(['timetable_version_id', 'section_id', 'day_of_week', 'period_number'], 'timetable_entries_version_section_day_period_unique');
             $table->unique(['timetable_version_id', 'teacher_id', 'day_of_week', 'period_number'], 'timetable_entries_version_teacher_day_period_unique');
         });
     }

@@ -9,7 +9,12 @@ export default function AuthLayout({
     ...props
 }: LayoutProps) {
     return (
-        <AuthLayoutTemplate title={title} description={description} className={className} {...props}>
+        <AuthLayoutTemplate
+            title={title}
+            description={description}
+            className={className}
+            {...props}
+        >
             {children}
         </AuthLayoutTemplate>
     );

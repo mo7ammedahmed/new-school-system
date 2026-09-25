@@ -91,34 +91,34 @@ export default function Home() {
             />
 
             <section className="relative overflow-hidden">
-                <div className="pointer-events-none absolute top-12 -left-32 size-96 rounded-full bg-accent/50 blur-3xl" />
+                <div className="bg-accent/50 pointer-events-none absolute top-12 -left-32 size-96 rounded-full blur-3xl" />
                 <div className="mx-auto grid max-w-7xl gap-14 px-5 pt-16 pb-20 sm:px-8 md:pt-24 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
                     <div className="relative">
-                        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-white/70 px-4 py-2 text-xs font-black text-brand-600">
+                        <div className="border-border text-brand-600 mb-7 inline-flex items-center gap-2 rounded-full border bg-white/70 px-4 py-2 text-xs font-semibold">
                             <Sparkles size={14} aria-hidden="true" />
                             {copy.eyebrow}
                         </div>
-                        <h1 className="max-w-3xl text-5xl leading-[1.12] font-black tracking-[-0.04em] text-foreground sm:text-6xl lg:text-7xl">
+                        <h1 className="text-foreground max-w-3xl text-5xl leading-[1.12] font-semibold tracking-[-0.04em] sm:text-6xl lg:text-7xl">
                             {copy.title}
                             <br />
                             <span className="text-secondary">
                                 {copy.accent}
                             </span>
                         </h1>
-                        <p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">
+                        <p className="text-muted-foreground mt-7 max-w-xl text-lg leading-8">
                             {copy.body}
                         </p>
                         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                             <Link
                                 href={canRegister ? '/register' : '/contact'}
-                                className="flex items-center justify-center gap-3 rounded-full bg-brand-600 px-7 py-4 font-black text-white transition hover:bg-brand-700"
+                                className="bg-brand-600 hover:bg-brand-700 text-primary-foreground flex items-center justify-center gap-3 rounded-full px-7 py-4 font-semibold transition"
                             >
                                 {copy.start}
                                 <ArrowLeft size={18} aria-hidden="true" />
                             </Link>
                             <Link
                                 href="/contact"
-                                className="flex items-center justify-center gap-2 rounded-full border border-border bg-white/60 px-7 py-4 font-black text-brand-700 transition hover:bg-white"
+                                className="border-border text-brand-700 hover:bg-card flex items-center justify-center gap-2 rounded-full border bg-white/60 px-7 py-4 font-semibold transition"
                             >
                                 <Play
                                     size={16}
@@ -128,13 +128,13 @@ export default function Home() {
                                 {copy.demo}
                             </Link>
                         </div>
-                        <div className="mt-12 grid max-w-lg grid-cols-3 gap-4 border-t border-border pt-7">
+                        <div className="border-border mt-12 grid max-w-lg grid-cols-3 gap-4 border-t pt-7">
                             {copy.stats.map(([value, label]) => (
                                 <div key={label}>
-                                    <p className="text-2xl font-black text-foreground">
+                                    <p className="text-foreground text-2xl font-semibold">
                                         {value}
                                     </p>
-                                    <p className="mt-1 text-xs leading-5 font-bold text-muted-foreground">
+                                    <p className="text-muted-foreground mt-1 text-xs leading-5 font-bold">
                                         {label}
                                     </p>
                                 </div>
@@ -143,28 +143,28 @@ export default function Home() {
                     </div>
 
                     <div className="relative mx-auto hidden w-full max-w-[520px] lg:block">
-                        <div className="rounded-[2.5rem] border border-white bg-hero-bg p-4 shadow-[0_35px_80px_-30px_var(--brand-900)]">
-                            <div className="rounded-[2rem] bg-card/50 p-5">
-                                <p className="text-xs font-bold text-muted-foreground">
+                        <div className="bg-hero-bg rounded-[2.5rem] border border-white p-4 shadow-[0_35px_80px_-30px_var(--brand-900)]">
+                            <div className="bg-card/50 rounded-lg p-5">
+                                <p className="text-muted-foreground text-xs font-bold">
                                     {copy.today}
                                 </p>
-                                <h2 className="mt-2 text-xl font-black text-foreground">
+                                <h2 className="text-foreground mt-2 text-xl font-semibold">
                                     {copy.greeting}
                                 </h2>
                                 <div className="mt-6 grid grid-cols-2 gap-3">
-                                    <div className="rounded-2xl bg-brand-600 p-4 text-white">
-                                        <p className="text-xs text-hero-muted">
+                                    <div className="bg-brand-600 text-primary-foreground rounded-lg p-4">
+                                        <p className="text-hero-muted text-xs">
                                             {copy.attendance}
                                         </p>
-                                        <p className="mt-2 text-3xl font-black">
+                                        <p className="mt-2 text-3xl font-semibold">
                                             94.8%
                                         </p>
                                     </div>
-                                    <div className="rounded-2xl border border-border bg-white p-4">
-                                        <p className="text-xs font-bold text-muted-foreground">
+                                    <div className="border-border bg-card rounded-lg border p-4">
+                                        <p className="text-muted-foreground text-xs font-bold">
                                             {copy.learning}
                                         </p>
-                                        <p className="mt-2 text-3xl font-black text-foreground">
+                                        <p className="text-foreground mt-2 text-3xl font-semibold">
                                             86.2
                                         </p>
                                     </div>
@@ -175,9 +175,9 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="bg-white py-20" id="features">
+            <section className="bg-card py-20" id="features">
                 <div className="mx-auto max-w-7xl px-5 sm:px-8">
-                    <h2 className="text-4xl font-black tracking-tight text-foreground">
+                    <h2 className="text-foreground text-4xl font-semibold tracking-tight">
                         {copy.impact}
                     </h2>
                     <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -187,18 +187,18 @@ export default function Home() {
                             return (
                                 <article
                                     key={title}
-                                    className="rounded-[1.75rem] border border-border bg-card/50 p-7"
+                                    className="border-border bg-card/50 rounded-lg border p-7"
                                 >
-                                    <div className="grid size-12 place-items-center rounded-2xl bg-accent text-brand-600">
+                                    <div className="bg-accent text-brand-600 grid size-12 place-items-center rounded-lg">
                                         <Icon size={23} aria-hidden="true" />
                                     </div>
-                                    <h3 className="mt-6 text-xl font-black text-foreground">
+                                    <h3 className="text-foreground mt-6 text-xl font-semibold">
                                         {title}
                                     </h3>
-                                    <p className="mt-3 leading-7 text-muted-foreground">
+                                    <p className="text-muted-foreground mt-3 leading-7">
                                         {body}
                                     </p>
-                                    <div className="mt-6 flex items-center gap-2 text-sm font-black text-brand-600">
+                                    <div className="text-brand-600 mt-6 flex items-center gap-2 text-sm font-semibold">
                                         <Check size={16} aria-hidden="true" />
                                         {locale === 'ar'
                                             ? 'مصمم ليوم المدرسة'
@@ -214,24 +214,24 @@ export default function Home() {
             <section className="bg-muted py-20" id="platform">
                 <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
                     <div>
-                        <p className="text-sm font-black tracking-[0.18em] text-secondary uppercase">
+                        <p className="text-secondary text-sm font-semibold tracking-[0.18em] uppercase">
                             {locale === 'ar'
                                 ? 'منصة واحدة لكل يوم المدرسة'
                                 : 'One platform for every school day'}
                         </p>
-                        <h2 className="mt-4 text-4xl font-black tracking-tight text-foreground">
+                        <h2 className="text-foreground mt-4 text-4xl font-semibold tracking-tight">
                             {locale === 'ar'
                                 ? 'من الإدارة إلى أثر التعلم.'
                                 : 'From administration to learning impact.'}
                         </h2>
-                        <p className="mt-5 max-w-xl leading-8 text-muted-foreground">
+                        <p className="text-muted-foreground mt-5 max-w-xl leading-8">
                             {locale === 'ar'
                                 ? 'اربط القبول والأكاديميات والحضور والمالية والإشعارات في مساحة عمل واحدة، مع صلاحيات واضحة لكل دور.'
                                 : 'Connect admissions, academics, attendance, finance, and notifications in one workspace with clear permissions for every role.'}
                         </p>
                         <Link
                             href="/features"
-                            className="mt-7 inline-flex rounded-full bg-brand-600 px-6 py-3 font-black text-white transition hover:bg-brand-700"
+                            className="bg-brand-600 hover:bg-brand-700 text-primary-foreground mt-7 inline-flex rounded-full px-6 py-3 font-semibold transition"
                         >
                             {locale === 'ar'
                                 ? 'استكشف المزايا'
@@ -278,15 +278,15 @@ export default function Home() {
                             <Link
                                 key={title}
                                 href={href}
-                                className="group rounded-[1.75rem] border border-border bg-white p-6 transition hover:-translate-y-1 hover:border-brand-600 hover:shadow-[0_18px_45px_-28px_var(--brand-900)]"
+                                className="group border-border hover:border-brand-600 bg-card rounded-lg border p-6 transition hover:-translate-y-1 hover:shadow-[0_18px_45px_-28px_var(--brand-900)]"
                             >
-                                <h3 className="text-lg font-black text-foreground">
+                                <h3 className="text-foreground text-lg font-semibold">
                                     {title}
                                 </h3>
-                                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                                <p className="text-muted-foreground mt-3 text-sm leading-7">
                                     {body}
                                 </p>
-                                <span className="mt-5 block text-sm font-black text-brand-600">
+                                <span className="text-brand-600 mt-5 block text-sm font-semibold">
                                     {locale === 'ar'
                                         ? 'اعرف المزيد ←'
                                         : 'Learn more →'}
@@ -300,15 +300,15 @@ export default function Home() {
             <section className="bg-hero-bg text-hero-muted" id="security">
                 <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 md:grid-cols-[1fr_auto] md:items-center">
                     <div>
-                        <p className="text-sm font-black tracking-[0.18em] text-hero-muted uppercase">
+                        <p className="text-hero-muted text-sm font-semibold tracking-[0.18em] uppercase">
                             {locale === 'ar' ? 'الأمان أولاً' : 'Security first'}
                         </p>
-                        <h2 className="mt-4 text-4xl font-black">
+                        <h2 className="mt-4 text-4xl font-semibold">
                             {locale === 'ar'
                                 ? 'بيانات المدرسة في مكان آمن.'
                                 : 'Your school data belongs in a safe place.'}
                         </h2>
-                        <p className="mt-4 max-w-2xl leading-8 text-hero-accent">
+                        <p className="text-hero-accent mt-4 max-w-2xl leading-8">
                             {locale === 'ar'
                                 ? 'عزل صارم بين المؤسسات، سجلات تدقيق غير قابلة للتغيير، وأمان مصمم للمدارس السعودية.'
                                 : 'Strict tenant isolation, immutable audit trails, and security designed for Saudi schools.'}
@@ -316,7 +316,7 @@ export default function Home() {
                     </div>
                     <Link
                         href="/security"
-                        className="rounded-full bg-white px-6 py-3 text-center font-black text-brand-600 transition hover:bg-accent/80"
+                        className="text-brand-600 hover:bg-accent/80 bg-card rounded-full px-6 py-3 text-center font-semibold transition"
                     >
                         {locale === 'ar'
                             ? 'اقرأ عن الأمان'
@@ -325,24 +325,24 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="bg-white py-20" id="pricing">
+            <section className="bg-card py-20" id="pricing">
                 <div className="mx-auto max-w-7xl px-5 text-center sm:px-8">
-                    <p className="text-sm font-black tracking-[0.18em] text-secondary uppercase">
+                    <p className="text-secondary text-sm font-semibold tracking-[0.18em] uppercase">
                         {locale === 'ar' ? 'ابدأ بوضوح' : 'Start with clarity'}
                     </p>
-                    <h2 className="mt-4 text-4xl font-black text-foreground">
+                    <h2 className="text-foreground mt-4 text-4xl font-semibold">
                         {locale === 'ar'
                             ? 'خطة تناسب مرحلة مدرستك.'
                             : 'A plan that fits your school stage.'}
                     </h2>
-                    <p className="mx-auto mt-4 max-w-2xl leading-8 text-muted-foreground">
+                    <p className="text-muted-foreground mx-auto mt-4 max-w-2xl leading-8">
                         {locale === 'ar'
                             ? 'تواصل معنا لنصمم بداية مناسبة لحجم مدرستك وأهدافها.'
                             : 'Talk to us and shape the right starting point for your school size and goals.'}
                     </p>
                     <Link
                         href="/pricing"
-                        className="mt-7 inline-flex rounded-full border border-border px-6 py-3 font-black text-brand-700 transition hover:bg-muted"
+                        className="border-border text-brand-700 hover:bg-muted mt-7 inline-flex rounded-full border px-6 py-3 font-semibold transition"
                     >
                         {locale === 'ar' ? 'شاهد الأسعار' : 'View pricing'}
                     </Link>
@@ -352,12 +352,12 @@ export default function Home() {
             <section className="bg-accent py-16" id="faq">
                 <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 sm:px-8 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h2 className="text-3xl font-black text-foreground">
+                        <h2 className="text-foreground text-3xl font-semibold">
                             {locale === 'ar'
                                 ? 'لديك سؤال قبل البداية؟'
                                 : 'Have a question before you start?'}
                         </h2>
-                        <p className="mt-2 text-muted-foreground">
+                        <p className="text-muted-foreground mt-2">
                             {locale === 'ar'
                                 ? 'ستجد إجابات عملية في مركز الأسئلة الشائعة.'
                                 : 'Find practical answers in our FAQ center.'}
@@ -365,7 +365,7 @@ export default function Home() {
                     </div>
                     <Link
                         href="/faq"
-                        className="rounded-full bg-brand-600 px-6 py-3 text-center font-black text-white transition hover:bg-brand-700"
+                        className="bg-brand-600 hover:bg-brand-700 text-primary-foreground rounded-full px-6 py-3 text-center font-semibold transition"
                     >
                         {locale === 'ar' ? 'الأسئلة الشائعة' : 'Visit the FAQ'}
                     </Link>

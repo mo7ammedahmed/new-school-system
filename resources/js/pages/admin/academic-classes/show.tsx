@@ -24,7 +24,8 @@ type Props = {
     };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-classes`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-classes`;
 const EDIT_URL = (schoolId: number, classId: number) =>
     `/admin/schools/${schoolId}/academic-classes/${classId}`;
 
@@ -35,16 +36,23 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
 
     const avgSectionSize =
         academicClass.section_count && academicClass.section_count > 0
-            ? Math.round(academicClass.student_count / academicClass.section_count)
+            ? Math.round(
+                  (academicClass.student_count ?? 0) /
+                      academicClass.section_count,
+              )
             : 0;
 
     return (
         <>
-            <Head title={t('academicClasses.show', { name: academicClass.name })} />
+            <Head
+                title={t('academicClasses.show', { name: academicClass.name })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        {t('academicClasses.show', { name: academicClass.name })}
+                        {t('academicClasses.show', {
+                            name: academicClass.name,
+                        })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
@@ -73,25 +81,33 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
                                 title={t('academicClasses.studentCount')}
                                 value={academicClass.student_count ?? 0}
                                 trend="up"
-                                description={t('academicClasses.studentCountDescription')}
+                                description={t(
+                                    'academicClasses.studentCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('academicClasses.sectionCount')}
                                 value={academicClass.section_count ?? 0}
                                 trend="up"
-                                description={t('academicClasses.sectionCountDescription')}
+                                description={t(
+                                    'academicClasses.sectionCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('academicClasses.teacherCount')}
                                 value={academicClass.teacher_count ?? 0}
                                 trend="up"
-                                description={t('academicClasses.teacherCountDescription')}
+                                description={t(
+                                    'academicClasses.teacherCountDescription',
+                                )}
                             />
                             <StatCard
                                 title={t('academicClasses.avgSectionSize')}
                                 value={avgSectionSize}
                                 trend="up"
-                                description={t('academicClasses.avgSectionSizeDescription')}
+                                description={t(
+                                    'academicClasses.avgSectionSizeDescription',
+                                )}
                             />
                         </div>
 
@@ -100,12 +116,6 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
                                 <TabsList className="grid w-[200px] grid-cols-1">
                                     <TabsTrigger value="info">
                                         {t('common.information')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="details">
-                                        {t('common.details')}
-                                    </TabsTrigger>
-                                    <TabsTrigger value="timeline">
-                                        {t('common.timeline')}
                                     </TabsTrigger>
                                 </TabsList>
 
@@ -125,7 +135,9 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
                                                 {t('common.createdAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {formatDate(academicClass.created_at)}
+                                                {formatDate(
+                                                    academicClass.created_at,
+                                                )}
                                             </p>
                                         </div>
 
@@ -134,25 +146,11 @@ export default function AcademicClassShow({ school, academicClass }: Props) {
                                                 {t('common.updatedAt')}
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {formatDate(academicClass.updated_at)}
+                                                {formatDate(
+                                                    academicClass.updated_at,
+                                                )}
                                             </p>
                                         </div>
-                                    </div>
-                                </TabsContent>
-
-                                <TabsContent value="details">
-                                    <div className="space-y-4">
-                                        <p className="text-muted-foreground">
-                                            {t('academicClasses.detailsComingSoon')}
-                                        </p>
-                                    </div>
-                                </TabsContent>
-
-                                <TabsContent value="timeline">
-                                    <div className="space-y-4">
-                                        <p className="text-muted-foreground">
-                                            {t('academicClasses.timelineComingSoon')}
-                                        </p>
                                     </div>
                                 </TabsContent>
                             </Tabs>

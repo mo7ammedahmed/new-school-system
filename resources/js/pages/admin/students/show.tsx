@@ -1,17 +1,12 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DateCell } from '@/components/data-display/date-cell';
-import { UserCell } from '@/components/data-display/user-cell';
-import { MoneyCell } from '@/components/data-display/money-cell';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 

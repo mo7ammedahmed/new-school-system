@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
+use App\Enums\UserRole;
 use App\Models\AttendanceRecord;
 use App\Models\School;
 use App\Services\AuditLogger;
@@ -13,6 +15,8 @@ use Inertia\Response;
 
 class AttendanceReportController
 {
+    use ResolvesSchool;
+
     public function index(Request $request, int $school): Response
     {
         $schoolModel = $this->school($school);
@@ -74,7 +78,7 @@ class AttendanceReportController
                     ->when($request->filled('from'), fn ($query) => $query->whereDate('attendance_date', '>=', $request->input('from')))
                     ->when($request->filled('to'), fn ($query) => $query->whereDate('attendance_date', '<=', $request->input('to')));
             });
-        if (auth()->user()->hasRole('teacher')) {
+        if (auth()->user()->hasRole(UserRole::Teacher)) {
             $query->whereHas('session.section.teachers', fn ($teachers) => $teachers->whereKey(auth()->id()));
         }
         $grouped = $query->get()->groupBy('student_id');
@@ -85,11 +89,6 @@ class AttendanceReportController
 
             return ['student' => trim($student->first_name.' '.$student->last_name), 'studentNumber' => $student->student_number, 'section' => $records->first()->session->section->name, 'present' => $counts->get('present', 0), 'absent' => $counts->get('absent', 0), 'late' => $counts->get('late', 0), 'excused' => $counts->get('excused', 0), 'total' => $records->count()];
         })->values()->all();
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 
     private function csvEscape(mixed $value): string

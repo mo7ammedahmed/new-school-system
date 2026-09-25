@@ -60,7 +60,7 @@ export default function TimetableCreate({
                             required
                         />
                         {form.errors.name && (
-                            <span className="text-xs text-red-600">
+                            <span className="text-danger-foreground text-xs">
                                 {form.errors.name}
                             </span>
                         )}

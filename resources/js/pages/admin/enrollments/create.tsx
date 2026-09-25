@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, useRemember } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,10 +12,8 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Link } from '@inertiajs/react';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
 import { useState } from 'react';
 
 type Props = {
@@ -46,9 +44,9 @@ export default function EnrollmentCreate({
         enrolled_on: '',
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [_showToast, setShowToast] = useState(false);
+    const [_toastMessage, setToastMessage] = useState('');
+    const [_toastType, setToastType] = useState<'success' | 'error'>('success');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,7 +57,7 @@ export default function EnrollmentCreate({
                 setToastType('success');
                 setShowToast(true);
             },
-            onError: (errors) => {
+            onError: (_errors) => {
                 // Show error toast
                 setToastMessage('Please correct the errors and try again.');
                 setToastType('error');

@@ -18,12 +18,12 @@ export function AppSidebarHeader({
                 {title || description ? (
                     <div className="flex-1 flex-col">
                         {title && (
-                            <span className="text-sm font-bold text-foreground">
+                            <span className="text-foreground text-sm font-bold">
                                 {title}
                             </span>
                         )}
                         {description && (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-muted-foreground text-xs">
                                 {description}
                             </span>
                         )}

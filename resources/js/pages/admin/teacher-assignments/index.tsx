@@ -26,7 +26,7 @@ type AssignmentData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     assignments: {
         data: AssignmentData[];
         meta: {
@@ -58,7 +58,7 @@ export default function TeacherAssignmentIndex({
     const { t } = useT();
     const list = paginated<AssignmentData>(assignments);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [teacherId, setTeacherId] = useState(filters.teacher_id ?? '');
+    const [teacherId, _setTeacherId] = useState(filters.teacher_id ?? '');
 
     const applyFilters = (next: { search?: string; teacher_id?: string }) => {
         router.get(

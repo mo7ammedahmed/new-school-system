@@ -1,15 +1,10 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
+import { confirmDelete } from '@/lib/confirm-delete';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
@@ -18,55 +13,44 @@ type Props = {
         name: string;
         email: string;
         role: string;
-        phone: string | null;
-        status: string | null;
     };
 };
 
 export default function UserShow({ school, user }: Props) {
+    const { t } = useT();
+    const listUrl = `/admin/schools/${school.id}/users`;
+
     return (
         <>
-            <Head title="User Details" />
+            <Head title={user.name} />
             <div className="space-y-6 p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">User Details</h1>
-                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Link
-                            href={`/admin/schools/${school.id}/users/${user.id}/edit`}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2 text-sm font-medium"
-                        >
-                            Edit User
-                        </Link>
-                        <Button
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        'Are you sure you want to delete this user?',
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert('User deleted successfully!');
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/users`;
-                                }
-                            }}
-                            variant="destructive"
-                        >
-                            Delete User
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-semibold">
+                        {t('users.title')}
+                    </h1>
+                    <div className="mt-4 flex flex-wrap gap-2 md:mt-0">
+                        <Button asChild>
+                            <Link href={`${listUrl}/${user.id}/edit`}>
+                                {t('users.edit')}
+                            </Link>
                         </Button>
                         <Button
-                            href={`/admin/schools/${school.id}/users`}
-                            variant="outline"
+                            variant="destructive"
+                            onClick={() =>
+                                confirmDelete(`${listUrl}/${user.id}`)
+                            }
                         >
-                            Back to Users
+                            {t('actions.delete')}
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link href={listUrl}>{t('users.backToList')}</Link>
                         </Button>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>User Information</CardTitle>
+                        <CardTitle>{t('users.information')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
@@ -79,40 +63,9 @@ export default function UserShow({ school, user }: Props) {
                                         {user.name}
                                     </h2>
                                     <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                                        {user.role && (
-                                            <Badge variant="secondary">
-                                                {user.role
-                                                    .split('_')
-                                                    .map(
-                                                        (word) =>
-                                                            word
-                                                                .charAt(0)
-                                                                .toUpperCase() +
-                                                            word.slice(1),
-                                                    )
-                                                    .join(' ')}
-                                            </Badge>
-                                        )}
-                                        {user.status && (
-                                            <Badge
-                                                variant={
-                                                    user.status === 'active'
-                                                        ? 'success'
-                                                        : 'destructive'
-                                                }
-                                            >
-                                                {user.status
-                                                    .split('_')
-                                                    .map(
-                                                        (word) =>
-                                                            word
-                                                                .charAt(0)
-                                                                .toUpperCase() +
-                                                            word.slice(1),
-                                                    )
-                                                    .join(' ')}
-                                            </Badge>
-                                        )}
+                                        <Badge variant="secondary">
+                                            {t(`roles.${user.role}`)}
+                                        </Badge>
                                     </div>
                                 </div>
                             </div>
@@ -120,26 +73,10 @@ export default function UserShow({ school, user }: Props) {
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
                                     <h3 className="text-muted-foreground text-sm font-medium">
-                                        Email
+                                        {t('users.email')}
                                     </h3>
                                     <p className="mt-1 block truncate">
                                         {user.email}
-                                    </p>
-                                </div>
-                                <div>
-                                    <h3 className="text-muted-foreground text-sm font-medium">
-                                        Phone
-                                    </h3>
-                                    <p className="mt-1 block truncate">
-                                        {user.phone ?? 'N/A'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <h3 className="text-muted-foreground text-sm font-medium">
-                                        Status
-                                    </h3>
-                                    <p className="mt-1 block capitalize">
-                                        {user.status ?? 'N/A'}
                                     </p>
                                 </div>
                             </div>

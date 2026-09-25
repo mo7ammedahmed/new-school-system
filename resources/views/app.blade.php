@@ -38,11 +38,22 @@
 
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+
+        {{-- The palette for this request, resolved by HandleAppearance: a
+             school's own override, or the platform palette for pages that
+             belong to no school. It has to load after app.css to win over the
+             bundle defaults, and every value in it passed the whitelist in
+             config/theme.php, so it is safe to emit unescaped. --}}
+        @if (! empty($themeCss))
+            <style id="theme-tokens">{!! $themeCss !!}</style>
+        @endif
+
         <x-inertia::head>
             <title>{{ config('app.name', 'Laravel') }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
+        <a href="#main-content" class="skip-link">{{ app()->getLocale() === 'ar' ? 'تجاوز إلى المحتوى' : 'Skip to main content' }}</a>
         <x-inertia::app />
     </body>
 </html>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\InvoiceRequest;
 use App\Models\Invoice;
 use App\Models\School;
@@ -13,6 +14,8 @@ use Inertia\Response;
 
 class InvoiceController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of invoices for the school.
      */
@@ -33,7 +36,7 @@ class InvoiceController
                 return [
                     'id' => $invoice->id,
                     'number' => $invoice->number,
-                    'student_name' => trim($invoice->student->first_name . ' ' . $invoice->student->last_name ?? ''),
+                    'student_name' => $invoice->student?->full_name,
                     'issued_on' => $invoice->issued_on?->toDateString(),
                     'due_on' => $invoice->due_on?->toDateString(),
                     'status' => $invoice->status,
@@ -107,8 +110,8 @@ class InvoiceController
                 'subtotal_minor' => $invoiceModel->subtotal_minor,
                 'total_minor' => $invoiceModel->total_minor,
                 'items' => $invoiceModel->items,
-                'student_name' => trim($invoiceModel->student->first_name . ' ' . $invoiceModel->student->last_name ?? ''),
-                'issuer_name' => trim($invoiceModel->issuer->first_name . ' ' . $invoiceModel->issuer->last_name ?? ''),
+                'student_name' => $invoiceModel->student?->full_name,
+                'issuer_name' => $invoiceModel->issuer?->name,
                 'installments_count' => $invoiceModel->installments->count(),
                 'installments' => $invoiceModel->installments->map(function ($installment) {
                     return [
@@ -163,6 +166,11 @@ class InvoiceController
         $schoolModel = $this->school($school);
         Gate::authorize('manage-enrollment', $schoolModel);
 
+        $invoiceModel = Invoice::query()
+            ->where('school_id', $schoolModel->id)
+            ->where('id', $invoice)
+            ->firstOrFail();
+
         $validated = $request->validated();
 
         // Store old values for audit
@@ -203,10 +211,5 @@ class InvoiceController
 
         return redirect()->route('invoices.index', $schoolModel->id)
             ->with('success', 'Invoice deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

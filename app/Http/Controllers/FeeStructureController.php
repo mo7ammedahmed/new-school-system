@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\FeeStructureRequest;
 use App\Models\FeeStructure;
 use App\Models\School;
@@ -13,6 +14,8 @@ use Inertia\Response;
 
 class FeeStructureController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of fee structures for the school.
      */
@@ -172,10 +175,5 @@ class FeeStructureController
 
         return redirect()->route('fee-structures.index', $schoolModel->id)
             ->with('success', 'Fee structure deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

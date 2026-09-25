@@ -1,15 +1,8 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useT } from '@/hooks/useT';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
     school: { id: number; name: string };
@@ -29,7 +22,9 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
 
     return (
         <>
-            <Head title={t('feeStructures.show', { name: feeStructure.name })} />
+            <Head
+                title={t('feeStructures.show', { name: feeStructure.name })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
@@ -43,21 +38,19 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
                             {t('actions.edit')}
                         </Link>
                         <Button
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        t('common.deleteConfirmation', {
-                                            name: t('feeStructures.title'),
-                                        })
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert('Fee structure deleted successfully!');
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/fee-structures`;
-                                }
-                            }}
+                            onClick={() =>
+                                confirmDelete(
+                                    `/admin/schools/${school.id}/fee-structures/${feeStructure.id}`,
+                                    {
+                                        message: t(
+                                            'common.deleteConfirmation',
+                                            {
+                                                name: t('feeStructures.title'),
+                                            },
+                                        ),
+                                    },
+                                )
+                            }
                             variant="destructive"
                         >
                             {t('actions.delete')}
@@ -91,7 +84,8 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
                                         {t('feeStructures.description')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {feeStructure.description ?? t('common.notAvailable')}
+                                        {feeStructure.description ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                                 <div>
@@ -99,7 +93,12 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
                                         {t('feeStructures.amount')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {(feeStructure.amount_minor / 100).toFixed(2)} {t(`currencies.${feeStructure.currency}`)}
+                                        {(
+                                            feeStructure.amount_minor / 100
+                                        ).toFixed(2)}{' '}
+                                        {t(
+                                            `currencies.${feeStructure.currency}`,
+                                        )}
                                     </p>
                                 </div>
                                 <div>
@@ -107,7 +106,9 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
                                         {t('feeStructures.currency')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {t(`currencies.${feeStructure.currency}`)}
+                                        {t(
+                                            `currencies.${feeStructure.currency}`,
+                                        )}
                                     </p>
                                 </div>
                                 <div>
@@ -115,7 +116,9 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
                                         {t('feeStructures.frequency')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {t(`frequencies.${feeStructure.frequency}`)}
+                                        {t(
+                                            `frequencies.${feeStructure.frequency}`,
+                                        )}
                                     </p>
                                 </div>
                                 <div>
@@ -123,7 +126,9 @@ export default function FeeStructureShow({ school, feeStructure }: Props) {
                                         {t('feeStructures.isActive')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {feeStructure.is_active ? t('common.yes') : t('common.no')}
+                                        {feeStructure.is_active
+                                            ? t('common.yes')
+                                            : t('common.no')}
                                     </p>
                                 </div>
                             </div>

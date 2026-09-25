@@ -1,4 +1,5 @@
 import { useT } from '@/hooks/useT';
+import { PageHero, PageHeroStat, PageHeroStats } from '@/components/page-hero';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Bell,
@@ -73,38 +74,37 @@ export default function TeacherDashboard() {
             <Head title={t('portal.teacherTitle')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-hero-bg p-6 text-white md:p-8">
-                    <p className="text-sm font-bold text-hero-muted">
-                        {t('portal.today')} · {today.iso} ·{' '}
-                        {dayName(today.weekday)}
-                    </p>
-                    <h1 className="mt-2 text-3xl font-black md:text-4xl">
-                        {t('portal.teacherTitle')}
-                    </h1>
-                    <p className="mt-3 max-w-xl leading-7 text-hero-accent">
-                        {t('portal.teacherSubtitle')}
-                    </p>
-                    <div className="mt-5 flex flex-wrap gap-3">
-                        <span className="rounded-full bg-card/10 px-4 py-2 text-sm font-bold">
+                <PageHero
+                    eyebrow={
+                        <>
+                            {t('portal.today')} · {today.iso} ·{' '}
+                            {dayName(today.weekday)}
+                        </>
+                    }
+                    title={t('portal.teacherTitle')}
+                    subtitle={t('portal.teacherSubtitle')}
+                >
+                    <PageHeroStats>
+                        <PageHeroStat>
                             {t('portal.sections')}: {counts.sections}
-                        </span>
-                        <span className="rounded-full bg-card/10 px-4 py-2 text-sm font-bold">
+                        </PageHeroStat>
+                        <PageHeroStat>
                             {t('portal.studentsCount', {
                                 count: counts.students,
                             })}
-                        </span>
-                    </div>
-                </header>
+                        </PageHeroStat>
+                    </PageHeroStats>
+                </PageHero>
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
+                    <section className="border-border bg-card rounded-lg border p-6">
+                        <h2 className="text-foreground flex items-center gap-2 text-xl font-semibold">
                             <CalendarDays size={19} aria-hidden="true" />
                             {t('portal.todayClasses')}
                         </h2>
 
                         {todayClasses.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">
+                            <p className="text-muted-foreground mt-4 text-sm">
                                 {t('portal.noClassesToday')}
                             </p>
                         ) : (
@@ -112,18 +112,18 @@ export default function TeacherDashboard() {
                                 {todayClasses.map((entry) => (
                                     <li
                                         key={entry.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                        className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                     >
                                         <span className="min-w-0">
-                                            <strong className="block text-sm font-black text-foreground">
+                                            <strong className="text-foreground block text-sm font-semibold">
                                                 {subjectLabel(entry)}
                                             </strong>
-                                            <small className="mt-1 block text-muted-foreground">
+                                            <small className="text-muted-foreground mt-1 block">
                                                 {entry.class_name} ·{' '}
                                                 {entry.section_name}
                                             </small>
                                         </span>
-                                        <span className="shrink-0 text-end text-xs font-bold text-brand-600">
+                                        <span className="text-brand-600 shrink-0 text-end text-xs font-bold">
                                             {t('portal.period')}{' '}
                                             {entry.period_number}
                                             {entry.starts_at ? (
@@ -138,14 +138,14 @@ export default function TeacherDashboard() {
                         )}
                     </section>
 
-                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
+                    <section className="border-border bg-card rounded-lg border p-6">
+                        <h2 className="text-foreground flex items-center gap-2 text-xl font-semibold">
                             <ClipboardList size={19} aria-hidden="true" />
                             {t('portal.invigilation')}
                         </h2>
 
                         {duties.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">
+                            <p className="text-muted-foreground mt-4 text-sm">
                                 {t('portal.noDuties')}
                             </p>
                         ) : (
@@ -153,17 +153,20 @@ export default function TeacherDashboard() {
                                 {duties.map((duty) => (
                                     <li
                                         key={duty.id}
-                                        className="rounded-2xl border border-border p-3"
+                                        className="border-border rounded-lg border p-3"
                                     >
                                         <div className="flex items-center justify-between gap-3">
-                                            <strong className="text-sm font-black text-foreground">
+                                            <strong className="text-foreground text-sm font-semibold">
                                                 {subjectLabel(duty)}
                                             </strong>
-                                            <span className="text-xs font-bold text-brand-600">
+                                            <span
+                                                dir="ltr"
+                                                className="text-brand-600 text-xs font-bold"
+                                            >
                                                 {duty.starts_at}–{duty.ends_at}
                                             </span>
                                         </div>
-                                        <small className="mt-1 block text-muted-foreground">
+                                        <small className="text-muted-foreground mt-1 block">
                                             {duty.exam_date} · {duty.class_name}{' '}
                                             · {duty.section_name}
                                             {duty.room
@@ -171,7 +174,7 @@ export default function TeacherDashboard() {
                                                 : ''}
                                         </small>
                                         {duty.schedule_title ? (
-                                            <small className="mt-1 block text-muted-foreground">
+                                            <small className="text-muted-foreground mt-1 block">
                                                 {isArabic &&
                                                 duty.schedule_title_ar
                                                     ? duty.schedule_title_ar
@@ -185,14 +188,14 @@ export default function TeacherDashboard() {
                     </section>
                 </div>
 
-                <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                    <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
+                <section className="border-border bg-card rounded-lg border p-6">
+                    <h2 className="text-foreground flex items-center gap-2 text-xl font-semibold">
                         <UsersRound size={19} aria-hidden="true" />
                         {t('portal.mySections')}
                     </h2>
 
                     {sections.length === 0 ? (
-                        <p className="mt-4 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground mt-4 text-sm">
                             {t('portal.noSections')}
                         </p>
                     ) : (
@@ -200,15 +203,15 @@ export default function TeacherDashboard() {
                             {sections.map((section) => (
                                 <li
                                     key={section.id}
-                                    className="rounded-2xl border border-border p-4"
+                                    className="border-border rounded-lg border p-4"
                                 >
-                                    <strong className="block text-sm font-black text-foreground">
+                                    <strong className="text-foreground block text-sm font-semibold">
                                         {section.class_name} · {section.name}
                                     </strong>
-                                    <small className="mt-1 block text-muted-foreground">
+                                    <small className="text-muted-foreground mt-1 block">
                                         {section.school_name}
                                     </small>
-                                    <small className="mt-1 block text-brand-600">
+                                    <small className="text-brand-600 mt-1 block">
                                         {t('portal.studentsCount', {
                                             count: section.students_count,
                                         })}
@@ -219,21 +222,21 @@ export default function TeacherDashboard() {
                     )}
                 </section>
 
-                <section className="rounded-[1.75rem] border border-border bg-card bg-muted p-6">
-                    <h2 className="text-xl font-black text-foreground">
+                <section className="border-border bg-card bg-muted rounded-lg border p-6">
+                    <h2 className="text-foreground text-xl font-semibold">
                         {t('portal.quickLinks')}
                     </h2>
                     <div className="mt-4 flex flex-wrap gap-3">
                         <Link
                             href="/portal/teacher"
-                            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 font-black text-brand-700 shadow-sm"
+                            className="bg-card text-brand-700 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold"
                         >
                             <BookOpenCheck size={18} aria-hidden="true" />
                             {t('portal.myWorkspace')}
                         </Link>
                         <Link
                             href="/portal/notifications"
-                            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 font-black text-brand-700 shadow-sm"
+                            className="bg-card text-brand-700 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold"
                         >
                             <Bell size={18} aria-hidden="true" />
                             {t('portal.notifications')}

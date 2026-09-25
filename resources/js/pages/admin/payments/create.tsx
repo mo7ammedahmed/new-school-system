@@ -65,7 +65,9 @@ export default function PaymentCreate({ school }: Props) {
             <Head title={t('payments.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">{t('payments.create')}</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t('payments.create')}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
                             <Link href={LIST_URL(school.id)}>
@@ -88,13 +90,20 @@ export default function PaymentCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('payments.organization')}
-                                description={t('payments.organizationDescription')}
+                                description={t(
+                                    'payments.organizationDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('payments.organizationPlaceholder')}
+                                    placeholder={t(
+                                        'payments.organizationPlaceholder',
+                                    )}
                                     value={data.organization_id}
                                     onChange={(e) =>
-                                        setData('organization_id', e.target.value)
+                                        setData(
+                                            'organization_id',
+                                            e.target.value,
+                                        )
                                     }
                                     required
                                     type="number"
@@ -109,7 +118,9 @@ export default function PaymentCreate({ school }: Props) {
                                 description={t('payments.schoolDescription')}
                             >
                                 <Input
-                                    placeholder={t('payments.schoolPlaceholder')}
+                                    placeholder={t(
+                                        'payments.schoolPlaceholder',
+                                    )}
                                     value={data.school_id}
                                     onChange={(e) =>
                                         setData('school_id', e.target.value)
@@ -124,13 +135,20 @@ export default function PaymentCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('payments.installment')}
-                                description={t('payments.installmentDescription')}
+                                description={t(
+                                    'payments.installmentDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('payments.installmentPlaceholder')}
+                                    placeholder={t(
+                                        'payments.installmentPlaceholder',
+                                    )}
                                     value={data.installment_id}
                                     onChange={(e) =>
-                                        setData('installment_id', e.target.value)
+                                        setData(
+                                            'installment_id',
+                                            e.target.value,
+                                        )
                                     }
                                     type="number"
                                     min="1"
@@ -144,7 +162,9 @@ export default function PaymentCreate({ school }: Props) {
                                 description={t('payments.invoiceDescription')}
                             >
                                 <Input
-                                    placeholder={t('payments.invoicePlaceholder')}
+                                    placeholder={t(
+                                        'payments.invoicePlaceholder',
+                                    )}
                                     value={data.invoice_id}
                                     onChange={(e) =>
                                         setData('invoice_id', e.target.value)
@@ -158,10 +178,14 @@ export default function PaymentCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('payments.receivedBy')}
-                                description={t('payments.receivedByDescription')}
+                                description={t(
+                                    'payments.receivedByDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('payments.receivedByPlaceholder')}
+                                    placeholder={t(
+                                        'payments.receivedByPlaceholder',
+                                    )}
                                     value={data.received_by}
                                     onChange={(e) =>
                                         setData('received_by', e.target.value)
@@ -176,19 +200,30 @@ export default function PaymentCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('payments.paymentMethod')}
-                                description={t('payments.paymentMethodDescription')}
+                                description={t(
+                                    'payments.paymentMethodDescription',
+                                )}
                             >
                                 <Select
                                     value={data.payment_method}
                                     onValueChange={(value) =>
                                         setData('payment_method', value)
                                     }
-                                    placeholder={t('payments.paymentMethodPlaceholder')}
+                                    placeholder={t(
+                                        'payments.paymentMethodPlaceholder',
+                                    )}
                                 >
-                                    <option value="">{t('payments.paymentMethodPlaceholder')}</option>
+                                    <option value="">
+                                        {t('payments.paymentMethodPlaceholder')}
+                                    </option>
                                     {PAYMENT_METHODS.map((method) => (
-                                        <option key={method.value} value={method.value}>
-                                            {t(`payments.methods.${method.value}`)}
+                                        <option
+                                            key={method.value}
+                                            value={method.value}
+                                        >
+                                            {t(
+                                                `payments.methods.${method.value}`,
+                                            )}
                                         </option>
                                     ))}
                                 </Select>
@@ -198,13 +233,20 @@ export default function PaymentCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('payments.referenceNumber')}
-                                description={t('payments.referenceNumberDescription')}
+                                description={t(
+                                    'payments.referenceNumberDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('payments.referenceNumberPlaceholder')}
+                                    placeholder={t(
+                                        'payments.referenceNumberPlaceholder',
+                                    )}
                                     value={data.reference_number}
                                     onChange={(e) =>
-                                        setData('reference_number', e.target.value)
+                                        setData(
+                                            'reference_number',
+                                            e.target.value,
+                                        )
                                     }
                                 />
                             </FormField>
@@ -212,11 +254,15 @@ export default function PaymentCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                label={t('payments.paymentDate')}
-                                description={t('payments.paymentDateDescription')}
+                                label={t('payments.paymentDate')}
+                                description={t(
+                                    'payments.paymentDateDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('payments.paymentDatePlaceholder')}
+                                    placeholder={t(
+                                        'payments.paymentDatePlaceholder',
+                                    )}
                                     value={data.payment_date}
                                     onChange={(e) =>
                                         setData('payment_date', e.target.value)
@@ -233,7 +279,9 @@ export default function PaymentCreate({ school }: Props) {
                                 description={t('payments.amountDescription')}
                             >
                                 <Input
-                                    placeholder={t('payments.amountPlaceholder')}
+                                    placeholder={t(
+                                        'payments.amountPlaceholder',
+                                    )}
                                     value={data.amount_minor}
                                     onChange={(e) =>
                                         setData('amount_minor', e.target.value)
@@ -255,13 +303,22 @@ export default function PaymentCreate({ school }: Props) {
                                     onValueChange={(value) =>
                                         setData('status', value)
                                     }
-                                    placeholder={t('payments.statusPlaceholder')}
+                                    placeholder={t(
+                                        'payments.statusPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('payments.statusPlaceholder')}</option>
+                                    <option value="">
+                                        {t('payments.statusPlaceholder')}
+                                    </option>
                                     {STATUSES.map((status) => (
-                                        <option key={status.value} value={status.value}>
-                                            {t(`payments.statuses.${status.value}`)}
+                                        <option
+                                            key={status.value}
+                                            value={status.value}
+                                        >
+                                            {t(
+                                                `payments.statuses.${status.value}`,
+                                            )}
                                         </option>
                                     ))}
                                 </Select>

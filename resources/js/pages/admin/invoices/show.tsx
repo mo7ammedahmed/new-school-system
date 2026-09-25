@@ -1,15 +1,8 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useT } from '@/hooks/useT';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
     school: { id: number; name: string };
@@ -50,21 +43,19 @@ export default function InvoiceShow({ school, invoice }: Props) {
                             {t('actions.edit')}
                         </Link>
                         <Button
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        t('common.deleteConfirmation', {
-                                            name: t('invoices.title'),
-                                        })
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert('Invoice deleted successfully!');
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/invoices`;
-                                }
-                            }}
+                            onClick={() =>
+                                confirmDelete(
+                                    `/admin/schools/${school.id}/invoices/${invoice.id}`,
+                                    {
+                                        message: t(
+                                            'common.deleteConfirmation',
+                                            {
+                                                name: t('invoices.title'),
+                                            },
+                                        ),
+                                    },
+                                )
+                            }
                             variant="destructive"
                         >
                             {t('actions.delete')}
@@ -114,7 +105,8 @@ export default function InvoiceShow({ school, invoice }: Props) {
                                         {t('invoices.issuedDate')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {invoice.issued_on ?? t('common.notAvailable')}
+                                        {invoice.issued_on ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                                 <div>
@@ -122,7 +114,8 @@ export default function InvoiceShow({ school, invoice }: Props) {
                                         {t('invoices.dueDate')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {invoice.due_on ?? t('common.notAvailable')}
+                                        {invoice.due_on ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                                 <div>
@@ -130,7 +123,9 @@ export default function InvoiceShow({ school, invoice }: Props) {
                                         {t('invoices.status')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {t(`invoices.statuses.${invoice.status}`)}
+                                        {t(
+                                            `invoices.statuses.${invoice.status}`,
+                                        )}
                                     </p>
                                 </div>
                                 <div>
@@ -146,7 +141,11 @@ export default function InvoiceShow({ school, invoice }: Props) {
                                         {t('invoices.subtotal')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        ${(invoice.subtotal_minor / 100).toFixed(2)} SAR
+                                        $
+                                        {(invoice.subtotal_minor / 100).toFixed(
+                                            2,
+                                        )}{' '}
+                                        SAR
                                     </p>
                                 </div>
                                 <div>
@@ -154,7 +153,9 @@ export default function InvoiceShow({ school, invoice }: Props) {
                                         {t('invoices.total')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        ${(invoice.total_minor / 100).toFixed(2)} SAR
+                                        $
+                                        {(invoice.total_minor / 100).toFixed(2)}{' '}
+                                        SAR
                                     </p>
                                 </div>
                                 <div>
@@ -175,7 +176,7 @@ export default function InvoiceShow({ school, invoice }: Props) {
                                 </div>
                             </div>
                         </div>
-                    </Content>
+                    </CardContent>
                 </Card>
             </div>
         </>

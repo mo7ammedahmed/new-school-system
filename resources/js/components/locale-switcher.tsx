@@ -16,7 +16,7 @@ export default function LocaleSwitcher({ className }: Props) {
 
     const nextLocale =
         available.length === 2
-            ? available.find((l) => l !== locale) ?? locale
+            ? (available.find((l) => l !== locale) ?? locale)
             : locale;
 
     return (
@@ -24,7 +24,7 @@ export default function LocaleSwitcher({ className }: Props) {
             type="button"
             onClick={() => switchLocale(nextLocale)}
             className={cn(
-                'inline-flex items-center gap-2 rounded-xl bg-muted px-3 py-2 text-sm font-bold text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
+                'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex shrink-0 items-center gap-2 rounded-xl px-2 py-2 text-sm font-bold transition-colors sm:px-3',
                 className,
             )}
             aria-label={
@@ -34,7 +34,7 @@ export default function LocaleSwitcher({ className }: Props) {
             }
         >
             <Globe2 size={16} />
-            <span className="uppercase">{locale ?? 'ar'}</span>
+            <span className="hidden uppercase sm:inline">{locale ?? 'ar'}</span>
         </button>
     );
 }

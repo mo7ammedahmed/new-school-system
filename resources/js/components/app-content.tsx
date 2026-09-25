@@ -7,14 +7,21 @@ type Props = React.ComponentProps<'main'> & {
 };
 
 export function AppContent({ variant = 'sidebar', children, ...props }: Props) {
+    // The blade-level skip link targets #main-content, so every layout that
+    // renders page content must expose that id.
     if (variant === 'sidebar') {
-        return <SidebarInset {...props}>{children}</SidebarInset>;
+        return (
+            <SidebarInset {...props} id="main-content">
+                {children}
+            </SidebarInset>
+        );
     }
 
     return (
         <main
-            className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl"
+            className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4"
             {...props}
+            id="main-content"
         >
             {children}
         </main>

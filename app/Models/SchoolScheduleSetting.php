@@ -31,6 +31,10 @@ class SchoolScheduleSetting extends Model
         'teacher_max_periods_per_week',
     ];
 
+    protected $attributes = [
+        'working_days' => '[0,1,2,3,4]',
+    ];
+
     protected $casts = [
         'working_days' => 'array',
         'max_exams_per_day_per_section' => 'integer',

@@ -23,24 +23,20 @@ function Drawer({
 }: DrawerProps) {
   return (
     <DialogPrimitive.Root
-      data-slot="drawer"
-      className={cn(
-        drawerVariants.default,
-        drawerVariants[side],
-        className
-      )}
       {...props}
     >
-      <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm" />
+      <DialogPrimitive.Overlay className="bg-inverse-surface/40 fixed inset-0 z-40 backdrop-blur-[4px]" />
       <DialogPrimitive.Content
-        data-slot="drawer-content"
+        data-slot="drawer"
         className={cn(
+          drawerVariants.default,
+          drawerVariants[side],
           "flex h-full flex-col overflow-y-auto scrollbar-thin",
           "bg-background border-border",
           "shadow-lg",
-          "focus:outline-none"
+          "focus:outline-none",
+          className
         )}
-        {...props}
       >
         {children}
       </DialogPrimitive.Content>

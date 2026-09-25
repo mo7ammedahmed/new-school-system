@@ -1,10 +1,9 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
@@ -13,20 +12,19 @@ import { DateCell } from '@/components/data-display/date-cell';
 import { UserCell } from '@/components/data-display/user-cell';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
+    school: { id: number; name: string };
     enrollment: {
         id: number;
         student: {
             id: number;
+            name: string;
             first_name: string;
             last_name: string;
             student_number: string;
             date_of_birth: string | null;
-            gender: string | null;
-            phone: string | null;
-            email: string | null;
-            address: string | null;
         };
         academicYear: {
             id: number;
@@ -58,15 +56,14 @@ type Props = {
 };
 
 export default function EnrollmentShow({
+    school,
     enrollment,
     canEdit,
     canDelete,
 }: Props) {
     return (
         <>
-            <Head
-                title={`Enrollment: ${enrollment.student.first_name} ${enrollment.student.last_name}`}
-            />
+            <Head title={`Enrollment: ${enrollment.student.name}`} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
@@ -74,14 +71,14 @@ export default function EnrollmentShow({
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button
-                            href={`/admin/schools/${enrollment.student.id}/enrollments`}
+                            href={`/admin/schools/${school.id}/enrollments`}
                             variant="outline"
                         >
                             Back to Enrollments
                         </Button>
                         {canEdit && (
                             <Button
-                                href={`/admin/schools/${enrollment.student.id}/enrollments/${enrollment.id}/edit`}
+                                href={`/admin/schools/${school.id}/enrollments/${enrollment.id}/edit`}
                                 variant="default"
                             >
                                 Edit Enrollment
@@ -89,18 +86,15 @@ export default function EnrollmentShow({
                         )}
                         {canDelete && (
                             <Button
-                                onClick={() => {
-                                    if (
-                                        window.confirm(
-                                            'Are you sure you want to delete this enrollment?',
-                                        )
-                                    ) {
-                                        // In a real implementation, you would send a DELETE request
-                                        alert(
-                                            'Enrollment deleted successfully',
-                                        );
-                                    }
-                                }}
+                                onClick={() =>
+                                    confirmDelete(
+                                        `/admin/schools/${school.id}/enrollments/${enrollment.id}`,
+                                        {
+                                            message:
+                                                'Are you sure you want to delete this enrollment?',
+                                        },
+                                    )
+                                }
                                 variant="destructive"
                             >
                                 Delete Enrollment
@@ -233,40 +227,11 @@ export default function EnrollmentShow({
 
                                         <div className="space-y-2">
                                             <p className="font-medium">
-                                                Gender:
+                                                Student Number:
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {enrollment.student.gender ??
-                                                    'Not specified'}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <p className="font-medium">
-                                                Phone:
-                                            </p>
-                                            <p className="text-muted-foreground">
-                                                {enrollment.student.phone ??
-                                                    'Not specified'}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <p className="font-medium">
-                                                Email:
-                                            </p>
-                                            <p className="text-muted-foreground">
-                                                {enrollment.student.email ??
-                                                    'Not specified'}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <p className="font-medium">
-                                                Address:
-                                            </p>
-                                            <p className="text-muted-foreground">
-                                                {enrollment.student.address ??
+                                                {enrollment.student
+                                                    .student_number ??
                                                     'Not specified'}
                                             </p>
                                         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Jobs\DeliverEmailNotification;
 use App\Models\Notification;
 use App\Models\NotificationDelivery;
@@ -56,6 +57,6 @@ class DeliveryMonitoringController
 
     private function authorizeStaff(Request $request): void
     {
-        abort_unless($request->user()->organization_id !== null && ($request->user()->hasRole('organization_admin') || $request->user()->hasRole('school_admin') || $request->user()->hasRole('finance_staff')), 403);
+        abort_unless($request->user()->organization_id !== null && ($request->user()->hasRole(UserRole::OrganizationAdmin) || $request->user()->hasRole(UserRole::SchoolAdmin) || $request->user()->hasRole(UserRole::FinanceStaff)), 403);
     }
 }

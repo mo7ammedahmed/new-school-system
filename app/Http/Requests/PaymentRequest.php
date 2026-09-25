@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Models\School;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class PaymentRequest extends FormRequest
 {
@@ -30,8 +29,9 @@ class PaymentRequest extends FormRequest
         return [
             'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
-            'installment_id' => ['nullable', 'integer'],
-            'invoice_id' => ['nullable', 'integer'],
+            // A payment settles an installment or an invoice, exactly one.
+            'installment_id' => ['nullable', 'integer', 'required_without:invoice_id', 'prohibits:invoice_id'],
+            'invoice_id' => ['nullable', 'integer', 'required_without:installment_id', 'prohibits:installment_id'],
             'received_by' => ['required', 'integer'],
             'payment_method' => ['nullable', 'string', 'max:50'],
             'reference_number' => ['nullable', 'string', 'max:100'],

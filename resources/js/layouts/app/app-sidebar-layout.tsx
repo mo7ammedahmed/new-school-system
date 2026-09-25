@@ -13,7 +13,7 @@ export default function AppSidebarLayout({
     title,
     description,
     className,
-    ...props
+    ..._props
 }: {
     children: React.ReactNode;
     breadcrumbs?: BreadcrumbItem[];
@@ -26,13 +26,16 @@ export default function AppSidebarLayout({
             <AppSidebar />
             <AppContent
                 variant="sidebar"
-                className={cn('min-w-0 overflow-x-clip pb-16 md:pb-0', className)}
+                className={cn(
+                    'min-w-0 overflow-x-clip pb-16 md:pb-0',
+                    className,
+                )}
             >
                 {title || description ? (
-                    <AppSidebarHeader 
-                        title={title} 
-                        description={description} 
-                        breadcrumbs={breadcrumbs} 
+                    <AppSidebarHeader
+                        title={title}
+                        description={description}
+                        breadcrumbs={breadcrumbs}
                     />
                 ) : (
                     <AppSidebarHeader breadcrumbs={breadcrumbs} />

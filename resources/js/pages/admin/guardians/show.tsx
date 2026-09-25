@@ -1,16 +1,9 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
-import { type ComponentType } from 'react';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
     school: { id: number; name: string };
@@ -45,19 +38,15 @@ export default function GuardianShow({ school, guardian }: Props) {
                             Edit Guardian
                         </Link>
                         <Button
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        'Are you sure you want to delete this guardian?',
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert('Guardian deleted successfully!');
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/guardians`;
-                                }
-                            }}
+                            onClick={() =>
+                                confirmDelete(
+                                    `/admin/schools/${school.id}/guardians/${guardian.id}`,
+                                    {
+                                        message:
+                                            'Are you sure you want to delete this guardian?',
+                                    },
+                                )
+                            }
                             variant="destructive"
                         >
                             Delete Guardian

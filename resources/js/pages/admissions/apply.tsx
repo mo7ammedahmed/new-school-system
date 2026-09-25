@@ -57,19 +57,19 @@ export default function Apply({ school }: Props) {
             <Head title={`${labels.title} — ${school.name}`} />
             <section className="mx-auto max-w-3xl px-5 pt-16 pb-24 sm:px-8">
                 <div className="mb-8">
-                    <p className="text-sm font-black text-[#c56a3b]">
+                    <p className="text-warning text-sm font-semibold">
                         {school.name}
                     </p>
-                    <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
+                    <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
                         {labels.title}
                     </h1>
-                    <p className="mt-4 max-w-2xl leading-8 text-[#5d746c]">
+                    <p className="text-on-surface-variant mt-4 max-w-2xl leading-8">
                         {labels.intro}
                     </p>
                 </div>
                 {flash?.success && (
                     <div
-                        className="mb-5 rounded-2xl border border-[#a9d4b5] bg-[#e9f7eb] px-5 py-4 font-bold text-[#23633a]"
+                        className="border-success-border bg-success-container text-success-foreground mb-5 rounded-lg border px-5 py-4 font-bold"
                         role="status"
                     >
                         {isArabic
@@ -79,7 +79,7 @@ export default function Apply({ school }: Props) {
                 )}
                 {flash?.error && (
                     <div
-                        className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 font-bold text-red-800"
+                        className="border-danger-border bg-danger-container text-danger-foreground mb-5 rounded-lg border px-5 py-4 font-bold"
                         role="alert"
                     >
                         {flash.error}
@@ -87,7 +87,7 @@ export default function Apply({ school }: Props) {
                 )}
                 <form
                     onSubmit={submit}
-                    className="grid gap-5 rounded-[2rem] border border-[#dbe8df] bg-white p-6 shadow-sm sm:p-9"
+                    className="border-outline-variant bg-card grid gap-5 rounded-lg border p-6 sm:p-9"
                 >
                     <div className="grid gap-5 sm:grid-cols-2">
                         <Field
@@ -179,7 +179,7 @@ export default function Apply({ school }: Props) {
                     </Field>
                     <button
                         disabled={form.processing}
-                        className="rounded-full bg-[#0d5c4d] px-6 py-3.5 font-black text-white transition hover:bg-[#08483d] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="bg-primary text-primary-foreground hover:bg-primary rounded-full px-6 py-3.5 font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {form.processing ? labels.sending : labels.submit}
                     </button>
@@ -200,14 +200,17 @@ function Field({
     children: ReactNode;
 }) {
     return (
-        <label className="grid gap-2 text-sm font-bold text-[#28544a]">
+        <label className="text-on-surface grid gap-2 text-sm font-bold">
             <span>
                 {label}
-                {required && <span className="text-[#c56a3b]"> *</span>}
+                {required && <span className="text-warning"> *</span>}
             </span>
             {children}
             {error && (
-                <span className="text-xs font-medium text-red-700" role="alert">
+                <span
+                    className="text-danger-foreground text-xs font-medium"
+                    role="alert"
+                >
                     {error}
                 </span>
             )}

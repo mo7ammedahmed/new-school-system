@@ -80,7 +80,7 @@ export default function FinanceReport({
                         Export outstanding CSV
                     </Link>
                 </header>
-                <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                     <article className="rounded-xl border p-4">
                         <p className="text-muted-foreground text-sm">
                             Collected revenue

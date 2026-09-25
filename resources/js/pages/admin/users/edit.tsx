@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -12,193 +12,159 @@ import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
 import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Toast } from '@/components/ui/toast';
-import { useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 type Props = {
     school: { id: number; name: string };
-    user: {
-        id: number;
-        name: string;
-        email: string;
-        role: string;
-        phone: string | null;
-        status: string | null;
-    };
+    user: { id: number; name: string; email: string; role: string };
+    /** The roles this screen may assign, keyed by role value. */
+    roles: Record<string, string>;
 };
 
-export default function UserEdit({ school, user }: Props) {
+export default function UserEdit({ school, user, roles }: Props) {
+    const { t } = useT();
+    const listUrl = `/admin/schools/${school.id}/users`;
+
     const { data, setData, put, processing, errors } = useForm({
         name: user.name,
         email: user.email,
         role: user.role,
-        phone: user.phone ?? '',
-        status: user.status ?? '',
+        password: '',
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(`/admin/schools/${school.id}/users/${user.id}`, {
-            onSuccess: () => {
-                // Show success toast
-                setToastMessage('User updated successfully.');
-                setToastType('success');
-                setShowToast(true);
-            },
-            onError: (errors) => {
-                // Show error toast
-                setToastMessage('Please correct the errors and try again.');
-                setToastType('error');
-                setShowToast(true);
-                // In a real implementation, the form errors would be displayed automatically
-            },
-        });
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        put(`${listUrl}/${user.id}`);
     };
+
+    const fieldError = (field: keyof typeof data) =>
+        errors[field] ? (
+            <p className="text-destructive text-sm">{errors[field]}</p>
+        ) : null;
 
     return (
         <>
-            <Head title="Edit User" />
+            <Head title={t('users.edit')} />
             <div className="space-y-6 p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">Edit User</h1>
-                    <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
-                        <Button
-                            href={`/admin/schools/${school.id}/users`}
-                            variant="outline"
-                        >
-                            Back to Users
-                        </Button>
-                    </div>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-semibold">
+                        {t('users.edit')}
+                    </h1>
+                    <Button asChild variant="outline">
+                        <Link href={listUrl}>{t('users.backToList')}</Link>
+                    </Button>
                 </div>
 
-                {/* Toast would go here in a real implementation */}
-
                 <Card>
-                    <CardHeader>
-                        <CardTitle>User Information</CardTitle>
-                        <CardDescription>
-                            Edit the details for the user.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <FormErrors errors={errors} />
+                    <form onSubmit={handleSubmit} noValidate>
+                        <CardHeader>
+                            <CardTitle>{t('users.information')}</CardTitle>
+                            <CardDescription>
+                                {t('users.editDescription', {
+                                    name: user.name,
+                                })}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <FormErrors errors={errors} />
 
-                        <FormSection>
-                            <FormField
-                                label="Name"
-                                description="Enter the user's full name"
-                            >
-                                <Input
-                                    placeholder="Full name"
-                                    value={data.name}
-                                    onChange={(e) =>
-                                        setData('name', e.target.value)
-                                    }
+                            <FormSection>
+                                <FormField
+                                    id="name"
+                                    label={t('users.name')}
+                                    description={t('users.nameHint')}
                                     required
-                                    maxLength={255}
-                                />
-                            </FormField>
-                        </FormSection>
+                                >
+                                    <Input
+                                        id="name"
+                                        value={data.name}
+                                        onChange={(e) =>
+                                            setData('name', e.target.value)
+                                        }
+                                        maxLength={255}
+                                        required
+                                        autoComplete="name"
+                                    />
+                                </FormField>
+                                {fieldError('name')}
+                            </FormSection>
 
-                        <FormSection>
-                            <FormField
-                                label="Email Address"
-                                description="Enter the user's email address"
-                            >
-                                <Input
-                                    placeholder="email@example.com"
-                                    value={data.email}
-                                    onChange={(e) =>
-                                        setData('email', e.target.value)
-                                    }
-                                    type="email"
+                            <FormSection>
+                                <FormField
+                                    id="email"
+                                    label={t('users.email')}
+                                    description={t('users.emailHint')}
                                     required
-                                    maxLength={255}
-                                />
-                            </FormField>
-                        </FormSection>
-
-                        <FormSection>
-                            <FormField
-                                label="Role"
-                                description="Select the user's role"
-                            >
-                                <Select
-                                    value={data.role}
-                                    onValueChange={(value) =>
-                                        setData('role', value)
-                                    }
-                                    placeholder="Select role"
                                 >
-                                    <option value="">Select role</option>
-                                    <option value="organization_admin">
-                                        Organization Admin
-                                    </option>
-                                    <option value="school_admin">
-                                        School Admin
-                                    </option>
-                                    <option value="teacher">Teacher</option>
-                                    <option value="staff">Staff</option>
-                                    <option value="guardian">Guardian</option>
-                                </Select>
-                            </FormField>
-                        </FormSection>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData('email', e.target.value)
+                                        }
+                                        maxLength={255}
+                                        required
+                                        autoComplete="email"
+                                    />
+                                </FormField>
+                                {fieldError('email')}
+                            </FormSection>
 
-                        <FormSection>
-                            <FormField
-                                label="Phone Number"
-                                description="Enter the user's phone number"
-                            >
-                                <Input
-                                    placeholder="Phone number"
-                                    value={data.phone}
-                                    onChange={(e) =>
-                                        setData('phone', e.target.value)
-                                    }
-                                    maxLength={40}
-                                />
-                            </FormField>
-                        </FormSection>
-
-                        <FormSection>
-                            <FormField
-                                label="Status"
-                                description="Select the user's status"
-                            >
-                                <Select
-                                    value={data.status}
-                                    onValueChange={(value) =>
-                                        setData('status', value)
-                                    }
-                                    placeholder="Select status"
+                            <FormSection>
+                                <FormField
+                                    id="role"
+                                    label={t('users.role')}
+                                    description={t('users.roleHint')}
+                                    required
                                 >
-                                    <option value="">Select status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </Select>
-                            </FormField>
-                        </FormSection>
-                    </CardContent>
-                    <CardFooter className="flex justify-end pt-4">
-                        <Button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // In a real implementation, you would navigate back
-                            }}
-                            variant="outline"
-                        >
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSubmit} isLoading={processing}>
-                            Update User
-                        </Button>
-                    </CardFooter>
+                                    <Select
+                                        id="role"
+                                        value={data.role}
+                                        onValueChange={(value) =>
+                                            setData('role', value)
+                                        }
+                                        required
+                                    >
+                                        {Object.keys(roles).map((role) => (
+                                            <option key={role} value={role}>
+                                                {t(`roles.${role}`)}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </FormField>
+                                {fieldError('role')}
+                            </FormSection>
+
+                            <FormSection>
+                                <FormField
+                                    id="password"
+                                    label={t('users.password')}
+                                    description={t('users.passwordKeep')}
+                                >
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={data.password}
+                                        onChange={(e) =>
+                                            setData('password', e.target.value)
+                                        }
+                                        autoComplete="new-password"
+                                    />
+                                </FormField>
+                                {fieldError('password')}
+                            </FormSection>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2 pt-4">
+                            <Button asChild variant="outline">
+                                <Link href={listUrl}>{t('common.cancel')}</Link>
+                            </Button>
+                            <Button type="submit" isLoading={processing}>
+                                {t('common.update')}
+                            </Button>
+                        </CardFooter>
+                    </form>
                 </Card>
             </div>
         </>

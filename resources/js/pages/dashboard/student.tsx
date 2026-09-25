@@ -1,4 +1,5 @@
 import { useT } from '@/hooks/useT';
+import { PageHero } from '@/components/page-hero';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Bell, CalendarDays, ClipboardList, LineChart } from 'lucide-react';
 
@@ -78,30 +79,30 @@ export default function StudentDashboard() {
             <Head title={t('portal.studentTitle')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-hero-bg p-6 text-white md:p-8">
-                    <p className="text-sm font-bold text-hero-muted">
-                        {t('portal.today')} · {today.iso} ·{' '}
-                        {dayName(today.weekday)}
-                    </p>
-                    <h1 className="mt-2 text-3xl font-black md:text-4xl">
-                        {student?.name ?? t('portal.studentTitle')}
-                    </h1>
-                    <p className="mt-3 max-w-xl leading-7 text-hero-accent">
-                        {student
+                <PageHero
+                    eyebrow={
+                        <>
+                            {t('portal.today')} · {today.iso} ·{' '}
+                            {dayName(today.weekday)}
+                        </>
+                    }
+                    title={student?.name ?? t('portal.studentTitle')}
+                    subtitle={
+                        student
                             ? `${student.class_name ?? ''} · ${student.section_name ?? ''} · ${student.school_name ?? ''}`
-                            : t('portal.noSchool')}
-                    </p>
-                </header>
+                            : t('portal.noSchool')
+                    }
+                />
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
+                    <section className="border-border bg-card rounded-lg border p-6">
+                        <h2 className="text-foreground flex items-center gap-2 text-xl font-semibold">
                             <CalendarDays size={19} aria-hidden="true" />
                             {t('portal.todayClasses')}
                         </h2>
 
                         {todayClasses.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">
+                            <p className="text-muted-foreground mt-4 text-sm">
                                 {t('portal.noClassesToday')}
                             </p>
                         ) : (
@@ -109,7 +110,7 @@ export default function StudentDashboard() {
                                 {todayClasses.map((entry) => (
                                     <li
                                         key={entry.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                        className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                     >
                                         <span className="flex min-w-0 items-center gap-2">
                                             {entry.subject_color ? (
@@ -123,15 +124,15 @@ export default function StudentDashboard() {
                                                 />
                                             ) : null}
                                             <span className="min-w-0">
-                                                <strong className="block text-sm font-black text-foreground">
+                                                <strong className="text-foreground block text-sm font-semibold">
                                                     {subjectLabel(entry)}
                                                 </strong>
-                                                <small className="mt-1 block text-muted-foreground">
+                                                <small className="text-muted-foreground mt-1 block">
                                                     {entry.teacher_name}
                                                 </small>
                                             </span>
                                         </span>
-                                        <span className="shrink-0 text-end text-xs font-bold text-brand-600">
+                                        <span className="text-brand-600 shrink-0 text-end text-xs font-bold">
                                             {t('portal.period')}{' '}
                                             {entry.period_number}
                                             {entry.starts_at ? (
@@ -146,14 +147,14 @@ export default function StudentDashboard() {
                         )}
                     </section>
 
-                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
+                    <section className="border-border bg-card rounded-lg border p-6">
+                        <h2 className="text-foreground flex items-center gap-2 text-xl font-semibold">
                             <ClipboardList size={19} aria-hidden="true" />
                             {t('portal.upcomingExams')}
                         </h2>
 
                         {upcomingExams.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">
+                            <p className="text-muted-foreground mt-4 text-sm">
                                 {t('portal.noUpcomingExams')}
                             </p>
                         ) : (
@@ -161,17 +162,20 @@ export default function StudentDashboard() {
                                 {upcomingExams.map((exam) => (
                                     <li
                                         key={exam.id}
-                                        className="rounded-2xl border border-border p-3"
+                                        className="border-border rounded-lg border p-3"
                                     >
                                         <div className="flex items-center justify-between gap-3">
-                                            <strong className="text-sm font-black text-foreground">
+                                            <strong className="text-foreground text-sm font-semibold">
                                                 {subjectLabel(exam)}
                                             </strong>
-                                            <span className="text-xs font-bold text-brand-600">
+                                            <span
+                                                dir="ltr"
+                                                className="text-brand-600 text-xs font-bold"
+                                            >
                                                 {exam.starts_at}–{exam.ends_at}
                                             </span>
                                         </div>
-                                        <small className="mt-1 block text-muted-foreground">
+                                        <small className="text-muted-foreground mt-1 block">
                                             {exam.exam_date}
                                             {exam.room
                                                 ? ` · ${t('portal.room')} ${exam.room}`
@@ -185,8 +189,8 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                        <h2 className="flex items-center gap-2 text-xl font-black text-foreground">
+                    <section className="border-border bg-card rounded-lg border p-6">
+                        <h2 className="text-foreground flex items-center gap-2 text-xl font-semibold">
                             <LineChart size={19} aria-hidden="true" />
                             {t('portal.attendance')}
                         </h2>
@@ -201,12 +205,12 @@ export default function StudentDashboard() {
                             ).map(([key, value]) => (
                                 <div
                                     key={key}
-                                    className="rounded-2xl bg-muted p-4"
+                                    className="bg-muted rounded-lg p-4"
                                 >
-                                    <dt className="text-xs font-bold text-muted-foreground">
+                                    <dt className="text-muted-foreground text-xs font-bold">
                                         {t(`portal.${key}`)}
                                     </dt>
-                                    <dd className="mt-1 text-2xl font-black text-foreground">
+                                    <dd className="text-foreground mt-1 text-2xl font-semibold">
                                         {value}
                                     </dd>
                                 </div>
@@ -214,13 +218,13 @@ export default function StudentDashboard() {
                         </dl>
                     </section>
 
-                    <section className="rounded-[1.75rem] border border-border bg-card p-6">
-                        <h2 className="text-xl font-black text-foreground">
+                    <section className="border-border bg-card rounded-lg border p-6">
+                        <h2 className="text-foreground text-xl font-semibold">
                             {t('portal.recentAssessments')}
                         </h2>
 
                         {recentAssessments.length === 0 ? (
-                            <p className="mt-4 text-sm text-muted-foreground">
+                            <p className="text-muted-foreground mt-4 text-sm">
                                 {t('portal.noAssessments')}
                             </p>
                         ) : (
@@ -228,17 +232,20 @@ export default function StudentDashboard() {
                                 {recentAssessments.map((assessment) => (
                                     <li
                                         key={assessment.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                        className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                     >
                                         <span>
-                                            <strong className="block text-sm font-black text-foreground">
+                                            <strong className="text-foreground block text-sm font-semibold">
                                                 {assessment.title}
                                             </strong>
-                                            <small className="mt-1 block text-muted-foreground">
+                                            <small className="text-muted-foreground mt-1 block">
                                                 {assessment.assessed_on}
                                             </small>
                                         </span>
-                                        <span className="text-sm font-black text-brand-600">
+                                        <span
+                                            dir="ltr"
+                                            className="text-brand-600 text-sm font-semibold"
+                                        >
                                             {assessment.score} /{' '}
                                             {assessment.max_score}
                                         </span>
@@ -249,14 +256,14 @@ export default function StudentDashboard() {
                     </section>
                 </div>
 
-                <section className="rounded-[1.75rem] border border-border bg-muted p-6">
-                    <h2 className="text-xl font-black text-foreground">
+                <section className="border-border bg-muted rounded-lg border p-6">
+                    <h2 className="text-foreground text-xl font-semibold">
                         {t('portal.quickLinks')}
                     </h2>
                     <div className="mt-4 flex flex-wrap gap-3">
                         <Link
                             href="/portal/notifications"
-                            className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 font-black text-brand-700 shadow-sm"
+                            className="bg-card text-brand-700 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold"
                         >
                             <Bell size={18} aria-hidden="true" />
                             {t('portal.notifications')}

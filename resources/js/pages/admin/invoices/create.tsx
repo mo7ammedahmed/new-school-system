@@ -14,7 +14,6 @@ import { FormErrors } from '@/components/forms/form-errors';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { useT } from '@/hooks/useT';
 
 type Props = {
@@ -67,7 +66,9 @@ export default function InvoiceCreate({ school }: Props) {
             <Head title={t('invoices.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">{t('invoices.create')}</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t('invoices.create')}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
                             <Link href={LIST_URL(school.id)}>
@@ -93,7 +94,9 @@ export default function InvoiceCreate({ school }: Props) {
                                 description={t('invoices.studentDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.studentPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.studentPlaceholder',
+                                    )}
                                     value={data.student_id}
                                     onChange={(e) =>
                                         setData('student_id', e.target.value)
@@ -111,7 +114,9 @@ export default function InvoiceCreate({ school }: Props) {
                                 description={t('invoices.issuedByDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.issuedByPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.issuedByPlaceholder',
+                                    )}
                                     value={data.issued_by}
                                     onChange={(e) =>
                                         setData('issued_by', e.target.value)
@@ -129,7 +134,9 @@ export default function InvoiceCreate({ school }: Props) {
                                 description={t('invoices.numberDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.numberPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.numberPlaceholder',
+                                    )}
                                     value={data.number}
                                     onChange={(e) =>
                                         setData('number', e.target.value)
@@ -143,10 +150,14 @@ export default function InvoiceCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('invoices.issuedDate')}
-                                description={t('invoices.issuedDateDescription')}
+                                description={t(
+                                    'invoices.issuedDateDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('invoices.issuedDatePlaceholder')}
+                                    placeholder={t(
+                                        'invoices.issuedDatePlaceholder',
+                                    )}
                                     value={data.issued_on}
                                     onChange={(e) =>
                                         setData('issued_on', e.target.value)
@@ -163,7 +174,9 @@ export default function InvoiceCreate({ school }: Props) {
                                 description={t('invoices.dueDateDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.dueDatePlaceholder')}
+                                    placeholder={t(
+                                        'invoices.dueDatePlaceholder',
+                                    )}
                                     value={data.due_on}
                                     onChange={(e) =>
                                         setData('due_on', e.target.value)
@@ -183,13 +196,22 @@ export default function InvoiceCreate({ school }: Props) {
                                     onValueChange={(value) =>
                                         setData('status', value)
                                     }
-                                    placeholder={t('invoices.statusPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.statusPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('invoices.statusPlaceholder')}</option>
+                                    <option value="">
+                                        {t('invoices.statusPlaceholder')}
+                                    </option>
                                     {STATUSES.map((status) => (
-                                        <option key={status.value} value={status.value}>
-                                            {t(`invoices.statuses.${status.value}`)}
+                                        <option
+                                            key={status.value}
+                                            value={status.value}
+                                        >
+                                            {t(
+                                                `invoices.statuses.${status.value}`,
+                                            )}
                                         </option>
                                     ))}
                                 </Select>
@@ -206,12 +228,19 @@ export default function InvoiceCreate({ school }: Props) {
                                     onValueChange={(value) =>
                                         setData('currency', value)
                                     }
-                                    placeholder={t('invoices.currencyPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.currencyPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('invoices.currencyPlaceholder')}</option>
+                                    <option value="">
+                                        {t('invoices.currencyPlaceholder')}
+                                    </option>
                                     {CURRENCIES.map((currency) => (
-                                        <option key={currency.value} value={currency.value}>
+                                        <option
+                                            key={currency.value}
+                                            value={currency.value}
+                                        >
                                             {t(`currencies.${currency.value}`)}
                                         </option>
                                     ))}
@@ -225,10 +254,15 @@ export default function InvoiceCreate({ school }: Props) {
                                 description={t('invoices.subtotalDescription')}
                             >
                                 <Input
-                                    placeholder={t('invoices.subtotalPlaceholder')}
+                                    placeholder={t(
+                                        'invoices.subtotalPlaceholder',
+                                    )}
                                     value={data.subtotal_minor}
                                     onChange={(e) =>
-                                        setData('subtotal_minor', e.target.value)
+                                        setData(
+                                            'subtotal_minor',
+                                            e.target.value,
+                                        )
                                     }
                                     type="number"
                                     min="0"
@@ -239,47 +273,49 @@ export default function InvoiceCreate({ school }: Props) {
 
                         <FormSection>
                             <FormField
-                label={t('invoices.total')}
-                description={t('invoices.totalDescription')}
-            >
-                <Input
-                    placeholder={t('invoices.totalPlaceholder')}
-                    value={data.total_minor}
-                    onChange={(e) =>
-                        setData('total_minor', e.target.value)
-                    }
-                    type="number"
-                    min="0"
-                    required
-                />
-            </FormSection>
+                                label={t('invoices.total')}
+                                description={t('invoices.totalDescription')}
+                            >
+                                <Input
+                                    placeholder={t('invoices.totalPlaceholder')}
+                                    value={data.total_minor}
+                                    onChange={(e) =>
+                                        setData('total_minor', e.target.value)
+                                    }
+                                    type="number"
+                                    min="0"
+                                    required
+                                />
+                            </FormField>
+                        </FormSection>
 
-            <FormSection>
-                <FormField
-                    label={t('invoices.items')}
-                    description={t('invoices.itemsDescription')}
-                >
-                    <Textarea
-                        placeholder={t('invoices.itemsPlaceholder')}
-                        value={data.items}
-                        onChange={(e) =>
-                            setData('items', e.target.value)
-                        }
-                    />
-                </FormSection>
-            </CardContent>
-            <CardFooter className="flex justify-end pt-4">
-                <Button asChild variant="outline">
-                    <Link href={LIST_URL(school.id)}>
-                        {t('common.cancel')}
-                    </Link>
-                </Button>
-                <Button onClick={handleSubmit} isLoading={processing}>
-                    {t('common.create')}
-                </Button>
-            </CardFooter>
-        </Card>
-    </div>
-    </>
-);
+                        <FormSection>
+                            <FormField
+                                label={t('invoices.items')}
+                                description={t('invoices.itemsDescription')}
+                            >
+                                <Textarea
+                                    placeholder={t('invoices.itemsPlaceholder')}
+                                    value={data.items}
+                                    onChange={(e) =>
+                                        setData('items', e.target.value)
+                                    }
+                                />
+                            </FormField>
+                        </FormSection>
+                    </CardContent>
+                    <CardFooter className="flex justify-end pt-4">
+                        <Button asChild variant="outline">
+                            <Link href={LIST_URL(school.id)}>
+                                {t('common.cancel')}
+                            </Link>
+                        </Button>
+                        <Button onClick={handleSubmit} isLoading={processing}>
+                            {t('common.create')}
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        </>
+    );
 }

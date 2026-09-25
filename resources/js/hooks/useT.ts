@@ -30,6 +30,13 @@ function getNested(obj: Record<string, unknown>, path: string): unknown {
         );
 }
 
+/**
+ * Wraps an interpolated value in Unicode isolates. Without them a Latin name
+ * inside an Arabic sentence drags the punctuation after it to the wrong end of
+ * the line.
+ */
+const RTL_ISOLATES = { start: '\u2068', end: '\u2069' };
+
 export function useT() {
     const { props } = usePage<SharedPageProps>();
     const locale = (props.locale as Locale) ?? 'en';
@@ -57,13 +64,24 @@ export function useT() {
             return key;
         }
 
-        if (params) {
-            return String(resolved).replace(/\{(\w+)\}/g, (_, k: string) =>
-                String(params[k] ?? `{${k}}`),
-            );
+        if (typeof resolved !== 'string' && typeof resolved !== 'number') {
+            return '';
         }
 
-        return String(resolved);
+        if (params) {
+            const isolate = (value: string): string =>
+                locale === 'ar' && value !== ''
+                    ? `${RTL_ISOLATES.start}${value}${RTL_ISOLATES.end}`
+                    : value;
+
+            return resolved
+                .toString()
+                .replace(/\{(\w+)\}/g, (_, k: string) =>
+                    isolate(String(params[k] ?? `{${k}}`)),
+                );
+        }
+
+        return resolved.toString();
     };
 
     const dayName = (day: number): string => {

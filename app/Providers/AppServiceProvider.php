@@ -91,6 +91,17 @@ class AppServiceProvider extends ServiceProvider
                 && $user->hasRole(UserRole::OrganizationAdmin, UserRole::SchoolAdmin);
         });
 
+        // Re-skinning every screen is an administrator action, exactly like
+        // editing the content those screens render.
+        Gate::define('manage-theme', function (User $user, School $school): bool {
+            return $user->belongsToOrganization($school->organization)
+                && $user->hasRole(UserRole::OrganizationAdmin, UserRole::SchoolAdmin);
+        });
+
+        // The palette for the pages that belong to no school (the marketing
+        // site) is platform property, so only a platform operator may set it.
+        Gate::define('manage-platform-theme', fn (User $user): bool => $user->isPlatformOperator());
+
         Gate::define('manage-enrollment', function (User $user, School $school): bool {
             return $user->belongsToOrganization($school->organization)
                 && $user->hasRole(UserRole::OrganizationAdmin, UserRole::SchoolAdmin);

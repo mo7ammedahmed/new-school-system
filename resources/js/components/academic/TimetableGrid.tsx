@@ -21,8 +21,7 @@ type TimetablePeriod = {
 
 type TimetableGridProps = {
     periods: TimetablePeriod[];
-    currentDay: number; // 0-6 (0 = Sunday)
-    locale?: 'ar' | 'en';
+    currentDay?: number; // 0-6 (0 = Sunday)
     isArabic?: boolean;
     canManage?: boolean;
     onPeriodClick?: (period: TimetablePeriod) => void;
@@ -77,7 +76,6 @@ const timeSlots = [
 export default function TimetableGrid({
     periods,
     currentDay = 0,
-    locale = 'en',
     isArabic = false,
     canManage = false,
     onPeriodClick,
@@ -227,7 +225,7 @@ export default function TimetableGrid({
                                     {/* Day Column */}
                                     <div className="absolute top-[calc(${index}*20px)] right-0 left-[60px] h-[20px]">
                                         {periodsInSlot.map(
-                                            (period, periodIndex) => {
+                                            (period, _periodIndex) => {
                                                 const startSlot =
                                                     timeSlots.indexOf(
                                                         period.starts_at,
@@ -240,11 +238,11 @@ export default function TimetableGrid({
                                                     endSlot - startSlot;
 
                                                 // Calculate position and size
-                                                const leftPercent =
+                                                const _leftPercent =
                                                     (startSlot /
                                                         timeSlots.length) *
                                                     100;
-                                                const widthPercent =
+                                                const _widthPercent =
                                                     (durationSlots /
                                                         timeSlots.length) *
                                                     100;
@@ -257,12 +255,12 @@ export default function TimetableGrid({
                                                                 period,
                                                             )
                                                         }
-                                                        onDragStart={(e) =>
+                                                        onDragStart={(_e) =>
                                                             onPeriodDragStart?.(
                                                                 period,
                                                             )
                                                         }
-                                                        onDrop={(e) =>
+                                                        onDrop={(_e) =>
                                                             onPeriodDrop?.(
                                                                 period,
                                                                 currentDay,

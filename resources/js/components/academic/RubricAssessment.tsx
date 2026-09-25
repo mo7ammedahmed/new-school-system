@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/forms/form-field';
 import { FormSection } from '@/components/forms/form-section';
-import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 
 type RubricCriterion = {
     id: number;
@@ -35,9 +34,11 @@ export default function RubricAssessment({
         overallFeedback: '',
     });
 
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>('success');
+    const [_showToast, _setShowToast] = useState(false);
+    const [_toastMessage, _setToastMessage] = useState('');
+    const [_toastType, _setToastType] = useState<'success' | 'error'>(
+        'success',
+    );
 
     const isArabic = false; // Would come from context in real implementation
 

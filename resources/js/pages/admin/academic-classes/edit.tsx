@@ -22,7 +22,8 @@ type Props = {
     };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/academic-classes`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/academic-classes`;
 const EDIT_URL = (schoolId: number, classId: number) =>
     `/admin/schools/${schoolId}/academic-classes/${classId}`;
 
@@ -43,11 +44,15 @@ export default function AcademicClassEdit({ school, academicClass }: Props) {
 
     return (
         <>
-            <Head title={t('academicClasses.edit', { name: academicClass.name })} />
+            <Head
+                title={t('academicClasses.edit', { name: academicClass.name })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        {t('academicClasses.edit', { name: academicClass.name })}
+                        {t('academicClasses.edit', {
+                            name: academicClass.name,
+                        })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
@@ -71,10 +76,14 @@ export default function AcademicClassEdit({ school, academicClass }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('academicClasses.name')}
-                                description={t('academicClasses.nameDescription')}
+                                description={t(
+                                    'academicClasses.nameDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('academicClasses.namePlaceholder')}
+                                    placeholder={t(
+                                        'academicClasses.namePlaceholder',
+                                    )}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)

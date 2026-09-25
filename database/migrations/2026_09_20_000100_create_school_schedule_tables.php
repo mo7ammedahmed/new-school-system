@@ -25,7 +25,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['organization_id', 'school_id', 'code']);
+            $table->unique(['organization_id', 'school_id', 'code'], 'subjects_school_code_unique');
         });
 
         // Required periods per subject per class
@@ -43,7 +43,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['organization_id', 'class_id', 'subject_id']);
+            $table->unique(['organization_id', 'class_id', 'subject_id'], 'class_subjects_class_subject_unique');
         });
 
         // Teacher assignments: which teacher teaches which subject in which section
@@ -63,7 +63,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['organization_id', 'academic_year_id', 'section_id', 'subject_id']);
+            $table->unique(['organization_id', 'academic_year_id', 'section_id', 'subject_id'], 'teaching_assignments_ay_section_subject_unique');
         });
 
         // Bell schedules
@@ -80,7 +80,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['organization_id', 'school_id', 'name']);
+            $table->unique(['organization_id', 'school_id', 'name'], 'bell_schedules_school_name_unique');
         });
 
         // Bell periods within a schedule
@@ -102,7 +102,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['bell_schedule_id', 'number']);
+            $table->unique(['bell_schedule_id', 'number'], 'bell_periods_schedule_number_unique');
         });
 
         // Schedule settings per school
@@ -110,7 +110,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
             $table->foreignId('school_id')->constrained()->cascadeOnDelete();
-            $table->json('working_days')->default('[0,1,2,3,4]');
+            $table->json('working_days');
             $table->unsignedTinyInteger('max_exams_per_day_per_section')->default(1);
             $table->unsignedSmallInteger('teacher_max_periods_per_day')->nullable();
             $table->unsignedSmallInteger('teacher_max_periods_per_week')->nullable();
@@ -121,7 +121,7 @@ return new class extends Migration
                 ->on('schools')
                 ->cascadeOnDelete();
 
-            $table->unique(['school_id']);
+            $table->unique(['school_id'], 'school_schedule_settings_school_unique');
         });
     }
 

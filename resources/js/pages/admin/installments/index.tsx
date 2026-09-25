@@ -8,10 +8,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Pagination } from '@/components/ui/pagination';
+import { Select } from '@/components/ui/select';
 import { confirmDelete } from '@/lib/confirm-delete';
 import { paginated } from '@/lib/paginated';
 import { SearchField } from '@/components/forms/search-field';
-import { Select } from '@/components/ui/select';
 import { useT } from '@/hooks/useT';
 import { useState } from 'react';
 
@@ -27,7 +27,7 @@ type InstallmentData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     installments: {
         data: InstallmentData[];
         meta: {
@@ -46,7 +46,8 @@ type Props = {
     school: { id: number; name: string };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/installments`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/installments`;
 
 const STATUSES = [
     { value: 'created', label: 'Created' },
@@ -63,7 +64,7 @@ export default function InstallmentIndex({
     const { t } = useT();
     const list = paginated<InstallmentData>(installments);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [status, setStatus] = useState(filters.status ?? '');
+    const [status, _setStatus] = useState(filters.status ?? '');
 
     const applyFilters = (next: { search?: string; status?: string }) => {
         router.get(
@@ -113,7 +114,9 @@ export default function InstallmentIndex({
                             }
                             placeholder={t('installments.filterByStatus')}
                         >
-                            <option value="">{t('installments.allStatuses')}</option>
+                            <option value="">
+                                {t('installments.allStatuses')}
+                            </option>
                             {STATUSES.map((status) => (
                                 <option key={status.value} value={status.value}>
                                     {t(`installments.statuses.${status.value}`)}
@@ -125,9 +128,18 @@ export default function InstallmentIndex({
 
                 <DataTable
                     columns={[
-                        { accessorKey: 'sequence', header: t('installments.sequence') },
-                        { accessorKey: 'student_name', header: t('installments.student') },
-                        { accessorKey: 'invoice_number', header: t('installments.invoice') },
+                        {
+                            accessorKey: 'sequence',
+                            header: t('installments.sequence'),
+                        },
+                        {
+                            accessorKey: 'student_name',
+                            header: t('installments.student'),
+                        },
+                        {
+                            accessorKey: 'invoice_number',
+                            header: t('installments.invoice'),
+                        },
                         {
                             accessorKey: 'due_on',
                             header: t('installments.dueDate'),
@@ -169,7 +181,8 @@ export default function InstallmentIndex({
                         ...installment,
                         amount: installment.amount_minor,
                         paid: installment.paid_minor,
-                        outstanding: installment.amount_minor - installment.paid_minor,
+                        outstanding:
+                            installment.amount_minor - installment.paid_minor,
                         actions: (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -210,8 +223,7 @@ export default function InstallmentIndex({
                         ),
                     }))}
                     emptyMessage={
-                        filters.search ||
-                        filters.status
+                        filters.search || filters.status
                             ? t('installments.emptyFiltered')
                             : t('installments.empty')
                     }

@@ -97,6 +97,8 @@ class HandleInertiaRequests extends Middleware
                     'manageEnrollment' => $this->allows($request, 'manage-enrollment', $primarySchool),
                     'manageUsers' => $this->allows($request, 'manage-users', $primarySchool),
                     'manageContent' => $this->allows($request, 'manage-content', $primarySchool),
+                    'manageTheme' => $this->allows($request, 'manage-theme', $primarySchool),
+                    'managePlatformTheme' => $user?->isPlatformOperator() ?? false,
                     'viewAttendanceReports' => $this->allows($request, 'view-attendance-report', $primarySchool),
                 ],
                 // Presentation hints only: every server endpoint re-authorizes.

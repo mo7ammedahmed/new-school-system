@@ -20,18 +20,15 @@ use Inertia\Response;
 
 class AdmissionsController
 {
-    public function create(Organization $organization, string $school): Response
+    public function create(Organization $organization, School $school): Response
     {
-        $schoolModel = $organization->schools()->where('slug', $school)->firstOrFail();
-
         return Inertia::render('admissions/apply', [
-            'school' => ['name' => $schoolModel->name, 'slug' => $schoolModel->slug, 'organizationSlug' => $organization->slug],
+            'school' => ['name' => $school->name, 'slug' => $school->slug, 'organizationSlug' => $organization->slug],
         ]);
     }
 
-    public function store(Request $request, Organization $organization, string $school, AuditLogger $audit): RedirectResponse
+    public function store(Request $request, Organization $organization, School $school, AuditLogger $audit): RedirectResponse
     {
-        $schoolModel = $organization->schools()->where('slug', $school)->firstOrFail();
         $data = $request->validate([
             'guardian_name' => ['required', 'string', 'max:160'],
             'guardian_email' => ['required', 'email', 'max:255'],
@@ -40,7 +37,7 @@ class AdmissionsController
             'student_date_of_birth' => ['nullable', 'date', 'before:today'],
             'message' => ['nullable', 'string', 'max:5000'],
         ]);
-        $application = $schoolModel->applications()->create([
+        $application = $school->applications()->create([
             ...$data,
             'organization_id' => $organization->id,
             'locale' => app()->getLocale(),
@@ -48,7 +45,7 @@ class AdmissionsController
         ]);
         $audit->record('application.submitted', $application, organization: $organization, after: $application->only(['school_id', 'student_name', 'guardian_email', 'status']));
 
-        return to_route('public.admissions.create', [$organization->slug, $schoolModel->slug])
+        return to_route('public.admissions.create', [$organization->slug, $school->slug])
             ->with('success', 'Application submitted.');
     }
 

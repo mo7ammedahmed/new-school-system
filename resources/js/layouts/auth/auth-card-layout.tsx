@@ -1,5 +1,4 @@
 import { Link } from '@inertiajs/react';
-import type { PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import {
     Card,
@@ -17,17 +16,22 @@ export default function AuthCardLayout({
     title,
     description,
     className,
-    ...props
+    ..._props
 }: LayoutProps) {
     return (
-        <div className={cn('bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10', className)}>
+        <div
+            className={cn(
+                'bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10',
+                className,
+            )}
+        >
             <div className="flex w-full max-w-md flex-col gap-6">
                 <Link
                     href={home()}
                     className="flex items-center gap-2 self-center font-medium"
                 >
                     <div className="flex h-9 w-9 items-center justify-center">
-                        <AppLogoIcon className="size-9 fill-current text-black dark:text-white" />
+                        <AppLogoIcon className="text-on-surface size-9 fill-current dark:text-white" />
                     </div>
                 </Link>
 

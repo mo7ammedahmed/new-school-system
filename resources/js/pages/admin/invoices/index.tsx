@@ -29,7 +29,7 @@ type InvoiceData = {
 };
 
 type Props = {
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
     invoices: {
         data: InvoiceData[];
         meta: {
@@ -72,10 +72,14 @@ export default function InvoiceIndex({
     const { t } = useT();
     const list = paginated<InvoiceData>(invoices);
     const [search, setSearch] = useState(filters.search ?? '');
-    const [status, setStatus] = useState(filters.status ?? '');
-    const [currency, setCurrency] = useState(filters.currency ?? '');
+    const [status, _setStatus] = useState(filters.status ?? '');
+    const [currency, _setCurrency] = useState(filters.currency ?? '');
 
-    const applyFilters = (next: { search?: string; status?: string; currency?: string }) => {
+    const applyFilters = (next: {
+        search?: string;
+        status?: string;
+        currency?: string;
+    }) => {
         router.get(
             LIST_URL(school.id),
             {
@@ -124,7 +128,9 @@ export default function InvoiceIndex({
                             }
                             placeholder={t('invoices.filterByStatus')}
                         >
-                            <option value="">{t('invoices.allStatuses')}</option>
+                            <option value="">
+                                {t('invoices.allStatuses')}
+                            </option>
                             {STATUSES.map((status) => (
                                 <option key={status.value} value={status.value}>
                                     {t(`invoices.statuses.${status.value}`)}
@@ -138,7 +144,9 @@ export default function InvoiceIndex({
                             }
                             placeholder={t('invoices.filterByCurrency')}
                         >
-                            <option value="">{t('invoices.allCurrencies')}</option>
+                            <option value="">
+                                {t('invoices.allCurrencies')}
+                            </option>
                             {CURRENCIES.map((c) => (
                                 <option key={c.value} value={c.value}>
                                     {t(`currencies.${c.value}`)}
@@ -151,7 +159,10 @@ export default function InvoiceIndex({
                 <DataTable
                     columns={[
                         { accessorKey: 'number', header: t('invoices.number') },
-                        { accessorKey: 'student_name', header: t('invoices.student') },
+                        {
+                            accessorKey: 'student_name',
+                            header: t('invoices.student'),
+                        },
                         {
                             accessorKey: 'issued_on',
                             header: t('invoices.issuedDate'),
@@ -177,19 +188,19 @@ export default function InvoiceIndex({
                             header: t('invoices.currency'),
                         },
                         {
-                            accessorKey: 'subtotal',
+                            accessorKey: 'subtotal_minor',
                             header: t('invoices.subtotal'),
                             cell: (value: number) =>
                                 `${(value / 100).toFixed(2)} SAR`,
                         },
                         {
-                            accessorKey: 'total',
+                            accessorKey: 'total_minor',
                             header: t('invoices.total'),
                             cell: (value: number) =>
                                 `${(value / 100).toFixed(2)} SAR`,
                         },
                         {
-                            accessorKey: 'items',
+                            accessorKey: 'items_count',
                             header: t('invoices.itemsCount'),
                         },
                         {
@@ -239,9 +250,7 @@ export default function InvoiceIndex({
                         ),
                     }))}
                     emptyMessage={
-                        filters.search ||
-                        filters.status ||
-                        filters.currency
+                        filters.search || filters.status || filters.currency
                             ? t('invoices.emptyFiltered')
                             : t('invoices.empty')
                     }

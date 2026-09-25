@@ -64,7 +64,7 @@ export function TabsTrigger({ value, className, children }: TabsTriggerProps) {
       type="button"
       onClick={() => setValue(value)}
       className={cn(
-        'inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
+        'inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
         {
           'bg-accent text-primary-foreground': isActive,
           'text-muted-foreground hover:bg-accent/50': !isActive,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Enums\UserRole;
 use App\Http\Requests\Academics\LinkStudentAccountRequest;
 use App\Models\AcademicClass;
@@ -21,6 +22,8 @@ use Inertia\Response;
 
 class AcademicAdminController
 {
+    use ResolvesSchool;
+
     /**
      * Display the academic administration dashboard.
      */
@@ -143,11 +146,6 @@ class AcademicAdminController
         $audit->record('teacher.assigned_section', $assignment, after: ['teacher_id' => $teacher->id, 'section_id' => $section->id]);
 
         return back();
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 
     /**

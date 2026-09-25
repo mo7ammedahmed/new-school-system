@@ -11,9 +11,11 @@ import {
     ClipboardList,
     FileText,
     GraduationCap,
+    KeyRound,
     LayoutGrid,
     List,
     Megaphone,
+    Paintbrush,
     Palette,
     Settings2,
     ShieldCheck,
@@ -54,7 +56,12 @@ export function useNavigation(): Navigation {
     const base = school ? `/admin/schools/${school.id}` : null;
 
     const platform: NavItem[] = [
-        { title: t('shell.dashboard'), href: dashboard(), icon: LayoutGrid },
+        {
+            title: t('shell.dashboard'),
+            shortTitle: t('shell.dashboardShort'),
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
     ];
 
     const administration: NavItem[] = [];
@@ -63,6 +70,7 @@ export function useNavigation(): Navigation {
         platform.push(
             {
                 title: t('shell.students'),
+                shortTitle: t('shell.studentsShort'),
                 href: '/portal/students',
                 icon: Users,
             },
@@ -141,6 +149,7 @@ export function useNavigation(): Navigation {
         administration.push(
             {
                 title: t('shell.finance'),
+                shortTitle: t('shell.financeShort'),
                 href: `${base}/finance`,
                 icon: WalletCards,
             },
@@ -164,6 +173,7 @@ export function useNavigation(): Navigation {
         administration.push(
             {
                 title: t('shell.notices'),
+                shortTitle: t('shell.noticesShort'),
                 href: `${base}/notices`,
                 icon: Megaphone,
             },
@@ -175,6 +185,22 @@ export function useNavigation(): Navigation {
         );
     }
 
+    if (base && abilities.manageTheme) {
+        administration.push({
+            title: t('shell.theme'),
+            href: `${base}/theme`,
+            icon: Palette,
+        });
+    }
+
+    if (abilities.managePlatformTheme) {
+        administration.push({
+            title: t('shell.platformTheme'),
+            href: '/admin/theme',
+            icon: Paintbrush,
+        });
+    }
+
     if (abilities.manageSiteContent) {
         administration.push({
             title: t('shell.siteContent'),
@@ -184,11 +210,18 @@ export function useNavigation(): Navigation {
     }
 
     if (base && abilities.manageUsers) {
-        administration.push({
-            title: t('shell.users'),
-            href: `${base}/users`,
-            icon: ShieldCheck,
-        });
+        administration.push(
+            {
+                title: t('shell.users'),
+                href: `${base}/users`,
+                icon: ShieldCheck,
+            },
+            {
+                title: t('shell.roles'),
+                href: `${base}/roles`,
+                icon: KeyRound,
+            },
+        );
     }
 
     if (abilities.manageFinance) {

@@ -53,9 +53,9 @@ type ScheduleSetupProps = {
 };
 
 export default function ScheduleSetup() {
-    const { school, subjects, teachingAssignments, bellSchedules, settings } =
+    const { school, subjects, _teachingAssignments, _bellSchedules, settings } =
         usePage<ScheduleSetupProps>().props;
-    const { t, dayName, locale, isArabic } = useT();
+    const { t, dayName, isArabic } = useT();
     const [activePanel, setActivePanel] = useState<
         'subjects' | 'assignments' | 'bell' | 'settings'
     >('subjects');

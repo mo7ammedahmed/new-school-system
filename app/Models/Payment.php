@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
@@ -28,28 +28,43 @@ class Payment extends Model
         'amount_minor' => 'integer',
     ];
 
-    public function organization()
+    /**
+     * @return BelongsTo<Organization, $this>
+     */
+    public function organization(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Organization::class);
+        return $this->belongsTo(Organization::class);
     }
 
-    public function school()
+    /**
+     * @return BelongsTo<School, $this>
+     */
+    public function school(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\School::class);
+        return $this->belongsTo(School::class);
     }
 
-    public function installment()
+    /**
+     * @return BelongsTo<Installment, $this>
+     */
+    public function installment(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Installment::class);
+        return $this->belongsTo(Installment::class);
     }
 
-    public function invoice()
+    /**
+     * @return BelongsTo<Invoice, $this>
+     */
+    public function invoice(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Invoice::class);
+        return $this->belongsTo(Invoice::class);
     }
 
-    public function receivedBy()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function receivedBy(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'received_by');
+        return $this->belongsTo(User::class, 'received_by');
     }
 }

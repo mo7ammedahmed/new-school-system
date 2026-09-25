@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\ResolvesSchool;
 use App\Http\Requests\InstallmentRequest;
 use App\Models\Installment;
 use App\Models\School;
@@ -13,6 +14,8 @@ use Inertia\Response;
 
 class InstallmentController
 {
+    use ResolvesSchool;
+
     /**
      * Display a listing of installments for the school.
      */
@@ -38,7 +41,7 @@ class InstallmentController
                     'paid_minor' => $installment->paid_minor,
                     'status' => $installment->status,
                     'invoice_number' => $installment->invoice->number ?? '',
-                    'student_name' => trim($installment->invoice->student->first_name . ' ' . $installment->invoice->student->last_name ?? ''),
+                    'student_name' => $installment->invoice?->student?->full_name,
                 ];
             }),
         ]);
@@ -103,7 +106,7 @@ class InstallmentController
                 'status' => $installmentModel->status,
                 'paid_at' => $installmentModel->paid_at?->toDateString(),
                 'invoice_number' => $installmentModel->invoice->number ?? '',
-                'student_name' => trim($installmentModel->invoice->student->first_name . ' ' . $installmentModel->invoice->student->last_name ?? ''),
+                'student_name' => $installmentModel->invoice?->student?->full_name,
             ],
         ]);
     }
@@ -144,6 +147,11 @@ class InstallmentController
         $schoolModel = $this->school($school);
         Gate::authorize('manage-enrollment', $schoolModel);
 
+        $installmentModel = Installment::query()
+            ->where('school_id', $schoolModel->id)
+            ->where('id', $installment)
+            ->firstOrFail();
+
         $validated = $request->validated();
 
         // Store old values for audit
@@ -168,6 +176,11 @@ class InstallmentController
         $schoolModel = $this->school($school);
         Gate::authorize('manage-enrollment', $schoolModel);
 
+        $installmentModel = Installment::query()
+            ->where('school_id', $schoolModel->id)
+            ->where('id', $installment)
+            ->firstOrFail();
+
         // Store values for audit before deletion
         $recordValues = $installmentModel->only([
             'invoice_id', 'sequence', 'due_on', 'amount_minor', 'paid_minor', 'status', 'paid_at',
@@ -179,10 +192,5 @@ class InstallmentController
 
         return redirect()->route('installments.index', $schoolModel->id)
             ->with('success', 'Installment deleted successfully.');
-    }
-
-    private function school(int $id): School
-    {
-        return School::query()->findOrFail($id);
     }
 }

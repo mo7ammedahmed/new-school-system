@@ -50,15 +50,15 @@ export default function FAQ() {
             />
             <section className="mx-auto max-w-4xl px-5 pt-20 pb-24 sm:px-8">
                 <div className="text-center">
-                    <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#e1efe2] text-[#0d5c4d]">
+                    <div className="bg-surface-container-low text-primary mx-auto grid size-14 place-items-center rounded-lg">
                         <MessageCircleQuestion size={27} />
                     </div>
-                    <p className="mt-6 text-sm font-black text-[#c56a3b]">
+                    <p className="text-warning mt-6 text-sm font-semibold">
                         {isArabic
                             ? 'أسئلة شائعة'
                             : 'Frequently asked questions'}
                     </p>
-                    <h1 className="mt-3 text-5xl font-black tracking-tight sm:text-6xl">
+                    <h1 className="mt-3 text-5xl font-semibold tracking-tight sm:text-6xl">
                         {isArabic
                             ? 'إجابات قبل البداية.'
                             : 'Answers before you begin.'}
@@ -68,30 +68,30 @@ export default function FAQ() {
                     {questions[locale].map(([question, answer]) => (
                         <details
                             key={question}
-                            className="group rounded-2xl border border-[#dbe8df] bg-white p-5 open:bg-[#f1f7f1]"
+                            className="group border-outline-variant bg-card open:bg-surface-container-low rounded-lg border p-5"
                         >
-                            <summary className="flex cursor-pointer list-none items-center justify-between gap-5 font-black text-[#17342f]">
+                            <summary className="text-on-surface flex cursor-pointer list-none items-center justify-between gap-5 font-semibold">
                                 <span>{question}</span>
                                 <ChevronDown
                                     size={20}
-                                    className="shrink-0 text-[#789087] transition-transform group-open:rotate-180"
+                                    className="text-on-surface-variant shrink-0 transition-transform group-open:rotate-180"
                                 />
                             </summary>
-                            <p className="max-w-3xl pt-4 text-sm leading-8 text-[#5d746c]">
+                            <p className="text-on-surface-variant max-w-3xl pt-4 text-sm leading-8">
                                 {answer}
                             </p>
                         </details>
                     ))}
                 </div>
-                <div className="mt-10 flex items-center justify-between rounded-2xl bg-[#e1efe2] p-6">
-                    <p className="font-black text-[#28544a]">
+                <div className="bg-surface-container-low mt-10 flex items-center justify-between rounded-lg p-6">
+                    <p className="text-on-surface font-semibold">
                         {isArabic
                             ? 'لديكم سؤال آخر؟'
                             : 'Have another question?'}
                     </p>
                     <Link
                         href="/contact"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#0d5c4d] px-5 py-3 text-sm font-black text-white"
+                        className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold"
                     >
                         {isArabic ? 'تواصلوا معنا' : 'Contact us'}{' '}
                         <ArrowLeft size={16} />

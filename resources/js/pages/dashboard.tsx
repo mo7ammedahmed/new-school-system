@@ -1,8 +1,7 @@
 import { useT } from '@/hooks/useT';
+import { PageHero } from '@/components/page-hero';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
-    BarChart3,
-    Bell,
     CalendarDays,
     CheckCircle2,
     ClipboardList,
@@ -12,8 +11,6 @@ import {
     GraduationCap,
     Inbox,
     Layers,
-    Megaphone,
-    Receipt,
     TrendingUp,
     UsersRound,
     WalletCards,
@@ -21,6 +18,7 @@ import {
 } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
 import { DashboardWidget } from '@/components/dashboard/dashboard-widget';
+import { StatCard } from '@/components/dashboard/stat-card';
 
 type AttendanceTotals = {
     present: number;
@@ -178,7 +176,7 @@ function formatMinor(
     }).format(minorToMajor(amountMinor));
 }
 
-function Card({
+function _Card({
     title,
     icon,
     href,
@@ -194,16 +192,16 @@ function Card({
     const Icon = icon;
 
     return (
-        <section className="rounded-[1.75rem] border border-border bg-card p-6">
+        <section className="border-border bg-card rounded-lg border p-6">
             <div className="flex items-center justify-between gap-3">
-                <h2 className="flex items-center gap-2 text-lg font-black text-foreground">
+                <h2 className="text-foreground flex items-center gap-2 text-lg font-semibold">
                     <Icon size={18} aria-hidden={true} />
                     {title}
                 </h2>
                 {href ? (
                     <Link
                         href={href}
-                        className="text-xs font-bold text-brand-600 underline-offset-4 hover:underline"
+                        className="text-brand-600 text-xs font-bold underline-offset-4 hover:underline"
                     >
                         {actionLabel}
                     </Link>
@@ -215,66 +213,15 @@ function Card({
 }
 
 function Empty({ children }: { children: ReactNode }) {
-    return <p className="text-sm text-muted-foreground">{children}</p>;
-}
-
-function StatCard({
-    title,
-    value,
-    hint,
-    icon,
-    href,
-}: {
-    title: string;
-    value: string;
-    hint: string;
-    icon: ComponentType<{ size?: number; 'aria-hidden'?: boolean }>;
-    href?: string;
-}) {
-    const Icon = icon;
-    const body = (
-        <div className="flex items-start gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-brand-600">
-                <Icon size={18} aria-hidden={true} />
-            </span>
-            <span className="min-w-0">
-                <span className="block text-sm font-bold text-muted-foreground">
-                    {title}
-                </span>
-                <span className="mt-1 block truncate text-2xl font-black text-foreground">
-                    {value}
-                </span>
-                <span className="mt-1 block text-xs text-muted-foreground">
-                    {hint}
-                </span>
-            </span>
-        </div>
-    );
-
-    if (href) {
-        return (
-            <Link
-                href={href}
-                className="rounded-3xl border border-border bg-card p-5 transition-shadow hover:shadow-[0_18px_40px_-32px_var(--brand-900)] focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:outline-none"
-            >
-                {body}
-            </Link>
-        );
-    }
-
-    return (
-        <div className="rounded-3xl border border-border bg-card p-5">
-            {body}
-        </div>
-    );
+    return <p className="text-muted-foreground text-sm">{children}</p>;
 }
 
 function AttendanceBar({ totals }: { totals: AttendanceTotals }) {
     const { t } = useT();
     const segments = [
-         { key: 'present', value: totals.present, className: 'bg-brand-800' },
-        { key: 'late', value: totals.late, className: 'bg-amber-500' },
-        { key: 'excused', value: totals.excused, className: 'bg-sky-500' },
+        { key: 'present', value: totals.present, className: 'bg-brand-800' },
+        { key: 'late', value: totals.late, className: 'bg-warning' },
+        { key: 'excused', value: totals.excused, className: 'bg-secondary' },
         { key: 'absent', value: totals.absent, className: 'bg-destructive' },
     ];
 
@@ -284,7 +231,7 @@ function AttendanceBar({ totals }: { totals: AttendanceTotals }) {
 
     return (
         <div className="space-y-4">
-            <div className="flex h-2.5 overflow-hidden rounded-full bg-accent">
+            <div className="bg-accent flex h-2.5 overflow-hidden rounded-full">
                 {segments.map((segment) =>
                     segment.value > 0 ? (
                         <span
@@ -302,18 +249,18 @@ function AttendanceBar({ totals }: { totals: AttendanceTotals }) {
                 {segments.map((segment) => (
                     <div
                         key={segment.key}
-                        className="rounded-2xl border border-border p-3"
+                        className="border-border rounded-lg border p-3"
                     >
-                        <dt className="text-xs font-bold text-muted-foreground">
+                        <dt className="text-muted-foreground text-xs font-bold">
                             {t(`portal.${segment.key}`)}
                         </dt>
-                        <dd className="mt-1 text-lg font-black text-foreground">
+                        <dd className="text-foreground mt-1 text-lg font-semibold">
                             {segment.value}
                         </dd>
                     </div>
                 ))}
             </dl>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
                 {t('dashboard.attendanceHint', { recorded: totals.recorded })} ·{' '}
                 {totals.presentPercentage}%
             </p>
@@ -358,115 +305,93 @@ export default function Dashboard() {
             <Head title={t('dashboard.title')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.75rem] bg-hero-bg p-6 text-white md:p-8">
-                    <p className="text-sm font-bold text-hero-muted">
-                        {t('dashboard.title')}
-                    </p>
-                    <h1 className="mt-2 text-3xl font-black md:text-4xl">
-                        {school.name}
-                    </h1>
-                    <p className="mt-3 max-w-2xl leading-7 text-hero-accent">
-                        {t('dashboard.subtitle', { school: school.name })}
-                    </p>
-                </header>
+                <PageHero
+                    eyebrow={t('dashboard.title')}
+                    title={school.name}
+                    subtitle={t('dashboard.subtitle', { school: school.name })}
+                />
 
-                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <DashboardWidget title={t('dashboard.students')}>
-                        <StatCard
-                            title={t('dashboard.students')}
-                            value={metrics.students.total.toLocaleString(locale)}
-                            hint={t('dashboard.studentsHint', {
-                                active: metrics.students.active,
-                                inactive: metrics.students.inactive,
-                            })}
-                            icon={UsersRound}
-                            href="/portal/students"
-                        />
-                    </DashboardWidget>
+                <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+                    <StatCard
+                        title={t('dashboard.students')}
+                        value={metrics.students.total.toLocaleString(locale)}
+                        description={t('dashboard.studentsHint', {
+                            active: metrics.students.active,
+                            inactive: metrics.students.inactive,
+                        })}
+                        icon={UsersRound}
+                        href="/portal/students"
+                    />
 
-                    <DashboardWidget title={t('dashboard.teachers')}>
-                        <StatCard
-                            title={t('dashboard.teachers')}
-                            value={metrics.teachers.total.toLocaleString(locale)}
-                            hint={t('dashboard.teachersHint', {
-                                assigned: metrics.teachers.assigned,
-                            })}
-                            icon={GraduationCap}
-                            href={`/admin/schools/${school.id}/users`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.teachers')}
+                        value={metrics.teachers.total.toLocaleString(locale)}
+                        description={t('dashboard.teachersHint', {
+                            assigned: metrics.teachers.assigned,
+                        })}
+                        icon={GraduationCap}
+                        href={`/admin/schools/${school.id}/users`}
+                    />
 
-                    <DashboardWidget title={t('dashboard.attendanceToday')}>
-                        <StatCard
-                            title={t('dashboard.attendanceToday')}
-                            value={`${attendance.presentPercentage}%`}
-                            hint={t('dashboard.attendanceHint', {
-                                recorded: attendance.recorded,
-                            })}
-                            icon={ClipboardList}
-                            href={`/admin/schools/${school.id}/reports/attendance`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.attendanceToday')}
+                        value={`${attendance.presentPercentage}%`}
+                        description={t('dashboard.attendanceHint', {
+                            recorded: attendance.recorded,
+                        })}
+                        icon={ClipboardList}
+                        href={`/admin/schools/${school.id}/reports/attendance`}
+                    />
 
-                    <DashboardWidget title={t('dashboard.activeClasses')}>
-                        <StatCard
-                            title={t('dashboard.activeClasses')}
-                            value={metrics.activeClasses.toLocaleString(locale)}
-                            hint={t('dashboard.activeClassesHint')}
-                            icon={Layers}
-                            href={`/admin/schools/${school.id}/academic-classes`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.activeClasses')}
+                        value={metrics.activeClasses.toLocaleString(locale)}
+                        description={t('dashboard.activeClassesHint')}
+                        icon={Layers}
+                        href={`/admin/schools/${school.id}/academic-classes`}
+                    />
 
-                    <DashboardWidget title={t('dashboard.pendingAdmissions')}>
-                        <StatCard
-                            title={t('dashboard.pendingAdmissions')}
-                            value={metrics.pendingAdmissions.toLocaleString(locale)}
-                            hint={t('dashboard.pendingAdmissionsHint')}
-                            icon={Inbox}
-                            href={`/admin/schools/${school.id}/applications`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.pendingAdmissions')}
+                        value={metrics.pendingAdmissions.toLocaleString(locale)}
+                        description={t('dashboard.pendingAdmissionsHint')}
+                        icon={Inbox}
+                        href={`/admin/schools/${school.id}/applications`}
+                    />
 
-                    <DashboardWidget title={t('dashboard.outstandingBalances')}>
-                        <StatCard
-                            title={t('dashboard.outstandingBalances')}
-                            value={formatMinor(
-                                metrics.outstandingBalances.amountMinor,
-                                locale,
-                            )}
-                            hint={t('dashboard.outstandingHint')}
-                            icon={WalletCards}
-                            href={`/admin/schools/${school.id}/reports/finance`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.outstandingBalances')}
+                        value={formatMinor(
+                            metrics.outstandingBalances.amountMinor,
+                            locale,
+                        )}
+                        description={t('dashboard.outstandingHint')}
+                        icon={WalletCards}
+                        href={`/admin/schools/${school.id}/reports/finance`}
+                    />
 
-                    <DashboardWidget title={t('dashboard.paymentsToday')}>
-                        <StatCard
-                            title={t('dashboard.paymentsToday')}
-                            value={formatMinor(
-                                metrics.paymentsToday.amountMinor,
-                                locale,
-                            )}
-                            hint={t('dashboard.paymentsHint', {
-                                count: metrics.paymentsToday.count,
-                            })}
-                            icon={CreditCard}
-                            href={`/admin/schools/${school.id}/finance`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.paymentsToday')}
+                        value={formatMinor(
+                            metrics.paymentsToday.amountMinor,
+                            locale,
+                        )}
+                        description={t('dashboard.paymentsHint', {
+                            count: metrics.paymentsToday.count,
+                        })}
+                        icon={CreditCard}
+                        href={`/admin/schools/${school.id}/finance`}
+                    />
 
-                    <DashboardWidget title={t('dashboard.upcomingExams')}>
-                        <StatCard
-                            title={t('dashboard.upcomingExams')}
-                            value={metrics.upcomingExams.length.toLocaleString(
-                                locale,
-                            )}
-                            hint={t('dashboard.upcomingExamsHint')}
-                            icon={CalendarDays}
-                            href={`/admin/schools/${school.id}/schedule/exams`}
-                        />
-                    </DashboardWidget>
+                    <StatCard
+                        title={t('dashboard.upcomingExams')}
+                        value={metrics.upcomingExams.length.toLocaleString(
+                            locale,
+                        )}
+                        description={t('dashboard.upcomingExamsHint')}
+                        icon={CalendarDays}
+                        href={`/admin/schools/${school.id}/schedule/exams`}
+                    />
                 </section>
 
                 {widgets.quickActions.length > 0 ? (
@@ -480,7 +405,7 @@ export default function Dashboard() {
                                     <Link
                                         key={action.key}
                                         href={action.href}
-                                        className="inline-flex items-center gap-2 rounded-full bg-card px-5 py-3 text-sm font-black text-brand-700 shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:outline-none"
+                                        className="bg-card text-brand-700 focus-visible:ring-brand-700 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
                                     >
                                         <Icon size={17} aria-hidden={true} />
                                         {t(meta?.key ?? action.key)}
@@ -520,51 +445,52 @@ export default function Dashboard() {
                                 ).map(([key, value]) => (
                                     <div
                                         key={key}
-                                        className="rounded-2xl border border-border p-3"
+                                        className="border-border rounded-lg border p-3"
                                     >
-                                        <dt className="text-xs font-bold text-muted-foreground">
+                                        <dt className="text-muted-foreground text-xs font-bold">
                                             {key}
                                         </dt>
-                                        <dd className="mt-1 text-lg font-black text-foreground">
+                                        <dd className="text-foreground mt-1 text-lg font-semibold">
                                             {value}
                                         </dd>
                                     </div>
                                 ))}
                             </dl>
-                        </DashboardWidget>
+                        )}
+                    </DashboardWidget>
 
                     <DashboardWidget
                         title={t('dashboard.financeSummary')}
                         refreshable
                     >
                         <dl className="space-y-3">
-                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-3">
-                                <dt className="text-sm font-bold text-muted-foreground">
+                            <div className="border-border flex items-center justify-between gap-4 rounded-lg border p-3">
+                                <dt className="text-muted-foreground text-sm font-bold">
                                     {t('dashboard.incomeToday')}
                                 </dt>
-                                <dd className="text-sm font-black text-foreground">
+                                <dd className="text-foreground text-sm font-semibold">
                                     {formatMinor(
                                         widgets.financeSummary.income.today,
                                         locale,
                                     )}
                                 </dd>
                             </div>
-                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-3">
-                                <dt className="text-sm font-bold text-muted-foreground">
+                            <div className="border-border flex items-center justify-between gap-4 rounded-lg border p-3">
+                                <dt className="text-muted-foreground text-sm font-bold">
                                     {t('dashboard.incomeMonth')}
                                 </dt>
-                                <dd className="text-sm font-black text-foreground">
+                                <dd className="text-foreground text-sm font-semibold">
                                     {formatMinor(
                                         widgets.financeSummary.income.month,
                                         locale,
                                     )}
                                 </dd>
                             </div>
-                            <div className="flex items-center justify-between gap-4 rounded-2xl border border-border p-3">
-                                <dt className="text-sm font-bold text-muted-foreground">
+                            <div className="border-border flex items-center justify-between gap-4 rounded-lg border p-3">
+                                <dt className="text-muted-foreground text-sm font-bold">
                                     {t('dashboard.outstandingMinor')}
                                 </dt>
-                                <dd className="text-sm font-black text-foreground">
+                                <dd className="text-foreground text-sm font-semibold">
                                     {formatMinor(
                                         widgets.financeSummary.outstandingMinor,
                                         locale,
@@ -579,33 +505,33 @@ export default function Dashboard() {
                         refreshable
                     >
                         <dl className="grid grid-cols-3 gap-3">
-                            <div className="rounded-2xl border border-border p-3">
-                                <dt className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
+                            <div className="border-border rounded-lg border p-3">
+                                <dt className="text-muted-foreground flex items-center gap-1 text-xs font-bold">
                                     <CheckCircle2
                                         size={14}
                                         aria-hidden="true"
                                     />
                                     {t('dashboard.successful')}
                                 </dt>
-                                <dd className="mt-1 text-lg font-black text-foreground">
+                                <dd className="text-foreground mt-1 text-lg font-semibold">
                                     {widgets.paymentStatus.successful}
                                 </dd>
                             </div>
-                            <div className="rounded-2xl border border-border p-3">
-                                <dt className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
+                            <div className="border-border rounded-lg border p-3">
+                                <dt className="text-muted-foreground flex items-center gap-1 text-xs font-bold">
                                     <XCircle size={14} aria-hidden="true" />
                                     {t('dashboard.failed')}
                                 </dt>
-                                <dd className="mt-1 text-lg font-black text-foreground">
+                                <dd className="text-foreground mt-1 text-lg font-semibold">
                                     {widgets.paymentStatus.failed}
                                 </dd>
                             </div>
-                            <div className="rounded-2xl border border-border p-3">
-                                <dt className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
+                            <div className="border-border rounded-lg border p-3">
+                                <dt className="text-muted-foreground flex items-center gap-1 text-xs font-bold">
                                     <TrendingUp size={14} aria-hidden="true" />
                                     {t('dashboard.inProgress')}
                                 </dt>
-                                <dd className="mt-1 text-lg font-black text-foreground">
+                                <dd className="text-foreground mt-1 text-lg font-semibold">
                                     {widgets.paymentStatus.pending}
                                 </dd>
                             </div>
@@ -618,11 +544,11 @@ export default function Dashboard() {
                         ) : (
                             <div className="space-y-4">
                                 <dl className="grid grid-cols-2 gap-3">
-                                    <div className="rounded-2xl border border-border p-3">
-                                        <dt className="text-xs font-bold text-muted-foreground">
+                                    <div className="border-border rounded-lg border p-3">
+                                        <dt className="text-muted-foreground text-xs font-bold">
                                             {t('dashboard.assessmentAverage')}
                                         </dt>
-                                        <dd className="mt-1 text-lg font-black text-foreground">
+                                        <dd className="text-foreground mt-1 text-lg font-semibold">
                                             {
                                                 metrics.assessmentStats
                                                     .averagePercent
@@ -630,16 +556,16 @@ export default function Dashboard() {
                                             %
                                         </dd>
                                     </div>
-                                    <div className="rounded-2xl border border-border p-3">
-                                        <dt className="text-xs font-bold text-muted-foreground">
+                                    <div className="border-border rounded-lg border p-3">
+                                        <dt className="text-muted-foreground text-xs font-bold">
                                             {t('dashboard.assessmentPassRate')}
                                         </dt>
-                                        <dd className="mt-1 text-lg font-black text-foreground">
+                                        <dd className="text-foreground mt-1 text-lg font-semibold">
                                             {metrics.assessmentStats.passRate}%
                                         </dd>
                                     </div>
                                 </dl>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     {t('dashboard.assessmentCount', {
                                         count: metrics.assessmentStats.total,
                                     })}
@@ -649,18 +575,21 @@ export default function Dashboard() {
                                         (assessment) => (
                                             <li
                                                 key={assessment.id}
-                                                className="rounded-2xl border border-border p-3"
+                                                className="border-border rounded-lg border p-3"
                                             >
                                                 <div className="flex items-center justify-between gap-3">
-                                                    <strong className="truncate text-sm font-black text-foreground">
+                                                    <strong className="text-foreground truncate text-sm font-semibold">
                                                         {assessment.title}
                                                     </strong>
-                                                    <span className="shrink-0 text-xs font-bold text-brand-600">
+                                                    <span
+                                                        dir="ltr"
+                                                        className="text-brand-600 shrink-0 text-xs font-bold"
+                                                    >
                                                         {assessment.score}/
                                                         {assessment.maxScore}
                                                     </span>
                                                 </div>
-                                                <small className="mt-1 block text-muted-foreground">
+                                                <small className="text-muted-foreground mt-1 block">
                                                     {assessment.student}
                                                     {assessment.sectionName
                                                         ? ` · ${assessment.sectionName}`
@@ -687,7 +616,7 @@ export default function Dashboard() {
                                     .map((entry) => (
                                         <li
                                             key={entry.id}
-                                            className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                            className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                         >
                                             <span
                                                 className="min-w-0 border-s-4 ps-3"
@@ -697,10 +626,10 @@ export default function Dashboard() {
                                                         'var(--border)',
                                                 }}
                                             >
-                                                <strong className="block truncate text-sm font-black text-foreground">
+                                                <strong className="text-foreground block truncate text-sm font-semibold">
                                                     {subjectLabel(entry)}
                                                 </strong>
-                                                <small className="mt-1 block text-muted-foreground">
+                                                <small className="text-muted-foreground mt-1 block">
                                                     {entry.class_name} ·{' '}
                                                     {entry.section_name}
                                                     {entry.teacher_name
@@ -708,7 +637,7 @@ export default function Dashboard() {
                                                         : ''}
                                                 </small>
                                             </span>
-                                            <span className="shrink-0 text-end text-xs font-bold text-brand-600">
+                                            <span className="text-brand-600 shrink-0 text-end text-xs font-bold">
                                                 {t('portal.period')}{' '}
                                                 {entry.period}
                                                 {entry.starts_at ? (
@@ -738,13 +667,13 @@ export default function Dashboard() {
                                     .map((installment) => (
                                         <li
                                             key={installment.id}
-                                            className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                            className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                         >
                                             <span className="min-w-0">
-                                                <strong className="block truncate text-sm font-black text-foreground">
+                                                <strong className="text-foreground block truncate text-sm font-semibold">
                                                     {installment.student}
                                                 </strong>
-                                                <small className="mt-1 block text-muted-foreground">
+                                                <small className="text-muted-foreground mt-1 block">
                                                     {installment.number} · #
                                                     {installment.sequence}
                                                     {installment.dueOn
@@ -757,7 +686,7 @@ export default function Dashboard() {
                                                         : ''}
                                                 </small>
                                             </span>
-                                            <span className="shrink-0 text-end text-sm font-black text-foreground">
+                                            <span className="text-foreground shrink-0 text-end text-sm font-semibold">
                                                 {formatMinor(
                                                     installment.outstandingMinor,
                                                     locale,
@@ -780,20 +709,20 @@ export default function Dashboard() {
                                     .map((exam) => (
                                         <li
                                             key={exam.id}
-                                            className="rounded-2xl border border-border p-3"
+                                            className="border-border rounded-lg border p-3"
                                         >
                                             <div className="flex items-center justify-between gap-3">
-                                                <strong className="truncate text-sm font-black text-foreground">
+                                                <strong className="text-foreground truncate text-sm font-semibold">
                                                     {subjectLabel(exam)}
                                                 </strong>
-                                                <span className="shrink-0 text-xs font-bold text-brand-600">
+                                                <span className="text-brand-600 shrink-0 text-xs font-bold">
                                                     {exam.starts_at}
                                                     {exam.ends_at
                                                         ? `–${exam.ends_at}`
                                                         : ''}
                                                 </span>
                                             </div>
-                                            <small className="mt-1 block text-muted-foreground">
+                                            <small className="text-muted-foreground mt-1 block">
                                                 {exam.exam_date} ·{' '}
                                                 {exam.class_name} ·{' '}
                                                 {exam.section_name}
@@ -818,20 +747,20 @@ export default function Dashboard() {
                                 {widgets.recentNotices.map((notice) => (
                                     <li
                                         key={notice.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                        className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                     >
-                                        <strong className="min-w-0 truncate text-sm font-black text-foreground">
+                                        <strong className="text-foreground min-w-0 truncate text-sm font-semibold">
                                             {notice.title}
                                         </strong>
                                         {notice.publishedAt ? (
-                                            <small className="shrink-0 text-xs text-muted-foreground">
+                                            <small className="text-muted-foreground shrink-0 text-xs">
                                                 {new Date(
                                                     notice.publishedAt,
                                                 ).toLocaleDateString(locale)}
                                             </small>
                                         ) : null}
                                     </li>
-                                )}
+                                ))}
                             </ul>
                         )}
                     </DashboardWidget>
@@ -860,12 +789,12 @@ export default function Dashboard() {
                             ).map(([key, value]) => (
                                 <div
                                     key={key}
-                                    className="rounded-2xl border border-border p-3"
+                                    className="border-border rounded-lg border p-3"
                                 >
-                                    <dt className="text-xs font-bold text-muted-foreground">
+                                    <dt className="text-muted-foreground text-xs font-bold">
                                         {t(`dashboard.${key}`)}
                                     </dt>
-                                    <dd className="mt-1 text-lg font-black text-foreground">
+                                    <dd className="text-foreground mt-1 text-lg font-semibold">
                                         {value}
                                     </dd>
                                 </div>
@@ -881,18 +810,18 @@ export default function Dashboard() {
                                 {widgets.recentActivity.map((entry) => (
                                     <li
                                         key={entry.id}
-                                        className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                                        className="border-border flex items-center justify-between gap-3 rounded-lg border p-3"
                                     >
                                         <span className="min-w-0">
-                                            <strong className="block truncate text-sm font-black text-foreground">
+                                            <strong className="text-foreground block truncate text-sm font-semibold">
                                                 {humanizeAction(entry.action)}
                                             </strong>
-                                            <small className="mt-1 block text-muted-foreground">
+                                            <small className="text-muted-foreground mt-1 block">
                                                 {entry.actor ?? '—'}
                                             </small>
                                         </span>
                                         {entry.at ? (
-                                            <small className="shrink-0 text-xs text-muted-foreground">
+                                            <small className="text-muted-foreground shrink-0 text-xs">
                                                 {new Date(
                                                     entry.at,
                                                 ).toLocaleString(locale, {

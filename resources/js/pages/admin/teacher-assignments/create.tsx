@@ -25,8 +25,10 @@ type Props = {
     }>;
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/teacher-assignments`;
-const CREATE_URL = (schoolId: number) => `/admin/schools/${schoolId}/teacher-assignments`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/teacher-assignments`;
+const CREATE_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/teacher-assignments`;
 
 export default function TeacherAssignmentCreate({
     school,
@@ -53,7 +55,9 @@ export default function TeacherAssignmentCreate({
             <Head title={t('teacherAssignments.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">{t('teacherAssignments.create')}</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t('teacherAssignments.create')}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
                             <Link href={LIST_URL(school.id)}>
@@ -65,7 +69,9 @@ export default function TeacherAssignmentCreate({
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('teacherAssignments.form.title')}</CardTitle>
+                        <CardTitle>
+                            {t('teacherAssignments.form.title')}
+                        </CardTitle>
                         <CardDescription>
                             {t('teacherAssignments.form.createDescription')}
                         </CardDescription>
@@ -76,17 +82,25 @@ export default function TeacherAssignmentCreate({
                         <FormSection>
                             <FormField
                                 label={t('teacherAssignments.teacher')}
-                                description={t('teacherAssignments.teacherDescription')}
+                                description={t(
+                                    'teacherAssignments.teacherDescription',
+                                )}
                             >
                                 <Select
                                     value={data.teacher_id}
                                     onValueChange={(value) =>
                                         setData('teacher_id', value)
                                     }
-                                    placeholder={t('teacherAssignments.teacherPlaceholder')}
+                                    placeholder={t(
+                                        'teacherAssignments.teacherPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('teacherAssignments.teacherPlaceholder')}</option>
+                                    <option value="">
+                                        {t(
+                                            'teacherAssignments.teacherPlaceholder',
+                                        )}
+                                    </option>
                                     {teachers.map((teacher) => (
                                         <option
                                             key={teacher.id}
@@ -102,23 +116,32 @@ export default function TeacherAssignmentCreate({
                         <FormSection>
                             <FormField
                                 label={t('teacherAssignments.section')}
-                                description={t('teacherAssignments.sectionDescription')}
+                                description={t(
+                                    'teacherAssignments.sectionDescription',
+                                )}
                             >
                                 <Select
                                     value={data.section_id}
                                     onValueChange={(value) =>
                                         setData('section_id', value)
                                     }
-                                    placeholder={t('teacherAssignments.sectionPlaceholder')}
+                                    placeholder={t(
+                                        'teacherAssignments.sectionPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('teacherAssignments.sectionPlaceholder')}</option>
+                                    <option value="">
+                                        {t(
+                                            'teacherAssignments.sectionPlaceholder',
+                                        )}
+                                    </option>
                                     {sections.map((section) => (
                                         <option
                                             key={section.id}
                                             value={section.id}
                                         >
-                                            {section.name} ({section.academic_class.name})
+                                            {section.name} (
+                                            {section.academic_class.name})
                                         </option>
                                     ))}
                                 </Select>

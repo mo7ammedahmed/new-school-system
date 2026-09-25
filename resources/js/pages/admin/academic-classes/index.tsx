@@ -40,7 +40,7 @@ type Props = {
             next: string | null;
         };
     };
-    filters: Record<string, any>;
+    filters?: Record<string, any>;
 };
 
 const LIST_URL = (schoolId: number) =>

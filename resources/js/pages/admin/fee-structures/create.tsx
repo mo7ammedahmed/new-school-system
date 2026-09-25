@@ -21,8 +21,10 @@ type Props = {
     school: { id: number; name: string };
 };
 
-const LIST_URL = (schoolId: number) => `/admin/schools/${schoolId}/fee-structures`;
-const CREATE_URL = (schoolId: number) => `/admin/schools/${schoolId}/fee-structures`;
+const LIST_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/fee-structures`;
+const CREATE_URL = (schoolId: number) =>
+    `/admin/schools/${schoolId}/fee-structures`;
 
 const CURRENCIES = [
     { value: 'SAR', label: 'Saudi Riyal' },
@@ -63,7 +65,9 @@ export default function FeeStructureCreate({ school }: Props) {
             <Head title={t('feeStructures.create')} />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold">{t('feeStructures.create')}</h1>
+                    <h1 className="text-2xl font-semibold">
+                        {t('feeStructures.create')}
+                    </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Button asChild variant="outline">
                             <Link href={LIST_URL(school.id)}>
@@ -89,7 +93,9 @@ export default function FeeStructureCreate({ school }: Props) {
                                 description={t('feeStructures.nameDescription')}
                             >
                                 <Input
-                                    placeholder={t('feeStructures.namePlaceholder')}
+                                    placeholder={t(
+                                        'feeStructures.namePlaceholder',
+                                    )}
                                     value={data.name}
                                     onChange={(e) =>
                                         setData('name', e.target.value)
@@ -103,10 +109,14 @@ export default function FeeStructureCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('feeStructures.description')}
-                                description={t('feeStructures.descriptionDescription')}
+                                description={t(
+                                    'feeStructures.descriptionDescription',
+                                )}
                             >
                                 <Textarea
-                                    placeholder={t('feeStructures.descriptionPlaceholder')}
+                                    placeholder={t(
+                                        'feeStructures.descriptionPlaceholder',
+                                    )}
                                     value={data.description}
                                     onChange={(e) =>
                                         setData('description', e.target.value)
@@ -119,10 +129,14 @@ export default function FeeStructureCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('feeStructures.amount')}
-                                description={t('feeStructures.amountDescription')}
+                                description={t(
+                                    'feeStructures.amountDescription',
+                                )}
                             >
                                 <Input
-                                    placeholder={t('feeStructures.amountPlaceholder')}
+                                    placeholder={t(
+                                        'feeStructures.amountPlaceholder',
+                                    )}
                                     value={data.amount_minor}
                                     onChange={(e) =>
                                         setData('amount_minor', e.target.value)
@@ -137,19 +151,28 @@ export default function FeeStructureCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('feeStructures.currency')}
-                                description={t('feeStructures.currencyDescription')}
+                                description={t(
+                                    'feeStructures.currencyDescription',
+                                )}
                             >
                                 <Select
                                     value={data.currency}
                                     onValueChange={(value) =>
                                         setData('currency', value)
                                     }
-                                    placeholder={t('feeStructures.currencyPlaceholder')}
+                                    placeholder={t(
+                                        'feeStructures.currencyPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('feeStructures.currencyPlaceholder')}</option>
+                                    <option value="">
+                                        {t('feeStructures.currencyPlaceholder')}
+                                    </option>
                                     {CURRENCIES.map((currency) => (
-                                        <option key={currency.value} value={currency.value}>
+                                        <option
+                                            key={currency.value}
+                                            value={currency.value}
+                                        >
                                             {t(`currencies.${currency.value}`)}
                                         </option>
                                     ))}
@@ -160,20 +183,33 @@ export default function FeeStructureCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('feeStructures.frequency')}
-                                description={t('feeStructures.frequencyDescription')}
+                                description={t(
+                                    'feeStructures.frequencyDescription',
+                                )}
                             >
                                 <Select
                                     value={data.frequency}
                                     onValueChange={(value) =>
                                         setData('frequency', value)
                                     }
-                                    placeholder={t('feeStructures.frequencyPlaceholder')}
+                                    placeholder={t(
+                                        'feeStructures.frequencyPlaceholder',
+                                    )}
                                     required
                                 >
-                                    <option value="">{t('feeStructures.frequencyPlaceholder')}</option>
+                                    <option value="">
+                                        {t(
+                                            'feeStructures.frequencyPlaceholder',
+                                        )}
+                                    </option>
                                     {FREQUENCIES.map((frequency) => (
-                                        <option key={frequency.value} value={frequency.value}>
-                                            {t(`frequencies.${frequency.value}`)}
+                                        <option
+                                            key={frequency.value}
+                                            value={frequency.value}
+                                        >
+                                            {t(
+                                                `frequencies.${frequency.value}`,
+                                            )}
                                         </option>
                                     ))}
                                 </Select>
@@ -183,12 +219,14 @@ export default function FeeStructureCreate({ school }: Props) {
                         <FormSection>
                             <FormField
                                 label={t('feeStructures.isActive')}
-                                description={t('feeStructures.isActiveDescription')}
+                                description={t(
+                                    'feeStructures.isActiveDescription',
+                                )}
                             >
                                 <Switch
                                     checked={data.is_active}
                                     onCheckedChange={(checked) =>
-                                        setData('is_active', checked)
+                                        setData('is_active', checked === true)
                                     }
                                 />
                             </FormField>

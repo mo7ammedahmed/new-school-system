@@ -71,21 +71,21 @@ export default function Security() {
             <section className="mx-auto max-w-7xl px-5 pt-20 pb-24 sm:px-8">
                 <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
                     <div>
-                        <div className="grid size-14 place-items-center rounded-2xl bg-[#0d5c4d] text-white">
+                        <div className="bg-primary text-primary-foreground grid size-14 place-items-center rounded-lg">
                             <ShieldCheck size={28} />
                         </div>
-                        <p className="mt-7 text-sm font-black text-[#c56a3b]">
+                        <p className="text-warning mt-7 text-sm font-semibold">
                             {isArabic
                                 ? 'الثقة ليست ميزة إضافية'
                                 : 'Trust is not an add-on'}
                         </p>
-                        <h1 className="mt-3 text-5xl leading-tight font-black tracking-tight sm:text-6xl">
+                        <h1 className="mt-3 text-5xl leading-tight font-semibold tracking-tight sm:text-6xl">
                             {isArabic
                                 ? 'الأمان جزء من كل قرار.'
                                 : 'Security belongs in every decision.'}
                         </h1>
                     </div>
-                    <p className="max-w-xl text-lg leading-9 text-[#5d746c]">
+                    <p className="text-on-surface-variant max-w-xl text-lg leading-9">
                         {isArabic
                             ? 'نبني مدرستي لتكون مساحة موثوقة للبيانات التعليمية والمالية. الوضوح والعزل وإمكانية المراجعة مبادئ في المنتج.'
                             : 'Madrasati is built as a trusted space for education and finance data. Clarity, isolation, and reviewability are product principles.'}
@@ -95,22 +95,27 @@ export default function Security() {
                     {pillars[locale].map(({ icon: Icon, title, text }) => (
                         <article
                             key={title}
-                            className="rounded-[1.75rem] border border-[#dbe8df] bg-white p-7"
+                            className="border-outline-variant bg-card rounded-lg border p-7"
                         >
-                            <div className="grid size-12 place-items-center rounded-2xl bg-[#e1efe2] text-[#0d5c4d]">
+                            <div className="bg-surface-container-low text-primary grid size-12 place-items-center rounded-lg">
                                 <Icon size={22} />
                             </div>
-                            <h2 className="mt-6 text-xl font-black">{title}</h2>
-                            <p className="mt-3 leading-7 text-[#6c837c]">
+                            <h2 className="mt-6 text-xl font-semibold">
+                                {title}
+                            </h2>
+                            <p className="text-on-surface-variant mt-3 leading-7">
                                 {text}
                             </p>
                         </article>
                     ))}
                 </div>
-                <div className="mt-12 flex flex-col gap-5 rounded-[2rem] bg-[#17342f] p-8 text-white sm:p-10 md:flex-row md:items-center md:justify-between">
+                <div className="bg-primary-container mt-12 flex flex-col gap-5 rounded-lg p-8 text-white sm:p-10 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <LockKeyhole className="text-[#f4c765]" size={25} />
-                        <h2 className="mt-5 text-2xl font-black">
+                        <LockKeyhole
+                            className="text-warning-border"
+                            size={25}
+                        />
+                        <h2 className="mt-5 text-2xl font-semibold">
                             {isArabic
                                 ? 'لديكم متطلبات امتثال محددة؟'
                                 : 'Have specific compliance requirements?'}
@@ -118,7 +123,7 @@ export default function Security() {
                     </div>
                     <Link
                         href="/contact"
-                        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-black text-[#0d5c4d]"
+                        className="bg-card text-primary inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold"
                     >
                         {isArabic ? 'تحدثوا مع الفريق' : 'Talk to the team'}{' '}
                         <ArrowLeft size={17} />

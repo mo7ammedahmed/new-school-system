@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useMemo, useState, useCallback } from 'react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/hooks/useT';
 
 type Column<T> = {
     accessorKey: keyof T;
@@ -31,6 +32,13 @@ type DataTableProps<T> = {
     renderRowActions?: (row: T) => React.ReactNode;
     // Show row selection checkboxes
     selectable?: boolean;
+    // Stable identity for a row, required when selectable
+    rowKey?: (row: T, index: number) => string | number;
+    // Actions shown while rows are selected
+    renderBulkActions?: (
+        rows: T[],
+        clearSelection: () => void,
+    ) => React.ReactNode;
     // Show loading state
     loading?: boolean;
     // Empty state message
@@ -62,12 +70,14 @@ type DataTableProps<T> = {
 export function DataTable<T>({
     columns,
     data,
-    pageSize = 10,
+    pageSize: initialPageSize = 10,
     pageSizeOptions = [10, 25, 50, 100],
     renderRowActions,
     selectable = false,
+    rowKey,
+    renderBulkActions,
     loading = false,
-    emptyMessage = 'No records found.',
+    emptyMessage,
     emptyAction,
     searchable = false,
     searchPlaceholder = 'Search...',
@@ -81,42 +91,63 @@ export function DataTable<T>({
     className,
 }: DataTableProps<T>) {
     const [pageIndex, setPageIndex] = useState(0);
+    const [pageSize, setPageSize] = useState(initialPageSize);
     const [sortConfig, setSortConfig] = useState<{
         key: keyof T;
         direction: 'asc' | 'desc';
     } | null>(null);
-    const [internalSearchValue, setInternalSearchValue] = useState(searchValue ?? '');
-    const [visibleColumns, setVisibleColumns] = useState<Set<keyof T>>(new Set(
-        columns
-            .filter(col => !col.hidden)
-            .map(col => col.accessorKey)
-    ));
+    const [internalSearchValue, setInternalSearchValue] = useState(
+        searchValue ?? '',
+    );
+    const [visibleColumns, setVisibleColumns] = useState<Set<keyof T>>(
+        new Set(
+            columns.filter((col) => !col.hidden).map((col) => col.accessorKey),
+        ),
+    );
+    const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(
+        new Set(),
+    );
+    const { t } = useT();
+
+    const keyOf = useCallback(
+        (row: T, index: number): string | number =>
+            rowKey ? rowKey(row, index) : index,
+        [rowKey],
+    );
+
+    const clearSelection = useCallback(() => setSelectedKeys(new Set()), []);
 
     // Handle controlled vs uncontrolled search
-    const effectiveSearchValue = searchValue !== undefined ? searchValue : internalSearchValue;
-    const handleSearchChange = useCallback((value: string) => {
-        setInternalSearchValue(value);
-        if (onSearchChange) {
-            onSearchChange(value);
-        }
-        // Reset to first page when search changes
-        setPageIndex(0);
-    }, [onSearchChange]);
+    const effectiveSearchValue =
+        searchValue !== undefined ? searchValue : internalSearchValue;
+    const handleSearchChange = useCallback(
+        (value: string) => {
+            setInternalSearchValue(value);
+            if (onSearchChange) {
+                onSearchChange(value);
+            }
+            // Reset to first page when search changes
+            setPageIndex(0);
+        },
+        [onSearchChange],
+    );
 
     // Filter data based on search
     const filteredData = useMemo(() => {
         if (!effectiveSearchValue || !searchable) return data;
 
         const searchTerm = effectiveSearchValue.toLowerCase();
-        return data.filter(row =>
-            columns.some(column => {
+        return data.filter((row) =>
+            columns.some((column) => {
                 if (visibleColumns.has(column.accessorKey)) {
                     const value = row[column.accessorKey];
-                    return value
-                        && String(value).toLowerCase().includes(searchTerm);
+                    return (
+                        value &&
+                        String(value).toLowerCase().includes(searchTerm)
+                    );
                 }
                 return false;
-            })
+            }),
         );
     }, [data, effectiveSearchValue, searchable, visibleColumns, columns]);
 
@@ -161,8 +192,8 @@ export function DataTable<T>({
     }, []);
 
     // Handle column visibility toggle
-    const toggleColumnVisibility = useCallback((key: keyof T) => {
-        setVisibleColumns(prev => {
+    const _toggleColumnVisibility = useCallback((key: keyof T) => {
+        setVisibleColumns((prev) => {
             const newSet = new Set(prev);
             if (newSet.has(key)) {
                 newSet.delete(key);
@@ -175,17 +206,17 @@ export function DataTable<T>({
 
     // Export to CSV
     const handleExport = useCallback(() => {
-        const header = visibleColumns
-            .map(key => {
-                const col = columns.find(c => c.accessorKey === key);
+        const header = [...visibleColumns]
+            .map((key: keyof T) => {
+                const col = columns.find((c) => c.accessorKey === key);
                 return `"${col?.header ?? String(key)}"`;
             })
             .join(',');
 
-        const rows = sortedData.map(row => {
-            return visibleColumns
-                .map(key => {
-                    const value = row[key];
+        const rows = sortedData.map((row) => {
+            return [...visibleColumns]
+                .map((key: keyof T) => {
+                    const value = row[key as keyof T];
                     const escaped = String(value ?? '')
                         .replace(/"/g, '""')
                         .replace(/,/g, ',');
@@ -195,7 +226,9 @@ export function DataTable<T>({
         });
 
         const csvContent = [header, ...rows].join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([csvContent], {
+            type: 'text/csv;charset=utf-8;',
+        });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
@@ -211,10 +244,10 @@ export function DataTable<T>({
             <div className={cn('data-table w-full', className)}>
                 {/* Enhanced loading skeleton */}
                 <div className="space-y-4">
-                    <div className="h-4 bg-muted/50 rounded w-1/2 animate-pulse" />
-                    <div className="h-4 bg-muted/50 rounded w-3/4 animate-pulse" />
-                    <div className="h-4 bg-muted/50 rounded w-2/3 animate-pulse" />
-                    <div className="h-4 bg-muted/50 rounded w-full animate-pulse" />
+                    <div className="bg-muted/50 h-4 w-1/2 animate-pulse rounded" />
+                    <div className="bg-muted/50 h-4 w-3/4 animate-pulse rounded" />
+                    <div className="bg-muted/50 h-4 w-2/3 animate-pulse rounded" />
+                    <div className="bg-muted/50 h-4 w-full animate-pulse rounded" />
                 </div>
             </div>
         );
@@ -223,29 +256,73 @@ export function DataTable<T>({
     if (sortedData.length === 0) {
         return (
             <div className={cn('data-table w-full', className)}>
-                <div className="text-center py-12">
+                <div className="py-12 text-center">
                     <p className="text-muted-foreground">
-                        {emptyMessage}
+                        {emptyMessage ?? t('table.noRecords')}
                     </p>
-                    {emptyAction && (
-                        <div className="mt-6">
-                            {emptyAction}
-                        </div>
-                    )}
+                    {emptyAction && <div className="mt-6">{emptyAction}</div>}
                 </div>
             </div>
         );
     }
 
     // Build visible columns array
-    const visibleColumnsArray = columns
-        .filter(col => !col.hidden && visibleColumns.has(col.accessorKey));
+    const visibleColumnsArray = columns.filter(
+        (col) => !col.hidden && visibleColumns.has(col.accessorKey),
+    );
+
+    const isSelected = (row: T, index: number) =>
+        selectedKeys.has(keyOf(row, index));
+
+    const toggleRow = (row: T, index: number) => {
+        const key = keyOf(row, index);
+        setSelectedKeys((previous) => {
+            const next = new Set(previous);
+
+            if (next.has(key)) {
+                next.delete(key);
+            } else {
+                next.add(key);
+            }
+
+            return next;
+        });
+    };
+
+    const allOnPageSelected =
+        paginatedData.length > 0 &&
+        paginatedData.every((row, index) => isSelected(row, index));
+
+    const toggleAllOnPage = (checked: boolean) => {
+        setSelectedKeys((previous) => {
+            const next = new Set(previous);
+
+            paginatedData.forEach((row, index) => {
+                const key = keyOf(row, index);
+
+                if (checked) {
+                    next.add(key);
+                } else {
+                    next.delete(key);
+                }
+            });
+
+            return next;
+        });
+    };
+
+    const selectedRows = paginatedData.filter((row, index) =>
+        isSelected(row, index),
+    );
 
     return (
         <div className={cn('data-table w-full', className)}>
             {/* Toolbar with search, export, and controls */}
-            {(searchable || exportable || columnVisibilityControl || pageSizeOptions.length > 1) && (
-                <div className="flex flex-wrap items-center justify-between mb-4 gap-3">
+            {(searchable ||
+                exportable ||
+                columnVisibilityControl ||
+                pageSizeOptions.length > 1) && (
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                     {/* Search */}
                     {searchable && (
                         <div className="flex items-center space-x-2">
@@ -253,11 +330,13 @@ export function DataTable<T>({
                                 type="text"
                                 placeholder={searchPlaceholder}
                                 value={effectiveSearchValue}
-                                onChange={(e) => handleSearchChange(e.target.value)}
+                                onChange={(e) =>
+                                    handleSearchChange(e.target.value)
+                                }
                                 className={cn(
-                                    "border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-64 rounded-md border px-4 py-2 text-sm",
-                                    compact && "h-8 px-3",
-                                    "file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                                    'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-64 rounded-md border px-4 py-2 text-sm',
+                                    compact && 'h-8 px-3',
+                                    'file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                                 )}
                             />
                         </div>
@@ -268,19 +347,28 @@ export function DataTable<T>({
                         {/* Page size selector */}
                         {pageSizeOptions.length > 1 && (
                             <>
-                                <label className="text-xs text-muted-foreground sr-only">Rows per page</label>
+                                <label className="text-muted-foreground sr-only text-xs">
+                                    {t('table.rowsPerPage')}
+                                </label>
                                 <select
                                     value={pageSize.toString()}
-                                    onChange={(e) => handlePageSizeChange(e.target.value)}
+                                    onChange={(e) =>
+                                        handlePageSizeChange(e.target.value)
+                                    }
                                     className={cn(
-                                        "border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring rounded-md border px-3 py-1.5 text-sm",
-                                        compact && "h-8 px-2",
-                                        "file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                                        'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring rounded-md border px-3 py-1.5 text-sm',
+                                        compact && 'h-8 px-2',
+                                        'file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                                     )}
                                 >
-                                    {pageSizeOptions.map(option => (
-                                        <option key={option} value={option.toString()}>
-                                            {option} per page
+                                    {pageSizeOptions.map((option) => (
+                                        <option
+                                            key={option}
+                                            value={option.toString()}
+                                        >
+                                            {t('table.perPage', {
+                                                count: option,
+                                            })}
                                         </option>
                                     ))}
                                 </select>
@@ -288,79 +376,112 @@ export function DataTable<T>({
                         )}
 
                         {/* Column visibility control */}
-                        {columnVisibilityControl && visibleColumnsArray.length > 1 && (
-                            <Button
-                                variant="outline"
-                                size={compact ? "icon" : "sm"}
-                                asChild
-                            >
-                                <Button asChild>
-                                    <span className="sr-only">Column visibility</span>
-                                    ⋮
+                        {columnVisibilityControl &&
+                            visibleColumnsArray.length > 1 && (
+                                <Button
+                                    variant="outline"
+                                    size={compact ? 'icon' : 'sm'}
+                                    asChild
+                                >
+                                    <Button asChild>
+                                        <span className="sr-only">
+                                            {t('table.columnVisibility')}
+                                        </span>
+                                        ⋮
+                                    </Button>
                                 </Button>
-                            </Button>
-                        )}
+                            )}
 
                         {/* Export button */}
                         {exportable && (
                             <Button
                                 variant="outline"
-                                size={compact ? "icon" : "sm"}
+                                size={compact ? 'icon' : 'sm'}
                                 onClick={handleExport}
                             >
                                 <Download className="h-4 w-4" />
-                                <span className="sr-only">Export data</span>
+                                <span className="sr-only">
+                                    {t('table.export')}
+                                </span>
                             </Button>
                         )}
                     </div>
                 </div>
             )}
 
+            {selectable && selectedKeys.size > 0 && renderBulkActions && (
+                <div className="border-border bg-muted mb-2 flex items-center gap-3 rounded-md border px-3 py-2">
+                    <span className="label-caps">
+                        {t('table.selectedCount', { count: selectedKeys.size })}
+                    </span>
+                    {renderBulkActions(selectedRows, clearSelection)}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="ms-auto"
+                        onClick={clearSelection}
+                    >
+                        {t('table.clearSelection')}
+                    </Button>
+                </div>
+            )}
+
             <div className="relative">
-                <table className={cn(
-                    "w-full border-collapse text-left text-sm rtl:text-right",
-                    compact && "text-xs",
-                    "border-separate"
-                )}>
+                <table
+                    className={cn(
+                        'w-full border-collapse text-start text-sm',
+                        compact && 'text-xs',
+                        'border-separate',
+                    )}
+                >
                     <thead>
-                        <tr className={cn(
-                            "border-b",
-                            compact && "bg-muted/50"
-                        )}>
+                        <tr className="border-border bg-muted/60 border-b">
                             {showRowNumbers && (
-                                <th className={cn(
-                                    "w-4 p-2 text-left",
-                                    compact && "p-1"
-                                )}>
+                                <th
+                                    className={cn(
+                                        'label-caps w-4 px-3 py-2 text-start',
+                                        compact && 'px-2',
+                                    )}
+                                >
                                     #
                                 </th>
                             )}
                             {selectable && (
-                                <th className={cn(
-                                    "w-4 p-2 text-left",
-                                    compact && "p-1"
-                                )}>
-                                    <Checkbox />
+                                <th
+                                    className={cn(
+                                        'w-4 px-3 py-2 text-start',
+                                        compact && 'px-2',
+                                    )}
+                                >
+                                    <Checkbox
+                                        aria-label={t('table.selectAll')}
+                                        checked={allOnPageSelected}
+                                        onCheckedChange={(value) =>
+                                            toggleAllOnPage(value === true)
+                                        }
+                                    />
                                 </th>
                             )}
                             {visibleColumnsArray.map((column, index) => (
                                 <th
                                     key={index}
                                     className={cn(
-                                        'text-muted-foreground p-2 text-left font-medium tracking-wider uppercase',
-                                        compact && "p-1",
+                                        'label-caps px-3 py-2 text-start',
+                                        compact && 'px-2',
                                         column.className,
                                         sortableClass(column.sortable ?? true),
-                                        column.width && `w-[${column.width}]`
+                                        column.width && `w-[${column.width}]`,
                                     )}
                                     onClick={() =>
                                         column.sortable &&
-                                        requestSort(column.accessorKey as keyof T)
+                                        requestSort(
+                                            column.accessorKey as keyof T,
+                                        )
                                     }
                                 >
                                     {column.header}
                                     {column.sortable && (
-                                        <span className="ml-1 text-xs">
+                                        <span className="ms-1 text-xs">
                                             {sortConfig?.key ===
                                                 column.accessorKey &&
                                                 (sortConfig.direction === 'asc'
@@ -371,48 +492,62 @@ export function DataTable<T>({
                                 </th>
                             ))}
                             {renderRowActions && (
-                                <th className={cn(
-                                    "text-muted-foreground p-2 text-left font-medium tracking-wider uppercase",
-                                    compact && "p-1"
-                                )}>
-                                    Actions
+                                <th
+                                    className={cn(
+                                        'label-caps px-3 py-2 text-start',
+                                        compact && 'px-2',
+                                    )}
+                                >
+                                    {t('common.actions')}
                                 </th>
                             )}
                         </tr>
                     </thead>
-                    <tbody className={cn(
-                        "divide-border bg-card divide-y",
-                        compact && "divide-y-2"
-                    )}>
+                    <tbody className="divide-border bg-card divide-y">
                         {paginatedData.map((row, rowIndex) => (
                             <tr
-                                key={rowIndex}
+                                key={keyOf(row, rowIndex)}
                                 className={cn(
-                                    "hover:bg-muted",
-                                    compact && "hover:bg-muted/50",
-                                    "border-b"
+                                    'border-border hover:bg-background border-b transition-colors',
+                                    compact ? 'h-11' : 'h-13',
+                                    isSelected(row, rowIndex) &&
+                                        'bg-muted border-secondary hover:bg-muted border-s-2',
                                 )}
                             >
                                 {showRowNumbers && (
-                                    <td className={cn(
-                                        "w-4 p-2 text-left text-muted-foreground",
-                                        compact && "p-1"
-                                    )}>
+                                    <td
+                                        className={cn(
+                                            'text-muted-foreground w-4 px-3 py-2 text-start',
+                                            compact && 'px-2',
+                                        )}
+                                    >
                                         {pageIndex * pageSize + rowIndex + 1}
                                     </td>
                                 )}
                                 {selectable && (
-                                    <td className={cn(
-                                        "w-4 p-2 text-left",
-                                        compact && "p-1"
-                                    )}>
-                                        <Checkbox />
+                                    <td
+                                        className={cn(
+                                            'w-4 px-3 py-2 text-start',
+                                            compact && 'px-2',
+                                        )}
+                                    >
+                                        <Checkbox
+                                            aria-label={t('table.selectRow')}
+                                            checked={isSelected(row, rowIndex)}
+                                            onCheckedChange={() =>
+                                                toggleRow(row, rowIndex)
+                                            }
+                                        />
                                     </td>
                                 )}
                                 {visibleColumnsArray.map((column, colIndex) => (
                                     <td
                                         key={colIndex}
-                                        className={cn('p-2', compact && "p-1", column.className)}
+                                        className={cn(
+                                            'px-3 py-2',
+                                            compact && 'px-2',
+                                            column.className,
+                                        )}
                                     >
                                         {column.cell
                                             ? column.cell(
@@ -429,10 +564,12 @@ export function DataTable<T>({
                                     </td>
                                 ))}
                                 {renderRowActions && (
-                                    <td className={cn(
-                                        "p-2 text-left",
-                                        compact && "p-1"
-                                    )}>
+                                    <td
+                                        className={cn(
+                                            'px-3 py-2 text-start',
+                                            compact && 'px-2',
+                                        )}
+                                    >
                                         {renderRowActions(row)}
                                     </td>
                                 )}
@@ -443,14 +580,16 @@ export function DataTable<T>({
 
                 {/* Enhanced pagination info and controls */}
                 {totalPages > 1 && (
-                    <div className={cn(
-                        "text-muted-foreground mt-4 flex items-center justify-between text-sm",
-                        compact && "mt-2 text-xs"
-                    )}>
+                    <div
+                        className={cn(
+                            'text-muted-foreground mt-4 flex items-center justify-between text-sm',
+                            compact && 'mt-2 text-xs',
+                        )}
+                    >
                         <div className="flex items-center space-x-3">
                             <p>
-                                Showing {paginatedData.length} of {sortedData.length}{' '}
-                                entries
+                                Showing {paginatedData.length} of{' '}
+                                {sortedData.length} entries
                             </p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -460,8 +599,8 @@ export function DataTable<T>({
                                 }
                                 disabled={pageIndex === 0}
                                 className={cn(
-                                    "discrete-button",
-                                    compact && "h-8 px-3 text-xs"
+                                    'discrete-button',
+                                    compact && 'h-8 px-3 text-xs',
                                 )}
                             >
                                 Previous
@@ -477,8 +616,8 @@ export function DataTable<T>({
                                 }
                                 disabled={pageIndex >= totalPages - 1}
                                 className={cn(
-                                    "discrete-button",
-                                    compact && "h-8 px-3 text-xs"
+                                    'discrete-button',
+                                    compact && 'h-8 px-3 text-xs',
                                 )}
                             >
                                 Next
@@ -506,5 +645,13 @@ function renderValue(value: unknown): React.ReactNode {
         return value as React.ReactNode;
     }
 
-    return String(value);
+    if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean'
+    ) {
+        return String(value);
+    }
+
+    return '';
 }

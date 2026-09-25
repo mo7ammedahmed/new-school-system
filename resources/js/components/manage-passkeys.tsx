@@ -4,6 +4,7 @@ import { destroy } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyRegi
 import Heading from '@/components/heading';
 import PasskeyItem from '@/components/passkey-item';
 import PasskeyRegistration from '@/components/passkey-register';
+import { useT } from '@/hooks/useT';
 import type { Passkey } from '@/types/auth';
 
 export type Props = {
@@ -12,14 +13,16 @@ export type Props = {
 };
 
 const EmptyState = () => {
+    const { t } = useT();
+
     return (
         <div className="p-8 text-center">
-            <div className="bg-muted mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl">
+            <div className="bg-muted mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg">
                 <KeyRound className="text-muted-foreground h-7 w-7" />
             </div>
-            <p className="font-medium">No passkeys yet</p>
+            <p className="font-medium">{t('settings.noPasskeys')}</p>
             <p className="text-muted-foreground mt-1 text-sm">
-                Add a passkey to sign in without a password
+                {t('settings.noPasskeysHint')}
             </p>
         </div>
     );
@@ -27,6 +30,7 @@ const EmptyState = () => {
 
 export default function ManagePasskeys(props: Props) {
     const passkeys = props.passkeys ?? [];
+    const { t } = useT();
 
     const handleDelete = (id: number, onError: () => void) => {
         router.delete(destroy.url(id), {
@@ -47,8 +51,8 @@ export default function ManagePasskeys(props: Props) {
         <div className="space-y-6">
             <Heading
                 variant="small"
-                title="Passkeys"
-                description="Manage your passkeys for passwordless sign-in"
+                title={t('settings.passkeys')}
+                description={t('settings.passkeysDescription')}
             />
 
             <div className="border-border overflow-hidden rounded-lg border">

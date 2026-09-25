@@ -1,15 +1,8 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useT } from '@/hooks/useT';
+import { confirmDelete } from '@/lib/confirm-delete';
 
 type Props = {
     school: { id: number; name: string };
@@ -32,11 +25,17 @@ export default function InstallmentShow({ school, installment }: Props) {
 
     return (
         <>
-            <Head title={t('installments.show', { sequence: installment.sequence })} />
+            <Head
+                title={t('installments.show', {
+                    sequence: installment.sequence,
+                })}
+            />
             <div className="space-y-6 p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-semibold">
-                        {t('installments.show', { sequence: installment.sequence })}
+                        {t('installments.show', {
+                            sequence: installment.sequence,
+                        })}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-4 md:mt-0">
                         <Link
@@ -46,21 +45,19 @@ export default function InstallmentShow({ school, installment }: Props) {
                             {t('actions.edit')}
                         </Link>
                         <Button
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        t('common.deleteConfirmation', {
-                                            name: t('installments.title'),
-                                        })
-                                    )
-                                ) {
-                                    // In a real implementation, you would send a DELETE request
-                                    // For now, we'll just show an alert
-                                    alert('Installment deleted successfully!');
-                                    // In a real app, you would redirect to the index page
-                                    // window.location.href = `/admin/schools/${school.id}/installments`;
-                                }
-                            }}
+                            onClick={() =>
+                                confirmDelete(
+                                    `/admin/schools/${school.id}/installments/${installment.id}`,
+                                    {
+                                        message: t(
+                                            'common.deleteConfirmation',
+                                            {
+                                                name: t('installments.title'),
+                                            },
+                                        ),
+                                    },
+                                )
+                            }
                             variant="destructive"
                         >
                             {t('actions.delete')}
@@ -110,7 +107,8 @@ export default function InstallmentShow({ school, installment }: Props) {
                                         {t('installments.dueDate')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {installment.due_on ?? t('common.notAvailable')}
+                                        {installment.due_on ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                                 <div>
@@ -118,7 +116,11 @@ export default function InstallmentShow({ school, installment }: Props) {
                                         {t('installments.amount')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        ${(installment.amount_minor / 100).toFixed(2)} SAR
+                                        $
+                                        {(
+                                            installment.amount_minor / 100
+                                        ).toFixed(2)}{' '}
+                                        SAR
                                     </p>
                                 </div>
                                 <div>
@@ -126,7 +128,11 @@ export default function InstallmentShow({ school, installment }: Props) {
                                         {t('installments.paidAmount')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        ${(installment.paid_minor / 100).toFixed(2)} SAR
+                                        $
+                                        {(installment.paid_minor / 100).toFixed(
+                                            2,
+                                        )}{' '}
+                                        SAR
                                     </p>
                                 </div>
                                 <div>
@@ -134,7 +140,13 @@ export default function InstallmentShow({ school, installment }: Props) {
                                         {t('installments.outstanding')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        ${((installment.amount_minor - installment.paid_minor) / 100).toFixed(2)} SAR
+                                        $
+                                        {(
+                                            (installment.amount_minor -
+                                                installment.paid_minor) /
+                                            100
+                                        ).toFixed(2)}{' '}
+                                        SAR
                                     </p>
                                 </div>
                                 <div>
@@ -142,7 +154,9 @@ export default function InstallmentShow({ school, installment }: Props) {
                                         {t('installments.status')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {t(`installments.statuses.${installment.status}`)}
+                                        {t(
+                                            `installments.statuses.${installment.status}`,
+                                        )}
                                     </p>
                                 </div>
                                 <div>
@@ -150,7 +164,8 @@ export default function InstallmentShow({ school, installment }: Props) {
                                         {t('installments.paidDate')}
                                     </h3>
                                     <p className="mt-1 block truncate">
-                                        {installment.paid_at ?? t('common.notAvailable')}
+                                        {installment.paid_at ??
+                                            t('common.notAvailable')}
                                     </p>
                                 </div>
                             </div>

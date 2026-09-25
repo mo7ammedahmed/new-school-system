@@ -3,7 +3,8 @@ import examPapers from '@/routes/admin/schedule/exams/papers';
 import examPaperRecord from '@/routes/admin/schedule/exam-papers';
 import examInvigilators from '@/routes/admin/schedule/exam-papers/invigilators';
 import { useT } from '@/hooks/useT';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { PageHero } from '@/components/page-hero';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     CalendarDays,
     ChevronLeft,
@@ -390,22 +391,16 @@ export default function ExamScheduleIndex() {
             <Head title={t('exams.title')} />
 
             <div className="space-y-6 p-4 md:p-8">
-                <header className="rounded-[1.5rem] bg-hero-bg p-6 text-white">
-                    <p className="text-sm font-bold text-hero-muted">
-                        {school.name}
-                    </p>
-                    <h1 className="mt-2 text-3xl font-black">
-                        {t('exams.title')}
-                    </h1>
-                    <p className="mt-2 max-w-2xl text-hero-accent">
-                        {t('exams.subtitle')}
-                    </p>
-                </header>
+                <PageHero
+                    eyebrow={school.name}
+                    title={t('exams.title')}
+                    subtitle={t('exams.subtitle')}
+                />
 
                 {props.flash?.success ? (
                     <p
                         role="status"
-                        className="rounded-xl bg-[#dcecdf] px-4 py-3 font-bold text-brand-600"
+                        className="text-brand-600 bg-surface-container-low rounded-xl px-4 py-3 font-bold"
                     >
                         {props.flash.success}
                     </p>
@@ -413,7 +408,7 @@ export default function ExamScheduleIndex() {
                 {props.flash?.error ? (
                     <p
                         role="alert"
-                        className="rounded-xl bg-[#f8e4d8] px-4 py-3 font-bold text-[#a5552e]"
+                        className="bg-warning-container text-warning-foreground rounded-xl px-4 py-3 font-bold"
                     >
                         {props.flash.error}
                     </p>
@@ -422,17 +417,17 @@ export default function ExamScheduleIndex() {
                 {/* Exam periods */}
                 <section
                     aria-labelledby="periods-heading"
-                    className="rounded-[1.5rem] border border-border bg-card p-6"
+                    className="border-border bg-card rounded-[1.5rem] border p-6"
                 >
                     <h2
                         id="periods-heading"
-                        className="text-xl font-black text-foreground"
+                        className="text-foreground text-xl font-semibold"
                     >
                         {t('exams.periods')}
                     </h2>
 
                     {schedules.length === 0 ? (
-                        <p className="mt-3 text-sm text-foreground">
+                        <p className="text-foreground mt-3 text-sm">
                             {t('exams.noPeriods')}
                         </p>
                     ) : (
@@ -444,26 +439,26 @@ export default function ExamScheduleIndex() {
                                             school: school.id,
                                             examSchedule: schedule.id,
                                         })}
-                                        className={`block rounded-2xl border p-4 transition hover:border-[#0d5c4d] ${
+                                        className={`hover:border-primary block rounded-lg border p-4 transition ${
                                             selectedSchedule?.id === schedule.id
-                                                ? 'border-[#0d5c4d] bg-[#f2f8f4]'
-                                                : 'border-[#dbe8df]'
+                                                ? 'border-primary bg-surface-container-low'
+                                                : 'border-outline-variant'
                                         }`}
                                     >
                                         <div className="flex items-center justify-between gap-2">
-                                            <span className="font-black text-foreground">
+                                            <span className="text-foreground font-semibold">
                                                 {scheduleLabels(schedule)}
                                             </span>
-                                            <span className="rounded-full bg-[#eef4f0] px-2 py-1 text-xs font-bold text-brand-600">
+                                            <span className="text-brand-600 bg-surface-container-low rounded-full px-2 py-1 text-xs font-bold">
                                                 {t(`status.${schedule.status}`)}
                                             </span>
                                         </div>
-                                        <p className="mt-2 text-xs font-bold text-foreground">
+                                        <p className="text-foreground mt-2 text-xs font-bold">
                                             {schedule.starts_on} →{' '}
                                             {schedule.ends_on}
                                         </p>
                                         {schedule.papers_count !== null ? (
-                                            <p className="mt-1 text-xs text-foreground">
+                                            <p className="text-foreground mt-1 text-xs">
                                                 {t('exams.papersCount', {
                                                     count: schedule.papers_count,
                                                 })}
@@ -475,130 +470,148 @@ export default function ExamScheduleIndex() {
                         </ul>
                     )}
 
-                    {can.manage && academicYears.length > 0 ? (
-                        <form
-                            onSubmit={submitPeriod}
-                            className="mt-6 grid gap-3 border-t border-[#eef4f0] pt-6 md:grid-cols-3"
-                        >
-                            <h3 className="text-sm font-black text-foreground md:col-span-3">
-                                {t('exams.newPeriod')}
-                            </h3>
+                    {can.manage ? (
+                        academicYears.length > 0 ? (
+                            <form
+                                onSubmit={submitPeriod}
+                                className="border-outline-variant mt-6 grid gap-3 border-t pt-6 md:grid-cols-3"
+                            >
+                                <h3 className="text-foreground text-sm font-semibold md:col-span-3">
+                                    {t('exams.newPeriod')}
+                                </h3>
 
-                            <label className="text-sm font-bold text-[#4c635c]">
-                                {t('exams.academicYear')}
-                                <select
-                                    className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
-                                    value={periodForm.data.academic_year_id}
-                                    onChange={(event) =>
-                                        periodForm.setData(
-                                            'academic_year_id',
-                                            Number(event.target.value),
-                                        )
-                                    }
+                                <label className="text-on-surface-variant text-sm font-bold">
+                                    {t('exams.academicYear')}
+                                    <select
+                                        className="field mt-1"
+                                        value={periodForm.data.academic_year_id}
+                                        onChange={(event) =>
+                                            periodForm.setData(
+                                                'academic_year_id',
+                                                Number(event.target.value),
+                                            )
+                                        }
+                                    >
+                                        {academicYears.map((year) => (
+                                            <option
+                                                key={year.id}
+                                                value={year.id}
+                                            >
+                                                {year.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+
+                                <label className="text-on-surface-variant text-sm font-bold">
+                                    {t('exams.titleEn')}
+                                    <input
+                                        className="field mt-1"
+                                        value={periodForm.data.title}
+                                        onChange={(event) =>
+                                            periodForm.setData(
+                                                'title',
+                                                event.target.value,
+                                            )
+                                        }
+                                        required
+                                    />
+                                </label>
+
+                                <label className="text-on-surface-variant text-sm font-bold">
+                                    {t('exams.titleAr')}
+                                    <input
+                                        className="field mt-1"
+                                        dir="rtl"
+                                        value={periodForm.data.title_ar}
+                                        onChange={(event) =>
+                                            periodForm.setData(
+                                                'title_ar',
+                                                event.target.value,
+                                            )
+                                        }
+                                    />
+                                </label>
+
+                                <label className="text-on-surface-variant text-sm font-bold">
+                                    {t('exams.term')}
+                                    <input
+                                        className="field mt-1"
+                                        placeholder={t('exams.termHint')}
+                                        value={periodForm.data.term}
+                                        onChange={(event) =>
+                                            periodForm.setData(
+                                                'term',
+                                                event.target.value,
+                                            )
+                                        }
+                                    />
+                                </label>
+
+                                <label className="text-on-surface-variant text-sm font-bold">
+                                    {t('exams.startsOn')}
+                                    <input
+                                        type="date"
+                                        className="field mt-1"
+                                        value={periodForm.data.starts_on}
+                                        onChange={(event) =>
+                                            periodForm.setData(
+                                                'starts_on',
+                                                event.target.value,
+                                            )
+                                        }
+                                        required
+                                    />
+                                </label>
+
+                                <label className="text-on-surface-variant text-sm font-bold">
+                                    {t('exams.endsOn')}
+                                    <input
+                                        type="date"
+                                        className="field mt-1"
+                                        value={periodForm.data.ends_on}
+                                        onChange={(event) =>
+                                            periodForm.setData(
+                                                'ends_on',
+                                                event.target.value,
+                                            )
+                                        }
+                                        required
+                                    />
+                                </label>
+
+                                <div className="md:col-span-3">
+                                    <button
+                                        type="submit"
+                                        disabled={periodForm.processing}
+                                        className="bg-hero-bg inline-flex items-center gap-2 rounded-full px-5 py-2 font-semibold text-white disabled:opacity-60"
+                                    >
+                                        <Plus size={16} aria-hidden="true" />
+                                        {t('exams.createPeriod')}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            // An exam period is scoped to an academic year, so say
+                            // which prerequisite is missing and link to it instead
+                            // of hiding the form with no explanation.
+                            <div className="border-outline-variant text-muted-foreground mt-6 flex flex-wrap items-center gap-2 border-t pt-6 text-sm">
+                                <span>{t('exams.needsAcademicYear')}</span>
+                                <Link
+                                    href={`/admin/schools/${school.id}/academic-years`}
+                                    className="text-secondary font-semibold underline underline-offset-4"
                                 >
-                                    {academicYears.map((year) => (
-                                        <option key={year.id} value={year.id}>
-                                            {year.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-
-                            <label className="text-sm font-bold text-[#4c635c]">
-                                {t('exams.titleEn')}
-                                <input
-                                    className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
-                                    value={periodForm.data.title}
-                                    onChange={(event) =>
-                                        periodForm.setData(
-                                            'title',
-                                            event.target.value,
-                                        )
-                                    }
-                                    required
-                                />
-                            </label>
-
-                            <label className="text-sm font-bold text-[#4c635c]">
-                                {t('exams.titleAr')}
-                                <input
-                                    className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
-                                    dir="rtl"
-                                    value={periodForm.data.title_ar}
-                                    onChange={(event) =>
-                                        periodForm.setData(
-                                            'title_ar',
-                                            event.target.value,
-                                        )
-                                    }
-                                />
-                            </label>
-
-                            <label className="text-sm font-bold text-[#4c635c]">
-                                {t('exams.term')}
-                                <input
-                                    className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
-                                    placeholder={t('exams.termHint')}
-                                    value={periodForm.data.term}
-                                    onChange={(event) =>
-                                        periodForm.setData(
-                                            'term',
-                                            event.target.value,
-                                        )
-                                    }
-                                />
-                            </label>
-
-                            <label className="text-sm font-bold text-[#4c635c]">
-                                {t('exams.startsOn')}
-                                <input
-                                    type="date"
-                                    className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
-                                    value={periodForm.data.starts_on}
-                                    onChange={(event) =>
-                                        periodForm.setData(
-                                            'starts_on',
-                                            event.target.value,
-                                        )
-                                    }
-                                    required
-                                />
-                            </label>
-
-                            <label className="text-sm font-bold text-[#4c635c]">
-                                {t('exams.endsOn')}
-                                <input
-                                    type="date"
-                                    className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
-                                    value={periodForm.data.ends_on}
-                                    onChange={(event) =>
-                                        periodForm.setData(
-                                            'ends_on',
-                                            event.target.value,
-                                        )
-                                    }
-                                    required
-                                />
-                            </label>
-
-                            <div className="md:col-span-3">
-                                <button
-                                    type="submit"
-                                    disabled={periodForm.processing}
-                                    className="inline-flex items-center gap-2 rounded-full bg-hero-bg px-5 py-2 font-black text-white disabled:opacity-60"
-                                >
-                                    <Plus size={16} aria-hidden="true" />
-                                    {t('exams.createPeriod')}
-                                </button>
+                                    {t('exams.addAcademicYear')}
+                                </Link>
                             </div>
-                        </form>
+                        )
                     ) : null}
                 </section>
 
                 {selectedSchedule ? (
                     <>
                         <div className="flex flex-wrap items-center justify-between gap-3">
-                            <h2 className="text-2xl font-black text-foreground">
+                            <h2 className="text-foreground text-2xl font-semibold">
                                 {scheduleLabels(selectedSchedule)}
                             </h2>
                             <div className="flex flex-wrap gap-2 print:hidden">
@@ -607,7 +620,7 @@ export default function ExamScheduleIndex() {
                                     <button
                                         type="button"
                                         onClick={publish}
-                                        className="rounded-full bg-[#0d5c4d] px-5 py-2 font-black text-white"
+                                        className="bg-primary text-primary-foreground rounded-full px-5 py-2 font-semibold"
                                     >
                                         {t('exams.publishPeriod')}
                                     </button>
@@ -627,7 +640,7 @@ export default function ExamScheduleIndex() {
                                                 { preserveScroll: true },
                                             )
                                         }
-                                        className="rounded-full border border-[#cfdcd5] px-5 py-2 font-black text-[#4c635c]"
+                                        className="border-outline-variant text-on-surface-variant rounded-full border px-5 py-2 font-semibold"
                                     >
                                         {t('exams.archivePeriod')}
                                     </button>
@@ -635,7 +648,7 @@ export default function ExamScheduleIndex() {
                                 <button
                                     type="button"
                                     onClick={() => window.print()}
-                                    className="inline-flex items-center gap-2 rounded-full border border-[#cfdcd5] px-5 py-2 font-black text-[#4c635c]"
+                                    className="border-outline-variant text-on-surface-variant inline-flex items-center gap-2 rounded-full border px-5 py-2 font-semibold"
                                 >
                                     <Printer size={16} aria-hidden="true" />
                                     {t('exams.printSchedule')}
@@ -643,7 +656,7 @@ export default function ExamScheduleIndex() {
                             </div>
                         </div>
                         {coverageWarnings.length > 0 ? (
-                            <p className="rounded-xl bg-[#f6efe0] px-4 py-3 text-sm font-bold text-[#8a6417]">
+                            <p className="bg-warning-container text-warning-foreground rounded-xl px-4 py-3 text-sm font-bold">
                                 <TriangleAlert
                                     size={16}
                                     className="inline"
@@ -655,7 +668,7 @@ export default function ExamScheduleIndex() {
                         {conflicting ? (
                             <div
                                 role="alert"
-                                className="rounded-xl bg-[#f8e4d8] px-4 py-3 font-bold text-[#a5552e]"
+                                className="bg-warning-container text-warning-foreground rounded-xl px-4 py-3 font-bold"
                             >
                                 <p>{conflicting}</p>
                                 {conflicts.length > 0 ? (
@@ -682,12 +695,12 @@ export default function ExamScheduleIndex() {
                             {/* Month calendar */}
                             <section
                                 aria-labelledby="calendar-heading"
-                                className="rounded-[1.5rem] border border-border bg-card p-6"
+                                className="border-border bg-card rounded-[1.5rem] border p-6"
                             >
                                 <div className="flex items-center justify-between gap-3">
                                     <h2
                                         id="calendar-heading"
-                                        className="text-lg font-black text-foreground"
+                                        className="text-foreground text-lg font-semibold"
                                     >
                                         <CalendarDays
                                             size={18}
@@ -703,7 +716,7 @@ export default function ExamScheduleIndex() {
                                             onClick={() =>
                                                 setMonth(shiftMonth(month, -1))
                                             }
-                                            className="rounded-full border border-[#cfdcd5] p-2"
+                                            className="border-outline-variant rounded-full border p-2"
                                         >
                                             <ChevronRight
                                                 size={16}
@@ -716,7 +729,7 @@ export default function ExamScheduleIndex() {
                                                 className="hidden rtl:inline"
                                             />
                                         </button>
-                                        <span className="min-w-[7rem] text-center font-black text-foreground">
+                                        <span className="text-foreground min-w-[7rem] text-center font-semibold">
                                             {month}
                                         </span>
                                         <button
@@ -725,7 +738,7 @@ export default function ExamScheduleIndex() {
                                             onClick={() =>
                                                 setMonth(shiftMonth(month, 1))
                                             }
-                                            className="rounded-full border border-[#cfdcd5] p-2"
+                                            className="border-outline-variant rounded-full border p-2"
                                         >
                                             <ChevronLeft
                                                 size={16}
@@ -750,7 +763,7 @@ export default function ExamScheduleIndex() {
                                             <div
                                                 key={day}
                                                 role="columnheader"
-                                                className="p-1 text-xs font-black text-foreground"
+                                                className="text-foreground p-1 text-xs font-semibold"
                                             >
                                                 {dayName(day)}
                                             </div>
@@ -791,15 +804,15 @@ export default function ExamScheduleIndex() {
                                                     }
                                                     className={`flex min-h-[4.5rem] flex-col items-start rounded-xl border p-2 text-start transition ${
                                                         isSelected
-                                                            ? 'border-[#0d5c4d] bg-[#eaf4ec]'
-                                                            : 'border-[#eef4f0] hover:border-[#0d5c4d]'
+                                                            ? 'border-primary bg-surface-container-low'
+                                                            : 'border-outline-variant hover:border-primary'
                                                     } ${cell.inMonth ? '' : 'opacity-40'} ${
                                                         isWorking
                                                             ? ''
-                                                            : 'bg-[#faf7f0]'
+                                                            : 'bg-surface-container-low'
                                                     }`}
                                                 >
-                                                    <span className="text-xs font-bold text-[#4c635c]">
+                                                    <span className="text-on-surface-variant text-xs font-bold">
                                                         {Number(
                                                             cell.iso.slice(
                                                                 8,
@@ -808,7 +821,7 @@ export default function ExamScheduleIndex() {
                                                         )}
                                                     </span>
                                                     {count > 0 ? (
-                                                        <span className="mt-auto rounded-full bg-[#0d5c4d] px-2 py-0.5 text-xs font-black text-white">
+                                                        <span className="bg-primary text-primary-foreground mt-auto rounded-full px-2 py-0.5 text-xs font-semibold">
                                                             {count}
                                                         </span>
                                                     ) : null}
@@ -818,7 +831,7 @@ export default function ExamScheduleIndex() {
                                     })()}
                                 </div>
 
-                                <p className="mt-4 text-xs font-bold text-foreground">
+                                <p className="text-foreground mt-4 text-xs font-bold">
                                     {t('exams.weekTotal')}: {weekTotal}
                                 </p>
                             </section>
@@ -826,15 +839,15 @@ export default function ExamScheduleIndex() {
                             {/* Day agenda */}
                             <section
                                 aria-labelledby="agenda-heading"
-                                className="rounded-[1.5rem] border border-border bg-card p-6"
+                                className="border-border bg-card rounded-[1.5rem] border p-6"
                             >
                                 <h2
                                     id="agenda-heading"
-                                    className="text-lg font-black text-foreground"
+                                    className="text-foreground text-lg font-semibold"
                                 >
                                     {t('exams.selectedDay')}
                                 </h2>
-                                <p className="mt-1 text-sm font-bold text-foreground">
+                                <p className="text-foreground mt-1 text-sm font-bold">
                                     {selectedDate}
                                     {hijri ? ` · ${hijri}` : ''}
                                     {selectedDate
@@ -843,7 +856,7 @@ export default function ExamScheduleIndex() {
                                 </p>
 
                                 {dayAgenda.length === 0 ? (
-                                    <p className="mt-4 text-sm text-foreground">
+                                    <p className="text-foreground mt-4 text-sm">
                                         {t('exams.noPapersOnDay')}
                                     </p>
                                 ) : (
@@ -851,10 +864,10 @@ export default function ExamScheduleIndex() {
                                         {dayAgenda.map((row) => (
                                             <li
                                                 key={row.id}
-                                                className="rounded-2xl border border-[#eef4f0] p-4"
+                                                className="border-outline-variant rounded-lg border p-4"
                                             >
                                                 <div className="flex items-center justify-between gap-3">
-                                                    <span className="font-black text-foreground">
+                                                    <span className="text-foreground font-semibold">
                                                         {subjectName({
                                                             subject_name_en:
                                                                 row.subject_name_en,
@@ -862,12 +875,15 @@ export default function ExamScheduleIndex() {
                                                                 row.subject_name_ar,
                                                         })}
                                                     </span>
-                                                    <span className="text-xs font-bold text-brand-600">
+                                                    <span
+                                                        dir="ltr"
+                                                        className="text-brand-600 text-xs font-bold"
+                                                    >
                                                         {row.starts_at} –{' '}
                                                         {row.ends_at}
                                                     </span>
                                                 </div>
-                                                <p className="mt-1 text-xs font-bold text-foreground">
+                                                <p className="text-foreground mt-1 text-xs font-bold">
                                                     {row.class_name} ·{' '}
                                                     {t('exams.section')}{' '}
                                                     {row.section_name}
@@ -876,7 +892,7 @@ export default function ExamScheduleIndex() {
                                                         : ''}
                                                 </p>
                                                 {row.invigilators.length > 0 ? (
-                                                    <p className="mt-1 text-xs text-foreground">
+                                                    <p className="text-foreground mt-1 text-xs">
                                                         {t(
                                                             'exams.invigilators',
                                                         )}
@@ -896,11 +912,11 @@ export default function ExamScheduleIndex() {
                         {can.manage && selectedSchedule.status === 'draft' ? (
                             <section
                                 aria-labelledby="paper-heading"
-                                className="rounded-[1.5rem] border border-border bg-card p-6 print:hidden"
+                                className="border-border bg-card rounded-[1.5rem] border p-6 print:hidden"
                             >
                                 <h2
                                     id="paper-heading"
-                                    className="text-lg font-black text-foreground"
+                                    className="text-foreground text-lg font-semibold"
                                 >
                                     {t('exams.addPaper')}
                                 </h2>
@@ -909,10 +925,10 @@ export default function ExamScheduleIndex() {
                                     onSubmit={submitPaper}
                                     className="mt-4 grid gap-3 md:grid-cols-4"
                                 >
-                                    <label className="text-sm font-bold text-[#4c635c]">
+                                    <label className="text-on-surface-variant text-sm font-bold">
                                         {t('exams.class')}
                                         <select
-                                            className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
+                                            className="field mt-1"
                                             value={paperForm.data.class_id}
                                             onChange={(event) => {
                                                 paperForm.setData(
@@ -938,10 +954,10 @@ export default function ExamScheduleIndex() {
                                         </select>
                                     </label>
 
-                                    <label className="text-sm font-bold text-[#4c635c]">
+                                    <label className="text-on-surface-variant text-sm font-bold">
                                         {t('exams.section')}
                                         <select
-                                            className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal disabled:opacity-50"
+                                            className="border-outline-variant mt-1 w-full rounded-lg border p-2 font-normal disabled:opacity-50"
                                             value={paperForm.data.section_id}
                                             disabled={paperForm.data.bulk}
                                             onChange={(event) =>
@@ -964,10 +980,10 @@ export default function ExamScheduleIndex() {
                                         </select>
                                     </label>
 
-                                    <label className="text-sm font-bold text-[#4c635c]">
+                                    <label className="text-on-surface-variant text-sm font-bold">
                                         {t('exams.subject')}
                                         <select
-                                            className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
+                                            className="field mt-1"
                                             value={paperForm.data.subject_id}
                                             onChange={(event) =>
                                                 paperForm.setData(
@@ -993,11 +1009,11 @@ export default function ExamScheduleIndex() {
                                         </select>
                                     </label>
 
-                                    <label className="text-sm font-bold text-[#4c635c]">
+                                    <label className="text-on-surface-variant text-sm font-bold">
                                         {t('exams.date')}
                                         <input
                                             type="date"
-                                            className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
+                                            className="field mt-1"
                                             value={paperForm.data.exam_date}
                                             onChange={(event) =>
                                                 paperForm.setData(
@@ -1009,12 +1025,12 @@ export default function ExamScheduleIndex() {
                                         />
                                     </label>
 
-                                    <label className="text-sm font-bold text-[#4c635c]">
+                                    <label className="text-on-surface-variant text-sm font-bold">
                                         {t('exams.time')}
                                         <span className="mt-1 flex gap-2">
                                             <input
                                                 type="time"
-                                                className="w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
+                                                className="field"
                                                 value={paperForm.data.starts_at}
                                                 onChange={(event) =>
                                                     paperForm.setData(
@@ -1026,7 +1042,7 @@ export default function ExamScheduleIndex() {
                                             />
                                             <input
                                                 type="time"
-                                                className="w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
+                                                className="field"
                                                 value={paperForm.data.ends_at}
                                                 onChange={(event) =>
                                                     paperForm.setData(
@@ -1039,10 +1055,10 @@ export default function ExamScheduleIndex() {
                                         </span>
                                     </label>
 
-                                    <label className="text-sm font-bold text-[#4c635c]">
+                                    <label className="text-on-surface-variant text-sm font-bold">
                                         {t('exams.room')}
                                         <input
-                                            className="mt-1 w-full rounded-lg border border-[#cfdcd5] p-2 font-normal"
+                                            className="field mt-1"
                                             value={paperForm.data.room}
                                             onChange={(event) =>
                                                 paperForm.setData(
@@ -1054,10 +1070,10 @@ export default function ExamScheduleIndex() {
                                     </label>
 
                                     <fieldset className="md:col-span-2">
-                                        <legend className="text-sm font-bold text-[#4c635c]">
+                                        <legend className="text-on-surface-variant text-sm font-bold">
                                             {t('exams.invigilators')}
                                         </legend>
-                                        <div className="mt-1 flex max-h-32 flex-wrap gap-2 overflow-auto rounded-lg border border-[#cfdcd5] p-2">
+                                        <div className="border-outline-variant mt-1 flex max-h-32 flex-wrap gap-2 overflow-auto rounded-lg border p-2">
                                             {teachers.map((teacher) => (
                                                 <label
                                                     key={teacher.id}
@@ -1093,7 +1109,7 @@ export default function ExamScheduleIndex() {
                                         </div>
                                     </fieldset>
 
-                                    <label className="flex items-center gap-2 text-sm font-bold text-[#4c635c] md:col-span-4">
+                                    <label className="text-on-surface-variant flex items-center gap-2 text-sm font-bold md:col-span-4">
                                         <input
                                             type="checkbox"
                                             checked={paperForm.data.bulk}
@@ -1108,12 +1124,12 @@ export default function ExamScheduleIndex() {
                                     </label>
 
                                     {paperForm.errors.section_id ? (
-                                        <p className="text-sm font-bold text-[#a5552e] md:col-span-4">
+                                        <p className="text-warning-foreground text-sm font-bold md:col-span-4">
                                             {paperForm.errors.section_id}
                                         </p>
                                     ) : null}
                                     {paperForm.errors.subject_id ? (
-                                        <p className="text-sm font-bold text-[#a5552e] md:col-span-4">
+                                        <p className="text-warning-foreground text-sm font-bold md:col-span-4">
                                             {paperForm.errors.subject_id}
                                         </p>
                                     ) : null}
@@ -1122,7 +1138,7 @@ export default function ExamScheduleIndex() {
                                         <button
                                             type="submit"
                                             disabled={paperForm.processing}
-                                            className="rounded-full bg-hero-bg px-6 py-2 font-black text-white disabled:opacity-60"
+                                            className="bg-hero-bg rounded-full px-6 py-2 font-semibold text-white disabled:opacity-60"
                                         >
                                             {t('exams.addPaper')}
                                         </button>
@@ -1133,17 +1149,17 @@ export default function ExamScheduleIndex() {
                         {/* Papers table (printable) */}
                         <section
                             aria-labelledby="papers-heading"
-                            className="rounded-[1.5rem] border border-border bg-card p-6"
+                            className="border-border bg-card rounded-[1.5rem] border p-6"
                         >
                             <h2
                                 id="papers-heading"
-                                className="text-lg font-black text-foreground"
+                                className="text-foreground text-lg font-semibold"
                             >
                                 {t('exams.papers')}
                             </h2>
 
                             {papers.length === 0 ? (
-                                <p className="mt-3 text-sm text-foreground">
+                                <p className="text-foreground mt-3 text-sm">
                                     {t('exams.noExams')}
                                 </p>
                             ) : (
@@ -1151,33 +1167,33 @@ export default function ExamScheduleIndex() {
                                     <table className="w-full border-collapse text-sm">
                                         <thead>
                                             <tr className="text-start">
-                                                <th className="border-b border-[#eef4f0] p-2 text-start">
+                                                <th className="border-outline-variant border-b p-2 text-start">
                                                     {t('exams.date')}
                                                 </th>
-                                                <th className="border-b border-[#eef4f0] p-2 text-start">
+                                                <th className="border-outline-variant border-b p-2 text-start">
                                                     {t('exams.time')}
                                                 </th>
-                                                <th className="border-b border-[#eef4f0] p-2 text-start">
+                                                <th className="border-outline-variant border-b p-2 text-start">
                                                     {t('exams.class')}
                                                 </th>
-                                                <th className="border-b border-[#eef4f0] p-2 text-start">
+                                                <th className="border-outline-variant border-b p-2 text-start">
                                                     {t('exams.subject')}
                                                 </th>
-                                                <th className="border-b border-[#eef4f0] p-2 text-start">
+                                                <th className="border-outline-variant border-b p-2 text-start">
                                                     {t('exams.room')}
                                                 </th>
-                                                <th className="border-b border-[#eef4f0] p-2 text-start">
+                                                <th className="border-outline-variant border-b p-2 text-start">
                                                     {t('exams.invigilators')}
                                                 </th>
-                                                <th className="border-b border-[#eef4f0] p-2 print:hidden" />
+                                                <th className="border-outline-variant border-b p-2 print:hidden" />
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {papers.map((paper) => (
                                                 <tr key={paper.id}>
-                                                    <td className="border-b border-[#f4f8f5] p-2 font-bold">
+                                                    <td className="border-outline-variant border-b p-2 font-bold">
                                                         {paper.exam_date}
-                                                        <span className="block text-xs font-normal text-foreground">
+                                                        <span className="text-foreground block text-xs font-normal">
                                                             {dayName(
                                                                 new Date(
                                                                     `${paper.exam_date}T00:00:00Z`,
@@ -1185,15 +1201,17 @@ export default function ExamScheduleIndex() {
                                                             )}
                                                         </span>
                                                     </td>
-                                                    <td className="border-b border-[#f4f8f5] p-2">
-                                                        {paper.starts_at}–
-                                                        {paper.ends_at}
+                                                    <td className="border-outline-variant border-b p-2">
+                                                        <span dir="ltr">
+                                                            {paper.starts_at}–
+                                                            {paper.ends_at}
+                                                        </span>
                                                     </td>
-                                                    <td className="border-b border-[#f4f8f5] p-2">
+                                                    <td className="border-outline-variant border-b p-2">
                                                         {paper.class_name} ·{' '}
                                                         {paper.section_name}
                                                     </td>
-                                                    <td className="border-b border-[#f4f8f5] p-2">
+                                                    <td className="border-outline-variant border-b p-2">
                                                         <span className="flex items-center gap-2">
                                                             {paper.subject_color ? (
                                                                 <span
@@ -1208,10 +1226,10 @@ export default function ExamScheduleIndex() {
                                                             {subjectName(paper)}
                                                         </span>
                                                     </td>
-                                                    <td className="border-b border-[#f4f8f5] p-2">
+                                                    <td className="border-outline-variant border-b p-2">
                                                         {paper.room ?? '—'}
                                                     </td>
-                                                    <td className="border-b border-[#f4f8f5] p-2">
+                                                    <td className="border-outline-variant border-b p-2">
                                                         <div className="flex flex-wrap gap-1">
                                                             {teachers.map(
                                                                 (teacher) => {
@@ -1244,8 +1262,8 @@ export default function ExamScheduleIndex() {
                                                                             }
                                                                             className={`rounded-full px-2 py-1 text-xs font-bold ${
                                                                                 assigned
-                                                                                    ? 'bg-[#0d5c4d] text-white'
-                                                                                    : 'bg-[#eef4f0] text-[#4c635c]'
+                                                                                    ? 'bg-primary text-primary-foreground'
+                                                                                    : 'bg-surface-container-low text-on-surface-variant'
                                                                             }`}
                                                                         >
                                                                             {
@@ -1257,7 +1275,7 @@ export default function ExamScheduleIndex() {
                                                             )}
                                                         </div>
                                                     </td>
-                                                    <td className="border-b border-[#f4f8f5] p-2 print:hidden">
+                                                    <td className="border-outline-variant border-b p-2 print:hidden">
                                                         {can.manage &&
                                                         selectedSchedule.status ===
                                                             'draft' ? (
@@ -1271,7 +1289,7 @@ export default function ExamScheduleIndex() {
                                                                 aria-label={t(
                                                                     'actions.delete',
                                                                 )}
-                                                                className="text-[#a5552e]"
+                                                                className="text-warning-foreground"
                                                             >
                                                                 <Trash2
                                                                     size={16}
@@ -1287,7 +1305,7 @@ export default function ExamScheduleIndex() {
                                 </div>
                             )}
 
-                            <p className="mt-4 hidden text-xs text-foreground print:block">
+                            <p className="text-foreground mt-4 hidden text-xs print:block">
                                 {school.name} ·{' '}
                                 {scheduleLabels(selectedSchedule)} · {locale}
                             </p>

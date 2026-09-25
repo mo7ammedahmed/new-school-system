@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\Tenantable;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $student_number
  * @property string $first_name
  * @property string $last_name
+ * @property string $full_name
  * @property CarbonImmutable|null $date_of_birth
  * @property string $status
  * @property CarbonImmutable|null $created_at
@@ -27,6 +29,19 @@ class Student extends Model
     use Tenantable;
 
     protected $fillable = ['organization_id', 'school_id', 'user_id', 'student_number', 'first_name', 'last_name', 'date_of_birth', 'status'];
+
+    /**
+     * The student's display name. One owner, so controllers stop re-deriving it
+     * (and stop crashing when a relation is missing).
+     *
+     * @return Attribute<string, string>
+     */
+    public function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => trim($this->first_name.' '.$this->last_name),
+        );
+    }
 
     protected $casts = ['date_of_birth' => 'date'];
 

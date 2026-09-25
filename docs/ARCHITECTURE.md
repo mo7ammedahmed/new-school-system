@@ -1,4 +1,4 @@
-# Architecture baseline
+﻿# Architecture baseline
 
 ## Technology direction
 
@@ -8,16 +8,16 @@ The project begins as a modular monolith. A single deployable application owns t
 
 ## System shape
 
-```text
+`	ext
 Public school site ─────┐
 Internal staff dashboard ├── Inertia web application ── Laravel modules ── MySQL
 Parent responsive portal ┘              │                     │
-                                        │                     ├── Queue workers
-                                        │                     ├── Stripe adapter
-                                        │                     ├── Notification adapters
-                                        │                     └── Future REST integrations
-                                        └── Arabic/English and RTL/LTR presentation
-```
+                                         │                     ├── Queue workers
+                                         │                     ├── Stripe adapter
+                                         │                     ├── Notification adapters
+                                         │                     └── Future REST integrations
+                                         └── Arabic/English and RTL/LTR presentation
+`
 
 The public site, staff dashboard, and parent portal may use distinct route groups and layout shells, but they share tenant resolution, localization, authorization, audit, and design foundations.
 
@@ -37,25 +37,25 @@ The public site, staff dashboard, and parent portal may use distinct route group
 | Reporting           | Produce scoped operational and financial views or exports.                                 | Query composition, access checks, pagination, export jobs, and retention controls.                                                                           |
 | Scheduling          | Place lessons and exams in time and expose the resulting calendar.                         | Subjects, teaching assignments, bell schedules, timetable placement rules, exam periods and papers, conflict policy, and the page payloads that render them. |
 
-`PaymentProvider` is the initial provider seam. Billing requests a provider-neutral payment operation and receives a normalized result; Stripe is the first adapter. Additional gateways are added as adapters only when a real second provider is approved.
+PaymentProvider is the initial provider seam. Billing requests a provider-neutral payment operation and receives a normalized result; Stripe is the first adapter. Additional gateways are added as adapters only when a real second provider is approved.
 
 ### Scheduling module structure
 
-The schedule code lives in one module, `app/Services/Schedule/`, with each piece owning exactly one concern:
+The schedule code lives in one module, pp/Services/Schedule/, with each piece owning exactly one concern:
 
-| Owner                                         | Owns                                                                                                                                                                  |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TimetableEngine`                             | Timetable placement rules: what may be scheduled where, plus publish/archive.                                                                                         |
-| `ExamConflictDetector`                        | Exam conflict policy: what is a blocking error, what only warns, and how a stored paper becomes its input (`inputFor`). Returns machine codes, never display strings. |
-| `ExamCalendarPayload`                         | The props the exam calendar page consumes, for both the no-period and selected-period states.                                                                         |
-| `TimetableEditorPayload`                      | The props the timetable editor consumes, including the version and entry serializers.                                                                                 |
-| `SchoolOptions`                               | The school-scoped option lists the schedule screens pick from.                                                                                                        |
-| `App\Http\Responses\ScheduleConflictResponse` | How conflict codes reach a client: a JSON `422` body or an Inertia flash.                                                                                             |
-| `App\Concerns\ResolvesScheduleSchool`         | Loading a school, authorizing the ability, and refusing a model from another school.                                                                                  |
+| Owner                                       | Owns                                                                                                                                                                |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TimetableEngine                             | Timetable placement rules: what may be scheduled where, plus publish/archive.                                                                                       |
+| ExamConflictDetector                        | Exam conflict policy: what is a blocking error, what only warns, and how a stored paper becomes its input (inputFor). Returns machine codes, never display strings. |
+| ExamCalendarPayload                         | The props the exam calendar page consumes, for both the no-period and selected-period states.                                                                       |
+| TimetableEditorPayload                      | The props the timetable editor consumes, including the version and entry serializers.                                                                               |
+| SchoolOptions                               | The school-scoped option lists the schedule screens pick from.                                                                                                      |
+| App\Http\Responses\ScheduleConflictResponse | How conflict codes reach a client: a JSON 422 body or an Inertia flash.                                                                                             |
+| App\Concerns\ResolvesScheduleSchool         | Loading a school, authorizing the ability, and refusing a model from another school.                                                                                |
 
-Data flows one way: a controller resolves and authorizes the school, asks a payload builder for the page's props, and renders; mutations validate through a `FormRequest`, ask the engine or detector for a domain verdict, then write and audit. Controllers hold no page shapes, no query composition for views, and no conflict-severity knowledge.
+Data flows one way: a controller resolves and authorizes the school, asks a payload builder for the page's props, and renders; mutations validate through a FormRequest, ask the engine or detector for a domain verdict, then write and audit. Controllers hold no page shapes, no query composition for views, and no conflict-severity knowledge.
 
-Visibility policy for published schedules is owned by model scopes (`ExamSchedule::published()`, `ExamPaper::inPublishedPeriod()`, `TimetableVersion::published()`), not by each query that happens to need it.
+Visibility policy for published schedules is owned by model scopes (ExamSchedule::published(), ExamPaper::inPublishedPeriod(), TimetableVersion::published()), not by each query that happens to need it.
 
 ## Tenant isolation model
 
@@ -81,7 +81,8 @@ All editable CMS fields that are visible to the public store Arabic and English 
 ## Integration and security rules
 
 - The first external payment adapter is Stripe. Provider webhooks are signature-verified, tenant-resolved safely, idempotent, and processed through controlled jobs.
-- REST endpoints are introduced for genuine third-party or future mobile clients. Inertia page actions remain internal application interfaces and are not treated as a public integration contract.
+- REST endpoints are **planned for future** introduction for genuine third-party or future mobile clients;
+  outes/api.php does not currently exist. Inertia page actions remain internal application interfaces and are not treated as a public integration contract.
 - Authentication, session protections, rate limiting, authorization policies, secure media access, encrypted secrets, and audit records are mandatory baseline controls.
 - Sensitive exports, finance actions, and grade publication require explicit authorization and leave an audit trail.
 - Backups, restore testing, monitoring, alerting, data residency, retention, and disaster recovery are operational requirements that need concrete targets before production launch.
